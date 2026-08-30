@@ -123,11 +123,26 @@
     "author": "EliverLara",
     "source_url": "https://github.com/EliverLara/Space",
     "license": "GPL-3.0",
-    "install_type": "script",
-    "source": { "type": "git", "repo": "https://github.com/EliverLara/Space.git" },
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/EliverLara/Space/archive/refs/heads/dark.zip",
+      "variant_urls": {
+        "dark": "https://github.com/EliverLara/Space/archive/refs/heads/dark.zip",
+        "light": "https://github.com/EliverLara/Space/archive/refs/heads/master.zip",
+        "transparent-sidebar": "https://github.com/EliverLara/Space/archive/refs/heads/transparent-sidebar.zip"
+      }
+    },
+    "variants": {
+      "mode": [
+        "dark",
+        "light",
+        "transparent-sidebar"
+      ]
+    },
     "target_dir": "~/.themes",
     "gtk4_fix": false,
     "gdm_eligible": true,
-    "notes": "Minimalist dark theme for GNOME Shell top panel, quick settings menu, and search overlays."
+    "notes": "Minimalist theme for GNOME Shell top panel with dark, light, and transparent sidebar options."
   }
 ]

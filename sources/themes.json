@@ -123,11 +123,26 @@
     "author": "EliverLara",
     "source_url": "https://github.com/EliverLara/Space",
     "license": "GPL-3.0",
-    "install_type": "script",
-    "source": { "type": "git", "repo": "https://github.com/EliverLara/Space.git" },
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/EliverLara/Space/archive/refs/heads/dark.zip",
+      "variant_urls": {
+        "dark": "https://github.com/EliverLara/Space/archive/refs/heads/dark.zip",
+        "light": "https://github.com/EliverLara/Space/archive/refs/heads/master.zip",
+        "transparent-sidebar": "https://github.com/EliverLara/Space/archive/refs/heads/transparent-sidebar.zip"
+      }
+    },
+    "variants": {
+      "mode": [
+        "dark",
+        "light",
+        "transparent-sidebar"
+      ]
+    },
     "target_dir": "~/.themes",
     "gtk4_fix": true,
     "gdm_eligible": true,
-    "notes": "Minimal, clean dark aesthetic theme for GTK 2/3/4 and GNOME Shell with rounded UI elements."
+    "notes": "Minimal, clean dark aesthetic theme with dark, light, and transparent sidebar variants."
   }
 ]
