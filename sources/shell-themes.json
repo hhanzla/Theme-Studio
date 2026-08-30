@@ -52,6 +52,34 @@
     "notes": "Transforms GNOME Shell into a modern macOS Big Sur & Monterey style desktop with transparent glass panel and docks."
   },
   {
+    "id": "dracula-shell",
+    "name": "Dracula Shell",
+    "category": "shell-theme",
+    "thumbnail": "assets/previews/dracula.png",
+    "author": "Dracula Theme",
+    "source_url": "https://github.com/dracula/gtk",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula-shell-v40.tar.xz",
+      "variant_urls": {
+        "standard": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula-shell-v40.tar.xz",
+        "pink": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula-shell-pink-accent-v40.tar.xz"
+      }
+    },
+    "variants": {
+      "accent": [
+        "standard",
+        "pink"
+      ]
+    },
+    "target_dir": "~/.themes",
+    "gtk4_fix": false,
+    "gdm_eligible": true,
+    "notes": "Official Dracula theme for GNOME Shell top panel and system menus."
+  },
+  {
     "id": "sweet-shell",
     "name": "Sweet Shell",
     "category": "shell-theme",

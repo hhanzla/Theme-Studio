@@ -52,6 +52,34 @@
     "notes": "MacOS Big Sur and Monterey style theme for GTK 2/3/4 and GNOME Shell with rich customization."
   },
   {
+    "id": "dracula-gtk",
+    "name": "Dracula",
+    "category": "gtk-theme",
+    "thumbnail": "assets/previews/dracula.png",
+    "author": "Dracula Theme",
+    "source_url": "https://github.com/dracula/gtk",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula.tar.xz",
+      "variant_urls": {
+        "standard": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula.tar.xz",
+        "pink": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula-pink-accent.tar.xz"
+      }
+    },
+    "variants": {
+      "accent": [
+        "standard",
+        "pink"
+      ]
+    },
+    "target_dir": "~/.themes",
+    "gtk4_fix": true,
+    "gdm_eligible": true,
+    "notes": "The official Dracula dark theme for GTK 2/3/4 and Libadwaita with iconic purple and pink neon accents."
+  },
+  {
     "id": "sweet-theme",
     "name": "Sweet",
     "category": "gtk-theme",

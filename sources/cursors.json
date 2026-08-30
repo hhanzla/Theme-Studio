@@ -35,5 +35,21 @@
     },
     "target_dir": "~/.icons",
     "notes": "Crisp, modern, and material-designed open-source cursor set with rounded and sharp variations across classic, ice, and amber palettes."
+  },
+  {
+    "id": "dracula-cursors",
+    "name": "Dracula Cursors",
+    "category": "cursor-theme",
+    "thumbnail": "assets/previews/dracula.png",
+    "author": "Dracula Theme",
+    "source_url": "https://github.com/dracula/gtk",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula-cursors.tar.xz"
+    },
+    "target_dir": "~/.icons",
+    "notes": "Official dark purple and cyan neon styled Dracula cursor set."
   }
 ]
