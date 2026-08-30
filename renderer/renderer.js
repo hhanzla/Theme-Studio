@@ -53,24 +53,8 @@ const tabInstalledBtn = document.getElementById('tab-installed');
 const tabBrowseBtn = document.getElementById('tab-browse');
 const toastContainerEl = document.getElementById('toast-container');
 
-// Toast Notification
-function showToast(message, type = 'info', duration = 3000) {
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  toastContainerEl.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(8px)';
-    toast.style.transition = 'all 0.2s ease';
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 200);
-  }, duration);
-}
+// showToast — delegates to Toast component (components/toast.js)
+// The global shim in toast.js keeps this name working everywhere.
 
 function restoreDefaultSubtabs() {
   const subtabsBar = document.querySelector('.subtabs-bar');
@@ -216,23 +200,38 @@ function updateView() {
 
   if (displayItems.length === 0) {
     emptyStateEl.classList.remove('hidden');
-    if (AppState.activeSubtab === 'installed') {
-      emptyTitleEl.textContent = 'No Installed Items';
-      emptyDescEl.textContent = query
-        ? `No installed items match "${query}".`
-        : 'You have not installed any items in this category yet.';
-    } else {
-      emptyTitleEl.textContent = 'No Items Found';
-      emptyDescEl.textContent = query
-        ? `No catalog items match "${query}".`
-        : 'There are no items currently available in this catalog.';
-    }
+
+    // Delegate empty text to the active view if available
+    const viewMap = {
+      'gtk-theme': window.ThemesView,
+      'shell-theme': null,
+      'icon-theme': window.IconsView,
+      'cursor-theme': window.CursorsView,
+      'wallpaper': window.WallpapersView,
+      'looks': window.LooksView
+    };
+    const activeView = viewMap[AppState.activeCategory];
+    const emptyText = activeView && typeof activeView.getEmptyText === 'function'
+      ? activeView.getEmptyText(AppState.activeSubtab, query)
+      : null;
+
+    emptyTitleEl.textContent = emptyText ? emptyText.title
+      : (AppState.activeSubtab === 'installed' ? 'No Installed Items' : 'No Items Found');
+    emptyDescEl.textContent = emptyText ? emptyText.desc
+      : (AppState.activeSubtab === 'installed'
+        ? (query ? `No installed items match "${query}".` : 'You have not installed any items in this category yet.')
+        : (query ? `No catalog items match "${query}".` : 'There are no items currently available in this catalog.'));
   } else {
     emptyStateEl.classList.add('hidden');
     displayItems.forEach((item) => {
       const card = window.ThemeCard.create(item, handleCardAction);
       cardsGridEl.appendChild(card);
     });
+
+    // Looks category: render info banner above grid
+    if (AppState.activeCategory === 'looks' && window.LooksView && typeof window.LooksView.renderBanner === 'function') {
+      window.LooksView.renderBanner(cardsGridEl);
+    }
 
     // Check active desktop settings to highlight currently active items (themes, icons, cursors, wallpaper)
     if (window.electronAPI && window.electronAPI.system && window.electronAPI.system.current) {

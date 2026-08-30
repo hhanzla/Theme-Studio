@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, nativeImage } = require('electron');
 const path = require('path');
 const { registerCatalogIpc } = require('./ipc/catalog.ipc');
 const { registerInstallerIpc } = require('./ipc/installer.ipc');
@@ -10,6 +10,9 @@ const { registerSettingsIpc } = require('./ipc/settings.ipc');
 let mainWindow = null;
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '../build/icon.png');
+  const appIcon = nativeImage.createFromPath(iconPath);
+
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 620,
@@ -19,7 +22,7 @@ function createWindow() {
     show: false,
     backgroundColor: '#ffffff',
     title: 'Theme Studio',
-    icon: path.join(__dirname, '../build/icon.png'),
+    icon: appIcon,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -48,6 +51,13 @@ app.setName('Theme Studio');
 app.setAppUserModelId('themestudio.desktop');
 
 app.whenReady().then(() => {
+  // Set taskbar / dock icon explicitly
+  const iconPath = path.join(__dirname, '../build/icon.png');
+  const appIcon = nativeImage.createFromPath(iconPath);
+  if (process.platform === 'linux' && app.setIcon) {
+    try { app.setIcon(appIcon); } catch (_) {}
+  }
+
   // Register IPC handlers
   registerCatalogIpc();
   registerInstallerIpc();
