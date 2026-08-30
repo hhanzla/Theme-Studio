@@ -400,7 +400,7 @@ window.ApplyVariantPicker = {
   }
 };
 
-// Look Variant Picker Component - Lets user configure variants for bundled Look components before applying
+// Look Variant Picker Component - Premium Custom Dropdowns and Grouped Styling
 window.LookVariantPicker = {
   open(item, onConfirm) {
     this.close();
@@ -409,165 +409,285 @@ window.LookVariantPicker = {
     overlay.className = 'modal-overlay';
     overlay.id = 'look-variant-picker-modal';
 
+    const COLOR_HEX_MAP = {
+      default: '#3b82f6',
+      purple: '#a855f7',
+      nord: '#88c0d0',
+      teal: '#14b8a6',
+      pink: '#ec4899',
+      red: '#ef4444',
+      orange: '#f97316',
+      yellow: '#eab308',
+      green: '#22c55e',
+      grey: '#71717a',
+      dracula: '#bd93f9',
+      standard: '#3b82f6',
+      black: '#18181b',
+      blue: '#2563eb',
+      ubuntu: '#e95420',
+      manjaro: '#35bf5c',
+      brown: '#78350f',
+      ice: '#f8fafc',
+      classic: '#18181b',
+      amber: '#f59e0b'
+    };
+
+    const renderCustomSelect = (fieldId, defaultVal, options) => {
+      const optionsHtml = options.map((opt, idx) => {
+        const isSelected = opt.value === defaultVal;
+        const colorDot = COLOR_HEX_MAP[opt.value] 
+          ? `<span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:${COLOR_HEX_MAP[opt.value]}; border:1px solid rgba(0,0,0,0.15); margin-right:6px; flex-shrink:0;"></span>` 
+          : '';
+        return `
+          <div class="custom-select-option ${isSelected ? 'selected' : ''}" data-value="${opt.value}" data-label="${opt.label}">
+            <div style="display:flex; align-items:center;">
+              ${colorDot}
+              <span>${opt.label}</span>
+            </div>
+            ${isSelected ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+          </div>
+        `;
+      }).join('');
+
+      const defaultObj = options.find(o => o.value === defaultVal) || options[0];
+      const defaultDot = COLOR_HEX_MAP[defaultObj.value] 
+        ? `<span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:${COLOR_HEX_MAP[defaultObj.value]}; border:1px solid rgba(0,0,0,0.15); margin-right:6px; flex-shrink:0;"></span>` 
+        : '';
+
+      return `
+        <div class="custom-select look-custom-select" id="${fieldId}" data-value="${defaultObj.value}">
+          <button type="button" class="custom-select-trigger">
+            <div style="display:flex; align-items:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              ${defaultDot}
+              <span class="custom-select-label">${defaultObj.label}</span>
+            </div>
+            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="custom-select-menu">
+            ${optionsHtml}
+          </div>
+        </div>
+      `;
+    };
+
+    // Options definitions
+    const orchisColorOptions = [
+      { value: 'default', label: 'Default (Blue)' },
+      { value: 'purple', label: 'Purple' },
+      { value: 'nord', label: 'Nord Ice' },
+      { value: 'teal', label: 'Teal Green' },
+      { value: 'pink', label: 'Pink' },
+      { value: 'red', label: 'Red' },
+      { value: 'orange', label: 'Orange' },
+      { value: 'yellow', label: 'Yellow' },
+      { value: 'green', label: 'Green' },
+      { value: 'grey', label: 'Grey' }
+    ];
+
+    const orchisModeOptions = [
+      { value: 'dark', label: 'Dark Mode' },
+      { value: 'light', label: 'Light Mode' },
+      { value: 'standard', label: 'Standard' }
+    ];
+
+    const orchisSizeOptions = [
+      { value: 'compact', label: 'Compact' },
+      { value: 'standard', label: 'Standard' }
+    ];
+
+    const telaColorOptions = [
+      { value: 'dracula', label: 'Dracula (Purple)' },
+      { value: 'nord', label: 'Nord (Ice)' },
+      { value: 'standard', label: 'Standard (Blue)' },
+      { value: 'black', label: 'Black' },
+      { value: 'blue', label: 'Blue' },
+      { value: 'green', label: 'Green' },
+      { value: 'grey', label: 'Grey' },
+      { value: 'orange', label: 'Orange' },
+      { value: 'pink', label: 'Pink' },
+      { value: 'purple', label: 'Purple' },
+      { value: 'red', label: 'Red' },
+      { value: 'ubuntu', label: 'Ubuntu (Orange)' },
+      { value: 'manjaro', label: 'Manjaro (Teal)' },
+      { value: 'yellow', label: 'Yellow' },
+      { value: 'brown', label: 'Brown' }
+    ];
+
+    const bibataStyleOptions = [
+      { value: 'modern', label: 'Modern (Rounded)' },
+      { value: 'original', label: 'Original (Sharp)' }
+    ];
+
+    const bibataColorOptions = [
+      { value: 'ice', label: 'Ice (White)' },
+      { value: 'classic', label: 'Classic (Black)' },
+      { value: 'amber', label: 'Amber (Gold)' }
+    ];
+
     overlay.innerHTML = `
-      <div class="modal-dialog" style="max-width: 580px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-dialog" style="max-width: 540px; width: 100%;">
         <div class="modal-header">
           <div>
             <h3 class="modal-title">${item.name}</h3>
-            <p class="modal-subtitle">Select variants for each bundled theme before applying</p>
+            <p class="modal-subtitle">Choose components and styling variants before applying preset</p>
           </div>
-          <button class="modal-close" id="look-variant-close" title="Close">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
+          <button class="modal-close-btn" id="look-variant-close" title="Close">×</button>
         </div>
 
-        <div class="modal-body" style="overflow-y: auto; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div class="modal-body" style="padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; overflow: visible;">
           <!-- Section 1: Orchis GTK & Shell -->
-          <div class="look-component-section" style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-              <span style="display: inline-flex; padding: 4px; border-radius: 4px; background: rgba(207, 65, 16, 0.1); color: #cf4110;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <div style="background: #fbfbfc; border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 12px 14px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <span style="display: inline-flex; padding: 3px; border-radius: 4px; background: rgba(207, 65, 16, 0.1); color: #cf4110;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                   <rect width="18" height="18" x="3" y="3" rx="2"></rect>
                   <path d="M3 9h18"></path>
                   <path d="M9 21V9"></path>
                 </svg>
               </span>
-              <strong style="font-size: 13.5px;">1. Orchis Theme (GTK & Shell)</strong>
+              <strong style="font-size: 12.5px; color: var(--text-primary);">1. Orchis Theme (GTK & Shell)</strong>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-              <div>
-                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Theme Color</label>
-                <select id="look-orchis-color" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
-                  <option value="default" selected>Default (Blue)</option>
-                  <option value="purple">Purple</option>
-                  <option value="nord">Nord</option>
-                  <option value="teal">Teal</option>
-                  <option value="pink">Pink</option>
-                  <option value="red">Red</option>
-                  <option value="orange">Orange</option>
-                  <option value="yellow">Yellow</option>
-                  <option value="green">Green</option>
-                  <option value="grey">Grey</option>
-                </select>
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px;">
+              <div class="form-group">
+                <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Color Accent</label>
+                ${renderCustomSelect('look-orchis-color', 'default', orchisColorOptions)}
               </div>
 
-              <div>
-                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Mode</label>
-                <select id="look-orchis-mode" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
-                  <option value="dark" selected>Dark</option>
-                  <option value="light">Light</option>
-                  <option value="standard">Standard</option>
-                </select>
+              <div class="form-group">
+                <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Mode</label>
+                ${renderCustomSelect('look-orchis-mode', 'dark', orchisModeOptions)}
               </div>
 
-              <div>
-                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Size</label>
-                <select id="look-orchis-size" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
-                  <option value="compact" selected>Compact</option>
-                  <option value="standard">Standard</option>
-                </select>
+              <div class="form-group">
+                <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Size</label>
+                ${renderCustomSelect('look-orchis-size', 'compact', orchisSizeOptions)}
               </div>
             </div>
           </div>
 
           <!-- Section 2: Tela Icon Theme -->
-          <div class="look-component-section" style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-              <span style="display: inline-flex; padding: 4px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: #2563eb;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <div style="background: #fbfbfc; border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 12px 14px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <span style="display: inline-flex; padding: 3px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: #2563eb;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                   <rect width="7" height="7" x="3" y="3" rx="1"></rect>
                   <rect width="7" height="7" x="14" y="3" rx="1"></rect>
                   <rect width="7" height="7" x="14" y="14" rx="1"></rect>
                   <rect width="7" height="7" x="3" y="14" rx="1"></rect>
                 </svg>
               </span>
-              <strong style="font-size: 13.5px;">2. Tela Icon Theme</strong>
+              <strong style="font-size: 12.5px; color: var(--text-primary);">2. Tela Icon Theme</strong>
             </div>
 
-            <div>
-              <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Folder Color Scheme</label>
-              <select id="look-tela-color" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
-                <option value="dracula" selected>Dracula</option>
-                <option value="nord">Nord</option>
-                <option value="standard">Standard Blue</option>
-                <option value="black">Black</option>
-                <option value="blue">Blue</option>
-                <option value="green">Green</option>
-                <option value="grey">Grey</option>
-                <option value="orange">Orange</option>
-                <option value="pink">Pink</option>
-                <option value="purple">Purple</option>
-                <option value="red">Red</option>
-                <option value="ubuntu">Ubuntu</option>
-                <option value="manjaro">Manjaro</option>
-                <option value="yellow">Yellow</option>
-                <option value="brown">Brown</option>
-              </select>
+            <div class="form-group">
+              <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Folder Color Scheme</label>
+              ${renderCustomSelect('look-tela-color', 'dracula', telaColorOptions)}
             </div>
           </div>
 
           <!-- Section 3: Bibata Modern Cursor -->
-          <div class="look-component-section" style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-              <span style="display: inline-flex; padding: 4px; border-radius: 4px; background: rgba(16, 185, 129, 0.1); color: #059669;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <div style="background: #fbfbfc; border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 12px 14px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <span style="display: inline-flex; padding: 3px; border-radius: 4px; background: rgba(16, 185, 129, 0.1); color: #059669;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path>
                   <path d="m13 13 6 6"></path>
                 </svg>
               </span>
-              <strong style="font-size: 13.5px;">3. Bibata Cursor</strong>
+              <strong style="font-size: 12.5px; color: var(--text-primary);">3. Bibata Cursor</strong>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <div>
-                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Style</label>
-                <select id="look-bibata-style" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
-                  <option value="modern" selected>Modern (Rounded)</option>
-                  <option value="original">Original (Sharp)</option>
-                </select>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div class="form-group">
+                <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Style</label>
+                ${renderCustomSelect('look-bibata-style', 'modern', bibataStyleOptions)}
               </div>
 
-              <div>
-                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Color</label>
-                <select id="look-bibata-color" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
-                  <option value="ice" selected>Ice (White)</option>
-                  <option value="classic">Classic (Black)</option>
-                  <option value="amber">Amber (Gold)</option>
-                </select>
+              <div class="form-group">
+                <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Color</label>
+                ${renderCustomSelect('look-bibata-color', 'ice', bibataColorOptions)}
               </div>
             </div>
           </div>
         </div>
 
-        <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: flex-end; gap: 8px;">
-          <button class="btn btn-secondary" id="look-variant-cancel">Cancel</button>
-          <button class="btn btn-primary" id="look-variant-confirm" style="background: #cf4110; border-color: #cf4110; color: #ffffff;">
-            Install & Apply Full Look
-          </button>
+        <div class="modal-footer">
+          <button class="btn-cancel" id="look-variant-cancel">Cancel</button>
+          <button class="btn-install" id="look-variant-confirm">Install & Apply Full Look</button>
         </div>
       </div>
     `;
 
     document.body.appendChild(overlay);
 
+    // Setup interactive custom dropdown listeners
+    overlay.querySelectorAll('.look-custom-select').forEach((selectEl) => {
+      const trigger = selectEl.querySelector('.custom-select-trigger');
+      const labelSpan = selectEl.querySelector('.custom-select-label');
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Close other open dropdowns
+        overlay.querySelectorAll('.look-custom-select').forEach(s => {
+          if (s !== selectEl) s.classList.remove('is-open');
+        });
+        selectEl.classList.toggle('is-open');
+      });
+
+      selectEl.querySelectorAll('.custom-select-option').forEach((optEl) => {
+        optEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const val = optEl.getAttribute('data-value');
+          const labelText = optEl.getAttribute('data-label');
+
+          selectEl.setAttribute('data-value', val);
+          labelSpan.textContent = labelText;
+
+          // Update color dot in trigger if exists
+          const triggerDot = trigger.querySelector('span[style*="border-radius:50%"]');
+          if (triggerDot && COLOR_HEX_MAP[val]) {
+            triggerDot.style.background = COLOR_HEX_MAP[val];
+          }
+
+          selectEl.querySelectorAll('.custom-select-option').forEach(o => {
+            o.classList.remove('selected');
+            const chk = o.querySelector('svg');
+            if (chk) chk.remove();
+          });
+
+          optEl.classList.add('selected');
+          optEl.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+
+          selectEl.classList.remove('is-open');
+        });
+      });
+    });
+
+    // Close on backdrop click or anywhere outside open menus
     const close = () => this.close();
     overlay.querySelector('#look-variant-close').addEventListener('click', close);
     overlay.querySelector('#look-variant-cancel').addEventListener('click', close);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        close();
+      } else {
+        overlay.querySelectorAll('.look-custom-select').forEach(s => s.classList.remove('is-open'));
+      }
+    });
 
+    // Confirm button
     overlay.querySelector('#look-variant-confirm').addEventListener('click', () => {
-      const orchisColor = overlay.querySelector('#look-orchis-color').value;
-      const orchisMode = overlay.querySelector('#look-orchis-mode').value;
-      const orchisSize = overlay.querySelector('#look-orchis-size').value;
+      const orchisColor = overlay.querySelector('#look-orchis-color')?.getAttribute('data-value') || 'default';
+      const orchisMode = overlay.querySelector('#look-orchis-mode')?.getAttribute('data-value') || 'dark';
+      const orchisSize = overlay.querySelector('#look-orchis-size')?.getAttribute('data-value') || 'compact';
 
-      const telaColor = overlay.querySelector('#look-tela-color').value;
+      const telaColor = overlay.querySelector('#look-tela-color')?.getAttribute('data-value') || 'dracula';
 
-      const bibataStyle = overlay.querySelector('#look-bibata-style').value;
-      const bibataColor = overlay.querySelector('#look-bibata-color').value;
+      const bibataStyle = overlay.querySelector('#look-bibata-style')?.getAttribute('data-value') || 'modern';
+      const bibataColor = overlay.querySelector('#look-bibata-color')?.getAttribute('data-value') || 'ice';
 
       const chosenVariants = {
         theme: {
