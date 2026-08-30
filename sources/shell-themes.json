@@ -86,5 +86,20 @@
     "gtk4_fix": false,
     "gdm_eligible": true,
     "notes": "Neon glow themed GNOME Shell top bar and system overlays."
+  },
+  {
+    "id": "space-shell",
+    "name": "Space Shell",
+    "category": "shell-theme",
+    "thumbnail": "assets/previews/space.png",
+    "author": "EliverLara",
+    "source_url": "https://github.com/EliverLara/Space",
+    "license": "GPL-3.0",
+    "install_type": "script",
+    "source": { "type": "git", "repo": "https://github.com/EliverLara/Space.git" },
+    "target_dir": "~/.themes",
+    "gtk4_fix": false,
+    "gdm_eligible": true,
+    "notes": "Minimalist dark theme for GNOME Shell top panel, quick settings menu, and search overlays."
   }
 ]
