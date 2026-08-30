@@ -684,6 +684,12 @@ function initEvents() {
           const res = await window.electronAPI.system.resetDefault();
           if (res && res.success) {
             showToast('Desktop appearance reset to Ubuntu default (Yaru)', 'success');
+            document.querySelectorAll('.theme-card').forEach(c => {
+              if (window.ThemeCard) window.ThemeCard.setApplied(c, false);
+            });
+            if (typeof window.refreshAppState === 'function') {
+              window.refreshAppState();
+            }
           } else {
             showToast(`Reset failed: ${res ? res.error : 'Unknown error'}`, 'warning');
           }
