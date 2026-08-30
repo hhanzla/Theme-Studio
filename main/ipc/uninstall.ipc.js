@@ -36,25 +36,51 @@ function formatBytes(bytes) {
 function registerUninstallIpc() {
   ipcMain.handle('uninstall:list', async () => {
     try {
-      const items = stateStore.getInstalledItems();
-      let allCatalog = [];
-      try {
-        allCatalog = catalog.listCatalog('all') || [];
-      } catch (_) {}
+      const stateItems = stateStore.getInstalledItems();
+      const stateMap = new Map();
+      for (const it of stateItems) {
+        stateMap.set(it.id, it);
+      }
 
-      const enriched = items.map(inst => {
+      // 1. Scan live catalog items with disk & state detection
+      const allCatalog = catalog.listCatalog('all') || [];
+      const installedCatalogItems = allCatalog.filter(c => c.installed);
+
+      for (const catItem of installedCatalogItems) {
+        if (!stateMap.has(catItem.id)) {
+          const info = catItem.installedInfo || {
+            id: catItem.id,
+            name: catItem.name,
+            category: catItem.category,
+            installed_folders: [],
+            primary_path: null
+          };
+          stateMap.set(catItem.id, {
+            ...info,
+            thumbnail: catItem.thumbnail,
+            author: catItem.author,
+            install_type: catItem.install_type
+          });
+        }
+      }
+
+      // 2. Enrich items with thumbnails, authors, and install types
+      const finalItems = Array.from(stateMap.values()).map(inst => {
         const baseId = (inst.id || '').replace(/-shell$/, '');
         const catMatch = allCatalog.find(c => c.id === inst.id || c.id === baseId || c.id.replace(/-shell$/, '') === baseId);
-        
         const thumbnail = inst.thumbnail || (catMatch ? catMatch.thumbnail : null) || `assets/previews/${baseId}.png`;
+        const installType = inst.install_type || (catMatch ? catMatch.install_type : 'script');
+        const author = inst.author || (catMatch ? catMatch.author : 'Unknown');
 
         return {
           ...inst,
-          thumbnail
+          thumbnail,
+          install_type: installType,
+          author
         };
       });
 
-      return { success: true, items: enriched };
+      return { success: true, items: finalItems };
     } catch (err) {
       console.error('[IPC uninstall:list] Error:', err);
       return { success: false, items: [], error: err.message };
