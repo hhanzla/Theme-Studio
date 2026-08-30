@@ -70,11 +70,39 @@ async function setIconTheme(iconName) {
 }
 
 /**
- * Applies a Cursor theme
+ * Applies a Cursor theme across GNOME, X11 fallback and GTK settings
  * @param {string} cursorName
  */
 async function setCursorTheme(cursorName) {
-  return execGsettings(['set', 'org.gnome.desktop.interface', 'cursor-theme', cursorName]);
+  const name = cursorName || 'Yaru';
+  const res = await execGsettings(['set', 'org.gnome.desktop.interface', 'cursor-theme', name]);
+
+  // Sync ~/.icons/default/index.theme for X11 / Wayland desktop compatibility
+  try {
+    const defaultIconDir = path.join(HOME, '.icons', 'default');
+    if (!fs.existsSync(defaultIconDir)) fs.mkdirSync(defaultIconDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(defaultIconDir, 'index.theme'),
+      `[Icon Theme]\nName=Default\nComment=Default Cursor Theme\nInherits=${name}\n`
+    );
+  } catch (_) {}
+
+  // Sync ~/.config/gtk-3.0/settings.ini
+  try {
+    const gtk3Dir = path.join(HOME, '.config', 'gtk-3.0');
+    if (fs.existsSync(gtk3Dir)) {
+      const iniPath = path.join(gtk3Dir, 'settings.ini');
+      let content = fs.existsSync(iniPath) ? fs.readFileSync(iniPath, 'utf8') : '[Settings]\n';
+      if (content.includes('gtk-cursor-theme-name')) {
+        content = content.replace(/gtk-cursor-theme-name\s*=.*/g, `gtk-cursor-theme-name = ${name}`);
+      } else {
+        content += `\ngtk-cursor-theme-name = ${name}\n`;
+      }
+      fs.writeFileSync(iniPath, content);
+    }
+  } catch (_) {}
+
+  return res;
 }
 
 /**
@@ -174,6 +202,9 @@ async function setWallpaper(wallpaperPath) {
  * Resets all appearance settings to Ubuntu / GNOME defaults
  */
 async function resetToDefaults() {
+  await setGtkTheme('Yaru');
+  await setIconTheme('Yaru');
+  await setCursorTheme('Yaru');
   await execGsettings(['reset', 'org.gnome.desktop.interface', 'gtk-theme']);
   await execGsettings(['reset', 'org.gnome.desktop.interface', 'icon-theme']);
   await execGsettings(['reset', 'org.gnome.desktop.interface', 'cursor-theme']);
@@ -182,6 +213,7 @@ async function resetToDefaults() {
   await execGsettings(['reset', 'org.gnome.desktop.background', 'picture-uri-dark']);
   try {
     await execGsettings(['reset', 'org.gnome.shell.extensions.user-theme', 'name']);
+    await execGsettings(['set', 'org.gnome.shell.extensions.user-theme', 'name', '']);
   } catch (_) {}
   return { success: true };
 }

@@ -40,21 +40,21 @@ async function removeInstalledItem(id) {
       ...(item.installed_folders || []).map(f => f.toLowerCase())
     ].filter(Boolean);
 
-    if (isGtkOrShell && itemNamesToCheck.some(n => current.gtk.toLowerCase().includes(n))) {
+    if (isGtkOrShell && itemNamesToCheck.some(n => current.gtk.toLowerCase().includes(n) || n.includes(current.gtk.toLowerCase()))) {
       console.log(`[Uninstaller] Theme "${item.name}" is currently active. Resetting GTK theme to Yaru...`);
       await gnome.setGtkTheme('Yaru');
     }
-    if (isGtkOrShell && itemNamesToCheck.some(n => (current.shell || '').toLowerCase().includes(n))) {
+    if (isGtkOrShell && itemNamesToCheck.some(n => (current.shell || '').toLowerCase().includes(n) || n.includes((current.shell || '').toLowerCase()))) {
       console.log(`[Uninstaller] Shell theme "${item.name}" is currently active. Resetting Shell theme...`);
       try {
         await gnome.setShellTheme('');
       } catch (_) {}
     }
-    if (item.category === 'icon-theme' && itemNamesToCheck.some(n => current.icons.toLowerCase().includes(n))) {
+    if ((item.category === 'icon-theme' || item.id.includes('icon')) && itemNamesToCheck.some(n => current.icons.toLowerCase().includes(n) || n.includes(current.icons.toLowerCase()))) {
       console.log(`[Uninstaller] Icon pack "${item.name}" is currently active. Resetting Icon theme to Yaru...`);
       await gnome.setIconTheme('Yaru');
     }
-    if (item.category === 'cursor-theme' && itemNamesToCheck.some(n => current.cursors.toLowerCase().includes(n))) {
+    if ((item.category === 'cursor-theme' || item.id.includes('cursor')) && itemNamesToCheck.some(n => current.cursors.toLowerCase().includes(n) || n.includes(current.cursors.toLowerCase()))) {
       console.log(`[Uninstaller] Cursor set "${item.name}" is currently active. Resetting Cursor theme to Yaru...`);
       await gnome.setCursorTheme('Yaru');
     }
