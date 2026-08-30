@@ -588,23 +588,85 @@ window.LookVariantPicker = {
             </div>
 
             <div class="form-group">
-              <label class="form-label" style="font-size: 10.5px; margin-bottom: 4px;">Theme Tweaks <small style="color: var(--text-muted); font-weight: normal;">(Multi-select)</small></label>
+              <div class="form-label" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span>Theme Tweaks <small style="color: var(--text-muted); font-weight: normal; font-size: 10px;">(Multi-select)</small></span>
+                <span class="tweak-info-badge" onclick="event.preventDefault();" title="Optional aesthetic customizations">
+                  ⓘ
+                  <span class="tweak-tooltip">Optional aesthetic customizations (macOS traffic lights, OLED pure black, solid panel, palettes, etc.)</span>
+                </span>
+              </div>
               <div class="tweaks-grid-container" style="grid-template-columns: 1fr 1fr; gap: 6px;">
                 <label class="tweak-checkbox-item">
                   <input type="checkbox" class="look-tweak-checkbox" value="macos" />
                   <span class="tweak-checkbox-label">macOS Controls</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Changes window buttons to macOS circular traffic lights">
+                    ⓘ
+                    <span class="tweak-tooltip">Changes window buttons (close, minimize, maximize) to macOS circular traffic lights style.</span>
+                  </span>
                 </label>
                 <label class="tweak-checkbox-item">
                   <input type="checkbox" class="look-tweak-checkbox" value="black" />
                   <span class="tweak-checkbox-label">Deep Black (OLED)</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Uses pure #000000 true black background">
+                    ⓘ
+                    <span class="tweak-tooltip">Uses pure #000000 true black background for dark mode (great for OLED screens).</span>
+                  </span>
                 </label>
                 <label class="tweak-checkbox-item">
                   <input type="checkbox" class="look-tweak-checkbox" value="solid" />
                   <span class="tweak-checkbox-label">Solid Panel</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Removes translucency and makes top panel solid opaque">
+                    ⓘ
+                    <span class="tweak-tooltip">Removes translucency and makes the top panel and sidebars solid opaque.</span>
+                  </span>
                 </label>
                 <label class="tweak-checkbox-item">
                   <input type="checkbox" class="look-tweak-checkbox" value="primary" />
                   <span class="tweak-checkbox-label">Primary Accent</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Highlights active window controls with selected accent color">
+                    ⓘ
+                    <span class="tweak-tooltip">Highlights active window controls, buttons, and switches with your selected accent color.</span>
+                  </span>
+                </label>
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="nord" />
+                  <span class="tweak-checkbox-label">Nord Palette</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Applies Arctic Nord cold blue palette">
+                    ⓘ
+                    <span class="tweak-tooltip">Applies Arctic Nord cold blue and pastel grey aesthetic palette.</span>
+                  </span>
+                </label>
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="dracula" />
+                  <span class="tweak-checkbox-label">Dracula Palette</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Applies gothic purple Dracula color scheme">
+                    ⓘ
+                    <span class="tweak-tooltip">Applies gothic purple and neon vibrant dark Dracula color scheme.</span>
+                  </span>
+                </label>
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="submenu" />
+                  <span class="tweak-checkbox-label">Submenu Icons</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Adds icons next to context menus and dropdowns">
+                    ⓘ
+                    <span class="tweak-tooltip">Adds icons next to context menus and dropdown menu items.</span>
+                  </span>
+                </label>
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="compact" />
+                  <span class="tweak-checkbox-label">Compact Spacing</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Reduces margins to save screen space">
+                    ⓘ
+                    <span class="tweak-tooltip">Reduces window margins and title bar height to save screen space.</span>
+                  </span>
+                </label>
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="dock" />
+                  <span class="tweak-checkbox-label">Floating Dock Fix</span>
+                  <span class="tweak-info-badge" onclick="event.preventDefault();" title="Optimizes margins for floating dock panels">
+                    ⓘ
+                    <span class="tweak-tooltip">Optimizes margins and border radius for floating dock panels.</span>
+                  </span>
                 </label>
               </div>
             </div>
