@@ -159,6 +159,13 @@
       "git",
       "bash"
     ],
+    "variants": {
+      "mode": [
+        "standard",
+        "dark",
+        "light"
+      ]
+    },
     "target_dir": "~/.local/share/icons"
   }
 ]
