@@ -123,5 +123,19 @@
       "zip_url": "https://github.com/EliverLara/candy-icons/archive/refs/heads/master.zip"
     },
     "target_dir": "~/.local/share/icons"
+  },
+  {
+    "id": "breeze-chameleon-icons",
+    "name": "Breeze Chameleon",
+    "category": "icon-theme",
+    "author": "L4ki",
+    "install_type": "zip-static",
+    "notes": "Adaptive Chameleon icon set based on KDE Breeze with dark, light, and rounded variants.",
+    "thumbnail": "assets/previews/breeze-chameleon-icons.png",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/L4ki/Breeze-Chameleon-Icons/archive/refs/heads/master.zip"
+    },
+    "target_dir": "~/.local/share/icons"
   }
 ]
