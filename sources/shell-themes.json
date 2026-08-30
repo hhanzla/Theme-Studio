@@ -13,7 +13,7 @@
       "color": ["default", "purple", "pink", "red", "orange", "yellow", "green", "teal", "grey", "all"],
       "mode": ["dark", "light", "standard"],
       "size": ["standard", "compact"],
-      "tweaks": ["none", "solid", "compact", "black", "primary", "macos", "submenu", "nord", "dracula"],
+      "tweaks": ["none", "solid", "compact", "black", "primary", "macos", "submenu", "nord", "dracula", "dock"],
       "icon": ["default", "apple", "gnome", "ubuntu", "arch", "fedora", "debian", "manjaro"]
     },
     "install_script": "./install.sh",
