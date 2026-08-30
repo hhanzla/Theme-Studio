@@ -202,7 +202,7 @@ async function installZipStatic(item, onProgress = () => {}, options = {}) {
 
   if (item.source && item.source.variant_urls) {
     const keyCombo = Object.values(variant).filter(v => v && v !== 'all').join('-');
-    const simpleKey = variant.color || variant.mode || variant.style;
+    const simpleKey = variant.color || variant.mode || variant.style || variant.accent;
     zipUrl = item.source.variant_urls[keyCombo] || 
              item.source.variant_urls[simpleKey] || 
              item.source.variant_urls['all'] || 

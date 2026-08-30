@@ -609,7 +609,8 @@ async function handleCardAction(item, card) {
   }
 
   // If item has variants, open variant picker
-  if (item.variants && ((item.variants.color && item.variants.color.length > 0) || (item.variants.mode && item.variants.mode.length > 0))) {
+  const hasVariants = item.variants && typeof item.variants === 'object' && Object.keys(item.variants).some(k => Array.isArray(item.variants[k]) && item.variants[k].length > 1);
+  if (hasVariants) {
     window.VariantPicker.open(item, (selectedVariant) => {
       performInstallation(item, card, selectedVariant);
     });
