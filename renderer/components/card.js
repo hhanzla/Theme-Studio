@@ -7,6 +7,8 @@ window.ThemeCard = {
     card.setAttribute('data-category', item.category || '');
 
     // Badges calculation
+    const hasMultipleVariants = item.variants && typeof item.variants === 'object' && Object.keys(item.variants).some(k => Array.isArray(item.variants[k]) && item.variants[k].length > 1);
+
     let typeBadgeHtml = '';
     if (item.install_type === 'script' && (item.install_script || item.install_args_template)) {
       typeBadgeHtml = '<span class="badge-tag badge-script">Script</span>';
@@ -16,18 +18,31 @@ window.ThemeCard = {
       typeBadgeHtml = '<span class="badge-tag badge-zip">Zip</span>';
     }
 
+    if (hasMultipleVariants) {
+      typeBadgeHtml += ' <span class="badge-tag badge-variants">Variants</span>';
+    }
+
     const installedBadgeHtml = item.installed
       ? '<span class="badge-tag badge-installed">Installed</span>'
       : '';
 
     // Variants text
     let variantsChips = '';
-    if (item.variants) {
+    if (item.variants && typeof item.variants === 'object') {
       if (item.variants.color && item.variants.color.length > 0) {
         variantsChips += `<span class="meta-chip">${item.variants.color.length} Colors</span>`;
       }
+      if (item.variants.accent && item.variants.accent.length > 0) {
+        variantsChips += `<span class="meta-chip">${item.variants.accent.length} Accents</span>`;
+      }
       if (item.variants.mode && item.variants.mode.length > 0) {
         variantsChips += `<span class="meta-chip">${item.variants.mode.join('/')}</span>`;
+      }
+      if (item.variants.style && item.variants.style.length > 0) {
+        variantsChips += `<span class="meta-chip">${item.variants.style.join('/')}</span>`;
+      }
+      if (item.variants.tweaks && item.variants.tweaks.length > 0) {
+        variantsChips += `<span class="meta-chip">${item.variants.tweaks.length} Tweaks</span>`;
       }
     }
 

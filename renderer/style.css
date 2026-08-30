@@ -636,6 +636,12 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
   border: 1px solid #d4d4d8;
 }
 
+.badge-variants {
+  background: #6366f1;
+  color: #ffffff;
+  font-weight: 700;
+}
+
 .badge-installed {
   background: #cf4110;
   color: #ffffff;
