@@ -1,8 +1,10 @@
-// Uninstall Manager View - Direct Grid Architecture matching Browse tabs
+// Uninstall Manager View - Batch Uninstall & Cache Cleaner Architecture
 window.UninstallView = {
   container: null,
   activeFilter: 'all',
   installedItems: [],
+  selectedIds: new Set(),
+  cacheSize: '0 B',
 
   /**
    * Initializes and renders the Uninstall Manager screen
@@ -10,7 +12,22 @@ window.UninstallView = {
    */
   async render(containerEl) {
     this.container = containerEl;
+    this.selectedIds.clear();
+    await this.fetchCacheSize();
     await this.loadItems();
+  },
+
+  async fetchCacheSize() {
+    try {
+      if (window.electronAPI && window.electronAPI.uninstall && window.electronAPI.uninstall.getCacheSize) {
+        const res = await window.electronAPI.uninstall.getCacheSize();
+        if (res && res.success) {
+          this.cacheSize = res.formatted || '0 B';
+        }
+      }
+    } catch (err) {
+      console.warn('[UninstallView] Failed to fetch cache size:', err);
+    }
   },
 
   async loadItems() {
@@ -26,53 +43,136 @@ window.UninstallView = {
       this.installedItems = [];
     }
 
-    this.renderSubtabs();
+    // Filter out selected IDs that are no longer installed
+    const validIds = new Set(this.installedItems.map(i => i.id));
+    for (const id of this.selectedIds) {
+      if (!validIds.has(id)) {
+        this.selectedIds.delete(id);
+      }
+    }
+
+    this.renderSubtabsAndToolbar();
     this.renderCards();
   },
 
-  renderSubtabs() {
+  renderSubtabsAndToolbar() {
     const subtabsBar = document.querySelector('.subtabs-bar');
     if (!subtabsBar) return;
 
     subtabsBar.style.display = 'flex';
+
+    const filtered = this.activeFilter === 'all'
+      ? this.installedItems
+      : this.installedItems.filter(i => i.category === this.activeFilter);
 
     const gtkCount = this.installedItems.filter(i => i.category === 'gtk-theme').length;
     const shellCount = this.installedItems.filter(i => i.category === 'shell-theme').length;
     const iconCount = this.installedItems.filter(i => i.category === 'icon-theme').length;
     const cursorCount = this.installedItems.filter(i => i.category === 'cursor-theme').length;
 
+    const allFilteredSelected = filtered.length > 0 && filtered.every(i => this.selectedIds.has(i.id));
+    const selectedCount = this.selectedIds.size;
+
     subtabsBar.innerHTML = `
-      <div class="subtabs">
-        <button class="subtab-btn ${this.activeFilter === 'all' ? 'active' : ''}" data-cat="all">
-          <span>All Installed</span>
-          <span class="badge count-badge">${this.installedItems.length}</span>
-        </button>
-        <button class="subtab-btn ${this.activeFilter === 'gtk-theme' ? 'active' : ''}" data-cat="gtk-theme">
-          <span>GTK Themes</span>
-          <span class="badge count-badge">${gtkCount}</span>
-        </button>
-        <button class="subtab-btn ${this.activeFilter === 'shell-theme' ? 'active' : ''}" data-cat="shell-theme">
-          <span>Shell Themes</span>
-          <span class="badge count-badge">${shellCount}</span>
-        </button>
-        <button class="subtab-btn ${this.activeFilter === 'icon-theme' ? 'active' : ''}" data-cat="icon-theme">
-          <span>Icons</span>
-          <span class="badge count-badge">${iconCount}</span>
-        </button>
-        <button class="subtab-btn ${this.activeFilter === 'cursor-theme' ? 'active' : ''}" data-cat="cursor-theme">
-          <span>Cursors</span>
-          <span class="badge count-badge">${cursorCount}</span>
-        </button>
+      <div class="subtabs-with-toolbar">
+        <div class="subtabs">
+          <button class="subtab-btn ${this.activeFilter === 'all' ? 'active' : ''}" data-cat="all">
+            <span>All Installed</span>
+            <span class="badge count-badge">${this.installedItems.length}</span>
+          </button>
+          <button class="subtab-btn ${this.activeFilter === 'gtk-theme' ? 'active' : ''}" data-cat="gtk-theme">
+            <span>GTK Themes</span>
+            <span class="badge count-badge">${gtkCount}</span>
+          </button>
+          <button class="subtab-btn ${this.activeFilter === 'shell-theme' ? 'active' : ''}" data-cat="shell-theme">
+            <span>Shell Themes</span>
+            <span class="badge count-badge">${shellCount}</span>
+          </button>
+          <button class="subtab-btn ${this.activeFilter === 'icon-theme' ? 'active' : ''}" data-cat="icon-theme">
+            <span>Icons</span>
+            <span class="badge count-badge">${iconCount}</span>
+          </button>
+          <button class="subtab-btn ${this.activeFilter === 'cursor-theme' ? 'active' : ''}" data-cat="cursor-theme">
+            <span>Cursors</span>
+            <span class="badge count-badge">${cursorCount}</span>
+          </button>
+        </div>
+
+        <div class="uninstall-toolbar-actions">
+          ${filtered.length > 0 ? `
+            <button class="toolbar-btn btn-select-all ${allFilteredSelected ? 'active' : ''}" id="btn-select-all-toggle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                ${allFilteredSelected 
+                  ? '<polyline points="20 6 9 17 4 12"></polyline>' 
+                  : '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>'}
+              </svg>
+              <span>${allFilteredSelected ? 'Deselect All' : 'Select All'}</span>
+            </button>
+          ` : ''}
+
+          <button 
+            class="toolbar-btn btn-batch-danger ${selectedCount > 0 ? 'visible' : ''}" 
+            id="btn-batch-uninstall" 
+            ${selectedCount === 0 ? 'disabled' : ''}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+            <span>Uninstall Selected (${selectedCount})</span>
+          </button>
+
+          <button class="toolbar-btn btn-clear-cache" id="btn-clear-cache" title="Clear downloaded archives and temp clones">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+            </svg>
+            <span>Clear Cache</span>
+            <span class="cache-badge">${this.cacheSize}</span>
+          </button>
+        </div>
       </div>
     `;
 
+    // Category filter click
     subtabsBar.querySelectorAll('.subtab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         this.activeFilter = btn.getAttribute('data-cat');
-        this.renderSubtabs();
+        this.renderSubtabsAndToolbar();
         this.renderCards();
       });
     });
+
+    // Select All toggle
+    const selectAllBtn = subtabsBar.querySelector('#btn-select-all-toggle');
+    if (selectAllBtn) {
+      selectAllBtn.addEventListener('click', () => {
+        if (allFilteredSelected) {
+          filtered.forEach(i => this.selectedIds.delete(i.id));
+        } else {
+          filtered.forEach(i => this.selectedIds.add(i.id));
+        }
+        this.renderSubtabsAndToolbar();
+        this.renderCards();
+      });
+    }
+
+    // Batch Uninstall button
+    const batchBtn = subtabsBar.querySelector('#btn-batch-uninstall');
+    if (batchBtn && selectedCount > 0) {
+      batchBtn.addEventListener('click', () => {
+        this.confirmBatchRemove();
+      });
+    }
+
+    // Clear Cache button
+    const clearCacheBtn = subtabsBar.querySelector('#btn-clear-cache');
+    if (clearCacheBtn) {
+      clearCacheBtn.addEventListener('click', () => {
+        this.confirmClearCache();
+      });
+    }
   },
 
   renderCards() {
@@ -100,7 +200,24 @@ window.UninstallView = {
 
     this.container.innerHTML = filtered.map(item => this.renderCard(item)).join('');
 
-    // Wire action buttons
+    // Checkbox and card selection click
+    this.container.querySelectorAll('.uninstall-checkbox').forEach(chk => {
+      chk.addEventListener('change', (e) => {
+        const id = chk.getAttribute('data-id');
+        if (chk.checked) {
+          this.selectedIds.add(id);
+        } else {
+          this.selectedIds.delete(id);
+        }
+        const card = this.container.querySelector(`.theme-card[data-id="${id}"]`);
+        if (card) {
+          card.classList.toggle('is-selected', chk.checked);
+        }
+        this.renderSubtabsAndToolbar();
+      });
+    });
+
+    // Single uninstall button click
     this.container.querySelectorAll('.btn-remove-item').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -110,6 +227,7 @@ window.UninstallView = {
       });
     });
 
+    // Single apply button click
     this.container.querySelectorAll('.btn-apply-item').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -128,10 +246,30 @@ window.UninstallView = {
 
     const baseId = (item.id || '').replace(/-shell$/, '');
     const thumbnailSrc = item.thumbnail || `assets/previews/${baseId}.png`;
+    const isSelected = this.selectedIds.has(item.id);
+
+    let typeBadgeHtml = '';
+    if (item.install_type === 'script' && (item.install_script || item.install_args_template)) {
+      typeBadgeHtml = '<span class="badge-tag badge-script">Script</span>';
+    } else if (item.install_type === 'script' || item.install_type === 'git') {
+      typeBadgeHtml = '<span class="badge-tag badge-git">Git</span>';
+    } else if (item.install_type === 'zip-static') {
+      typeBadgeHtml = '<span class="badge-tag badge-zip">Zip</span>';
+    }
 
     return `
-      <div class="theme-card is-installed" data-id="${item.id}">
+      <div class="theme-card is-installed ${isSelected ? 'is-selected' : ''}" data-id="${item.id}">
         <div class="card-thumbnail-container">
+          <label class="card-select-label" title="Select for batch action">
+            <input 
+              type="checkbox" 
+              class="uninstall-checkbox" 
+              data-id="${item.id}" 
+              ${isSelected ? 'checked' : ''} 
+            />
+            <span class="custom-checkbox-ui"></span>
+          </label>
+
           <img 
             src="${thumbnailSrc}" 
             alt="${item.name}" 
@@ -148,9 +286,7 @@ window.UninstallView = {
           </div>
           <div class="card-badges-floating">
             <div class="badge-type-slot">
-              <span class="badge-tag ${item.install_type === 'script' ? 'badge-script' : 'badge-zip'}">
-                ${item.install_type === 'script' ? 'Script' : 'Zip'}
-              </span>
+              ${typeBadgeHtml}
             </div>
             <div class="badge-installed-slot">
               <span class="badge-tag badge-installed">Installed</span>
@@ -242,6 +378,8 @@ window.UninstallView = {
           const res = await window.electronAPI.uninstall.remove({ id: item.id });
           if (res && res.success) {
             showToast(`${item.name} uninstalled successfully`, 'success');
+            this.selectedIds.delete(item.id);
+            await this.fetchCacheSize();
             await this.loadItems();
             if (typeof window.refreshAppState === 'function') {
               window.refreshAppState();
@@ -251,6 +389,73 @@ window.UninstallView = {
           }
         } catch (err) {
           showToast(`Error uninstalling: ${err.message}`, 'warning');
+        }
+      }
+    });
+  },
+
+  confirmBatchRemove() {
+    const count = this.selectedIds.size;
+    if (count === 0) return;
+
+    const names = Array.from(this.selectedIds)
+      .map(id => {
+        const it = this.installedItems.find(i => i.id === id);
+        return it ? it.name : id;
+      })
+      .slice(0, 4)
+      .join(', ');
+    const moreText = count > 4 ? ` and ${count - 4} more...` : '';
+
+    window.ConfirmDialog.show({
+      title: `Batch Uninstall (${count} Items)`,
+      subtitle: 'Remove selected themes and restore default appearance',
+      message: `Are you sure you want to completely uninstall ${count} selected items (${names}${moreText})? This will delete all their files from disk and reset appearance to system defaults if active.`,
+      confirmText: `Uninstall All ${count} Items`,
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        showToast(`Uninstalling ${count} items in batch...`, 'info');
+        try {
+          const idsToUninstall = Array.from(this.selectedIds);
+          const res = await window.electronAPI.uninstall.batchRemove({ ids: idsToUninstall });
+          if (res && res.success) {
+            showToast(`Successfully uninstalled ${res.removedCount} items!`, 'success');
+            this.selectedIds.clear();
+            await this.fetchCacheSize();
+            await this.loadItems();
+            if (typeof window.refreshAppState === 'function') {
+              window.refreshAppState();
+            }
+          } else {
+            showToast(`Batch uninstall error: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error in batch uninstall: ${err.message}`, 'warning');
+        }
+      }
+    });
+  },
+
+  confirmClearCache() {
+    window.ConfirmDialog.show({
+      title: 'Clear Download Cache',
+      subtitle: `Freed space: ${this.cacheSize}`,
+      message: `Are you sure you want to delete all cached download archives (.zip, .tar.xz) and temporary Git clones? This frees up disk space and will NOT affect your installed themes.`,
+      confirmText: 'Clear Cache',
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        showToast('Clearing download and extraction cache...', 'info');
+        try {
+          const res = await window.electronAPI.uninstall.clearCache();
+          if (res && res.success) {
+            showToast('Download cache cleared successfully!', 'success');
+            await this.fetchCacheSize();
+            this.renderSubtabsAndToolbar();
+          } else {
+            showToast(`Failed to clear cache: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error clearing cache: ${err.message}`, 'warning');
         }
       }
     });

@@ -15,7 +15,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   uninstall: {
     list: () => ipcRenderer.invoke('uninstall:list'),
-    remove: (payload) => ipcRenderer.invoke('uninstall:remove', payload)
+    remove: (payload) => ipcRenderer.invoke('uninstall:remove', payload),
+    batchRemove: (payload) => ipcRenderer.invoke('uninstall:batch-remove', payload),
+    getCacheSize: () => ipcRenderer.invoke('uninstall:get-cache-size'),
+    clearCache: () => ipcRenderer.invoke('system:clear-cache')
   },
   system: {
     resetDefault: () => ipcRenderer.invoke('reset:default'),
