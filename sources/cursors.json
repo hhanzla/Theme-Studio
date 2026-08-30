@@ -1,18 +1,39 @@
 [
   {
     "id": "bibata-modern-ice",
-    "name": "Bibata Modern Ice",
+    "name": "Bibata Cursors",
     "category": "cursor-theme",
     "thumbnail": "assets/previews/bibata-modern-ice.png",
     "author": "ful1e5",
-    "source_url": "https://www.gnome-look.org/p/1197198",
+    "source_url": "https://github.com/ful1e5/Bibata_Cursor",
     "license": "GPL-3.0",
     "install_type": "zip-static",
     "source": {
       "type": "tar.xz",
-      "url": "https://github.com/ful1e5/Bibata_Cursor/releases/latest/download/Bibata-Modern-Ice.tar.xz"
+      "url": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata.tar.xz",
+      "variant_urls": {
+        "modern-ice": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Ice.tar.xz",
+        "modern-classic": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz",
+        "modern-amber": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Amber.tar.xz",
+        "original-ice": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Original-Ice.tar.xz",
+        "original-classic": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Original-Classic.tar.xz",
+        "original-amber": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Original-Amber.tar.xz",
+        "all": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata.tar.xz"
+      }
+    },
+    "variants": {
+      "style": [
+        "modern",
+        "original"
+      ],
+      "color": [
+        "ice",
+        "classic",
+        "amber",
+        "all"
+      ]
     },
     "target_dir": "~/.icons",
-    "notes": "Crisp white minimalist and rounded material cursor theme."
+    "notes": "Crisp, modern, and material-designed open-source cursor set with rounded and sharp variations across classic, ice, and amber palettes."
   }
 ]

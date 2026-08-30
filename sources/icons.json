@@ -140,6 +140,17 @@
       "git",
       "bash"
     ],
+    "variants": {
+      "shape": [
+        "round",
+        "square"
+      ],
+      "mode": [
+        "dark",
+        "light",
+        "all"
+      ]
+    },
     "target_dir": "~/.local/share/icons"
   },
   {

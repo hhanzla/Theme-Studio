@@ -200,8 +200,13 @@ async function installZipStatic(item, onProgress = () => {}, options = {}) {
   let zipUrl = item.source && (item.source.zip_url || item.source.url);
   const variant = options.variant || {};
 
-  if (item.source && item.source.variant_urls && variant.color) {
-    zipUrl = item.source.variant_urls[variant.color] || zipUrl;
+  if (item.source && item.source.variant_urls) {
+    const keyCombo = Object.values(variant).filter(v => v && v !== 'all').join('-');
+    const simpleKey = variant.color || variant.mode || variant.style;
+    zipUrl = item.source.variant_urls[keyCombo] || 
+             item.source.variant_urls[simpleKey] || 
+             item.source.variant_urls['all'] || 
+             zipUrl;
   } else if (item.source && item.source.url_template && variant.color) {
     zipUrl = item.source.url_template.replace(/\{color\}/g, variant.color);
   }
@@ -210,7 +215,8 @@ async function installZipStatic(item, onProgress = () => {}, options = {}) {
     throw new Error(`Catalog item "${item.id}" does not have a valid zip_url in source`);
   }
 
-  const variantSlug = variant.color ? `-${variant.color}` : '';
+  const variantValues = Object.values(variant).filter(Boolean);
+  const variantSlug = variantValues.length > 0 ? `-${variantValues.join('-')}` : '';
   const isTarXz = zipUrl.endsWith('.tar.xz') || zipUrl.endsWith('.tar.gz') || zipUrl.endsWith('.tar');
   const fileExt = isTarXz ? (zipUrl.endsWith('.tar.gz') ? '.tar.gz' : '.tar.xz') : '.zip';
   const archivePath = path.join(DOWNLOAD_CACHE, `${item.id}${variantSlug}${fileExt}`);
