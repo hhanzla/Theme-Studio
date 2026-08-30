@@ -4,6 +4,7 @@ window.ThemeCard = {
     const card = document.createElement('div');
     card.className = `theme-card ${item.installed ? 'is-installed' : ''}`;
     card.setAttribute('data-id', item.id);
+    card.setAttribute('data-category', item.category || '');
 
     // Badges calculation
     let typeBadgeHtml = '';

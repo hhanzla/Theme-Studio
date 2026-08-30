@@ -274,13 +274,24 @@ function updateView() {
             else if (item.category === 'icon-theme') targetToCheck = (s.icons || '').toLowerCase();
             else if (item.category === 'cursor-theme') targetToCheck = (s.cursors || '').toLowerCase();
 
-            const nameSlug = (item.name || '').toLowerCase().replace(/shell|gtk|theme|themes/g, '').replace(/[^a-z0-9]/g, '').trim();
+            const strip = (str) => (str || '').toLowerCase().replace(/shell|gtk|theme|themes/g, '').replace(/[^a-z0-9]/g, '').trim();
+            const nameSlug = strip(item.name);
 
-            if (targetToCheck && nameSlug && targetToCheck.replace(/[^a-z0-9]/g, '').includes(nameSlug)) {
-              window.ThemeCard.setApplied(cardEl, true);
-            } else {
-              window.ThemeCard.setApplied(cardEl, false);
-            }
+            // Check 1: exact match with gsettings value
+            // Check 2: slug match (strips punctuation/keywords)
+            // Check 3: _appliedTarget set during this session
+            const appliedFolder = (item.installedInfo && item.installedInfo.installed_folders && item.installedInfo.installed_folders[0]) || '';
+            const sessionTarget = item._appliedTarget || '';
+
+            const isApplied = targetToCheck && (
+              targetToCheck === (item.name || '').toLowerCase() ||
+              targetToCheck === appliedFolder.toLowerCase() ||
+              targetToCheck === sessionTarget.toLowerCase() ||
+              (nameSlug && strip(targetToCheck).includes(nameSlug)) ||
+              (nameSlug && nameSlug.includes(strip(targetToCheck)))
+            );
+
+            window.ThemeCard.setApplied(cardEl, !!isApplied);
           });
         }
       }).catch(() => {});
@@ -483,20 +494,27 @@ async function handleCardAction(item, card) {
 
     const applyDirectly = async (chosenTarget) => {
       try {
+        let applyRes;
         if (item.category === 'gtk-theme') {
-          await window.electronAPI.system.applyGtk(chosenTarget);
-          showToast(`Applied ${chosenTarget} as active GTK window theme`, 'success');
+          applyRes = await window.electronAPI.system.applyGtk(chosenTarget);
+          if (applyRes && applyRes.success) showToast(`Applied ${chosenTarget} as active GTK window theme`, 'success');
         } else if (item.category === 'shell-theme') {
-          await window.electronAPI.system.applyShell(chosenTarget);
-          showToast(`Applied ${chosenTarget} as active GNOME Shell theme`, 'success');
+          applyRes = await window.electronAPI.system.applyShell(chosenTarget);
+          if (applyRes && applyRes.success) showToast(`Applied ${chosenTarget} as active GNOME Shell theme`, 'success');
         } else if (item.category === 'icon-theme') {
-          await window.electronAPI.system.applyIcons(chosenTarget);
-          showToast(`Applied ${chosenTarget} as active icon pack`, 'success');
+          applyRes = await window.electronAPI.system.applyIcons(chosenTarget);
+          if (applyRes && applyRes.success) showToast(`Applied ${chosenTarget} as active icon pack`, 'success');
         } else if (item.category === 'cursor-theme') {
-          await window.electronAPI.system.applyCursors(chosenTarget);
-          showToast(`Applied ${chosenTarget} as active cursor set`, 'success');
+          applyRes = await window.electronAPI.system.applyCursors(chosenTarget);
+          if (applyRes && applyRes.success) showToast(`Applied ${chosenTarget} as active cursor set`, 'success');
         } else {
           showToast(`${item.name} is installed.`, 'info');
+          return;
+        }
+
+        if (!applyRes || !applyRes.success) {
+          showToast(`Failed to apply ${item.name}: ${applyRes ? applyRes.error : 'Unknown error'}`, 'warning');
+          return;
         }
 
         // Reset all other cards in current view
@@ -506,8 +524,11 @@ async function handleCardAction(item, card) {
           }
         });
 
-        // Set this card to Applied
+        // Set this card to Applied immediately
         window.ThemeCard.setApplied(card, true);
+
+        // Also store the applied folder name on the item so updateView matching works
+        item._appliedTarget = chosenTarget;
       } catch (err) {
         showToast(`Failed to apply ${item.name}: ${err.message}`, 'warning');
       }
@@ -535,7 +556,7 @@ async function handleCardAction(item, card) {
       }
     } catch (_) {}
 
-    const defaultTarget = (item.installed_folders && item.installed_folders[0]) || item.name;
+    const defaultTarget = (item.installedInfo && item.installedInfo.installed_folders && item.installedInfo.installed_folders[0]) || item.name;
     applyDirectly(defaultTarget);
     return;
   }
