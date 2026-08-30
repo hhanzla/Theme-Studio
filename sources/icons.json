@@ -92,9 +92,8 @@
     ],
     "variants": {
       "color": [
-        "default",
-        "black",
         "blue",
+        "black",
         "brown",
         "cyan",
         "green",
@@ -129,13 +128,18 @@
     "name": "Breeze Chameleon",
     "category": "icon-theme",
     "author": "L4ki",
-    "install_type": "zip-static",
+    "install_type": "script",
     "notes": "Adaptive Chameleon icon set based on KDE Breeze with dark, light, and rounded variants.",
     "thumbnail": "assets/previews/breeze-chameleon-icons.png",
     "source": {
-      "type": "zip",
-      "zip_url": "https://github.com/L4ki/Breeze-Chameleon-Icons/archive/refs/heads/master.zip"
+      "type": "git",
+      "repo": "https://github.com/L4ki/Breeze-Chameleon-Icons.git",
+      "branch": "master"
     },
+    "dependencies": [
+      "git",
+      "bash"
+    ],
     "target_dir": "~/.local/share/icons"
   }
 ]

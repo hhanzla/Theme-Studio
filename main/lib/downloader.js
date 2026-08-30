@@ -52,43 +52,62 @@ function downloadFile(url, destPath, onProgress = () => {}, id = null) {
       const totalBytes = parseInt(res.headers['content-length'] || '0', 10);
       let downloadedBytes = 0;
 
-      const fileStream = fs.createWriteStream(destPath);
+      const tempPartPath = `${destPath}.part`;
+      const fileStream = fs.createWriteStream(tempPartPath);
+
+      if (id) {
+        activeDownloads.set(id, { req, destPath: tempPartPath, finalPath: destPath });
+      }
 
       res.on('data', (chunk) => {
         downloadedBytes += chunk.length;
         if (totalBytes > 0) {
-          const percent = Math.min(100, Math.round((downloadedBytes / totalBytes) * 100));
-          onProgress(percent, downloadedBytes, totalBytes);
+          const percent = Math.min(99, Math.round((downloadedBytes / totalBytes) * 100));
+          const mbs = (downloadedBytes / (1024 * 1024)).toFixed(1);
+          const totalMbs = (totalBytes / (1024 * 1024)).toFixed(1);
+          onProgress(percent, downloadedBytes, totalBytes, `Downloading ${mbs}/${totalMbs} MB (${percent}%)`);
         } else {
-          // If content-length not provided, estimate progress
-          onProgress(50, downloadedBytes, 0);
+          const mbs = (downloadedBytes / (1024 * 1024)).toFixed(1);
+          onProgress(50, downloadedBytes, 0, `Downloading ${mbs} MB`);
         }
       });
 
       res.pipe(fileStream);
 
       fileStream.on('finish', () => {
-        fileStream.close();
-        if (id) activeDownloads.delete(id);
-        onProgress(100, downloadedBytes, totalBytes);
-        resolve(destPath);
+        fileStream.close(() => {
+          if (totalBytes > 0 && downloadedBytes < totalBytes) {
+            try { fs.unlinkSync(tempPartPath); } catch (_) {}
+            if (id) activeDownloads.delete(id);
+            return reject(new Error(`Download interrupted: received ${downloadedBytes} of ${totalBytes} bytes`));
+          }
+          try {
+            if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+            fs.renameSync(tempPartPath, destPath);
+          } catch (err) {
+            return reject(err);
+          }
+          if (id) activeDownloads.delete(id);
+          onProgress(100, downloadedBytes, totalBytes, 'Download complete');
+          resolve(destPath);
+        });
       });
 
       fileStream.on('error', (err) => {
-        fs.unlink(destPath, () => {});
+        try { fs.unlinkSync(tempPartPath); } catch (_) {}
         if (id) activeDownloads.delete(id);
         reject(err);
       });
     });
 
     req.on('error', (err) => {
-      fs.unlink(destPath, () => {});
+      try { fs.unlinkSync(`${destPath}.part`); } catch (_) {}
       if (id) activeDownloads.delete(id);
       reject(err);
     });
 
     if (id) {
-      activeDownloads.set(id, { req, destPath });
+      activeDownloads.set(id, { req, destPath: `${destPath}.part`, finalPath: destPath });
     }
   });
 }
@@ -100,16 +119,22 @@ function downloadFile(url, destPath, onProgress = () => {}, id = null) {
  */
 function extractZip(zipPath, destDir) {
   return new Promise((resolve, reject) => {
-    try {
-      if (!fs.existsSync(destDir)) {
-        fs.mkdirSync(destDir, { recursive: true });
-      }
-      const zip = new AdmZip(zipPath);
-      zip.extractAllTo(destDir, true);
-      resolve(destDir);
-    } catch (err) {
-      reject(err);
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
     }
+
+    execFile('unzip', ['-o', '-q', zipPath, '-d', destDir], (err) => {
+      if (err) {
+        try {
+          const zip = new AdmZip(zipPath);
+          zip.extractAllTo(destDir, true);
+          return resolve(destDir);
+        } catch (admErr) {
+          return reject(new Error(`ZIP extraction failed: ${err.message || admErr.message}`));
+        }
+      }
+      resolve(destDir);
+    });
   });
 }
 

@@ -221,12 +221,12 @@ async function installZipStatic(item, onProgress = () => {}, options = {}) {
     if (fs.existsSync(archivePath) && fs.statSync(archivePath).size > 1024) {
       onProgress({ id: item.id, percent: 75, stage: 'downloading', message: 'Using cached archive...' });
     } else {
-      onProgress({ id: item.id, percent: 5, stage: 'downloading', message: 'Starting download...' });
+      onProgress({ id: item.id, percent: 0, stage: 'downloading', message: 'Connecting...' });
 
-      await downloader.downloadFile(zipUrl, archivePath, (percent) => {
+      await downloader.downloadFile(zipUrl, archivePath, (percent, downloaded, total, msg) => {
         // Map download 0..100 to overall 5..75%
         const overallPercent = Math.round(5 + (percent * 0.7));
-        onProgress({ id: item.id, percent: overallPercent, stage: 'downloading', message: `Downloading (${percent}%)...` });
+        onProgress({ id: item.id, percent: overallPercent, stage: 'downloading', message: msg || `Downloading (${percent}%)...` });
       }, item.id);
     }
 
@@ -441,13 +441,54 @@ async function installScript(item, options = {}, onProgress = () => {}) {
       } catch (_) {}
       executable = 'bash';
       execArgs = ['./install.sh', ...rawArgs];
-    } else if (fs.existsSync(buildShPath)) {
+    } else if (buildShPath && fs.existsSync(buildShPath)) {
       try {
         fs.chmodSync(buildShPath, 0o755);
       } catch (_) {}
       executable = 'bash';
       execArgs = ['./build.sh', ...rawArgs];
     } else {
+      // Direct repo with theme subdirectories (e.g. Breeze Chameleon)
+      const themeDirs = findThemeDirectories(cloneDir);
+      if (themeDirs.length > 0) {
+        onProgress({ id: item.id, percent: 80, stage: 'applying', message: 'Installing theme folders...' });
+        const installedFolderNames = [];
+        let primaryInstalledPath = null;
+        for (const dir of themeDirs) {
+          const folderName = path.basename(dir);
+          const destPath = path.join(targetDir, folderName);
+          if (fs.existsSync(destPath)) {
+            fs.rmSync(destPath, { recursive: true, force: true });
+          }
+          copyDirRecursive(dir, destPath);
+          installedFolderNames.push(folderName);
+          if (!primaryInstalledPath) primaryInstalledPath = destPath;
+          if (item.category === 'icon-theme' || item.category === 'cursor-theme') {
+            try {
+              const { execFile: execF } = require('child_process');
+              execF('gtk-update-icon-cache', [destPath], () => {});
+            } catch (_) {}
+          }
+        }
+
+        const installedItem = {
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          install_type: 'script',
+          variant: options.variant || {},
+          target_dir: targetDir,
+          installed_folders: installedFolderNames,
+          primary_path: primaryInstalledPath,
+          gtk4_fix_applied: false,
+          installed_at: new Date().toISOString()
+        };
+
+        stateStore.addInstalled(installedItem);
+        onProgress({ id: item.id, percent: 100, stage: 'completed', message: 'Installation complete!' });
+        return { success: true, item: installedItem };
+      }
+
       throw new Error(`Could not find install.sh or install.py in ${cloneDir}`);
     }
 
