@@ -97,8 +97,6 @@ function restoreDefaultSubtabs() {
 async function loadCategory(category) {
   AppState.activeCategory = category;
   AppState.activeSubtab = 'browse'; // Always start on Browse when switching categories
-  // Persist so reload stays on same page
-  try { localStorage.setItem('ts_last_category', category); } catch (_) {}
 
   // Update Active Sidebar Item
   document.querySelectorAll('.sidebar-nav .nav-item').forEach((btn) => {
@@ -693,14 +691,10 @@ window.refreshAppState = () => {
   }
 };
 
-// Startup
+// Startup — Always default to GTK Themes on every start
 document.addEventListener('DOMContentLoaded', () => {
   initEvents();
-  // Restore last active category from localStorage
-  let startCategory = 'gtk-theme';
-  try {
-    const saved = localStorage.getItem('ts_last_category');
-    if (saved) startCategory = saved;
-  } catch (_) {}
-  loadCategory(startCategory);
+  AppState.activeCategory = 'gtk-theme';
+  AppState.activeSubtab = 'browse';
+  loadCategory('gtk-theme');
 });
