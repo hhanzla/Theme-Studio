@@ -615,8 +615,8 @@ window.LookVariantPicker = {
         </div>
 
         <div class="modal-footer">
-          <button class="btn-cancel" id="look-variant-cancel">Cancel</button>
-          <button class="btn-install" id="look-variant-confirm">Install & Apply Full Look</button>
+          <button class="modal-btn btn-secondary" id="look-variant-cancel">Cancel</button>
+          <button class="modal-btn btn-primary" id="look-variant-confirm">Install & Apply Full Look</button>
         </div>
       </div>
     `;

@@ -1217,7 +1217,7 @@ body {
 }
 
 .modal-btn {
-  padding: 7px 14px;
+  padding: 7px 16px;
   border-radius: var(--radius);
   font-family: var(--font-main);
   font-size: 12px;
@@ -1225,6 +1225,28 @@ body {
   cursor: pointer;
   border: 1px solid transparent;
   transition: all var(--transition-fast);
+}
+
+.modal-btn.btn-primary {
+  background: #cf4110;
+  color: #ffffff;
+  border-color: #cf4110;
+}
+
+.modal-btn.btn-primary:hover {
+  background: #b5380c;
+  border-color: #b5380c;
+}
+
+.modal-btn.btn-secondary {
+  background: #ffffff;
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.modal-btn.btn-secondary:hover {
+  background: #f4f4f5;
+  border-color: #d4d4d8;
 }
 
 @keyframes fadeIn {
