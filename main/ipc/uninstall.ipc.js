@@ -136,14 +136,26 @@ function registerUninstallIpc() {
 
   ipcMain.handle('uninstall:get-cache-size', async () => {
     try {
-      let totalBytes = 0;
-      if (fs.existsSync(paths.DOWNLOAD_CACHE)) {
-        totalBytes += getDirSize(paths.DOWNLOAD_CACHE);
+      if (!fs.existsSync(paths.DOWNLOAD_CACHE)) {
+        return { success: true, bytes: 0, formatted: '0 B' };
       }
+
+      const { execFile } = require('child_process');
+      const bytes = await new Promise((resolve) => {
+        execFile('du', ['-sb', paths.DOWNLOAD_CACHE], (err, stdout) => {
+          if (!err && stdout) {
+            const match = stdout.trim().split(/\s+/)[0];
+            const parsed = parseInt(match, 10);
+            if (!isNaN(parsed)) return resolve(parsed);
+          }
+          resolve(getDirSize(paths.DOWNLOAD_CACHE));
+        });
+      });
+
       return {
         success: true,
-        bytes: totalBytes,
-        formatted: formatBytes(totalBytes)
+        bytes,
+        formatted: formatBytes(bytes)
       };
     } catch (err) {
       return { success: false, bytes: 0, formatted: '0 B', error: err.message };

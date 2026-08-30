@@ -7,14 +7,23 @@ window.UninstallView = {
   cacheSize: '0 B',
 
   /**
-   * Initializes and renders the Uninstall Manager screen
+   * Initializes and renders the Uninstall Manager screen instantly without freeze
    * @param {HTMLElement} containerEl
    */
   async render(containerEl) {
     this.container = containerEl;
     this.selectedIds.clear();
-    await this.fetchCacheSize();
+    
+    // Render items immediately for instantaneous tab switching (0ms lag)
     await this.loadItems();
+
+    // Fetch cache size asynchronously in background without blocking UI
+    this.fetchCacheSize().then(() => {
+      const cacheBadge = document.querySelector('.cache-badge');
+      if (cacheBadge) {
+        cacheBadge.textContent = this.cacheSize;
+      }
+    });
   },
 
   async fetchCacheSize() {
@@ -200,9 +209,9 @@ window.UninstallView = {
 
     this.container.innerHTML = filtered.map(item => this.renderCard(item)).join('');
 
-    // Checkbox and card selection click
+    // Checkbox selection click
     this.container.querySelectorAll('.uninstall-checkbox').forEach(chk => {
-      chk.addEventListener('change', (e) => {
+      chk.addEventListener('change', () => {
         const id = chk.getAttribute('data-id');
         if (chk.checked) {
           this.selectedIds.add(id);
@@ -248,15 +257,6 @@ window.UninstallView = {
     const thumbnailSrc = item.thumbnail || `assets/previews/${baseId}.png`;
     const isSelected = this.selectedIds.has(item.id);
 
-    let typeBadgeHtml = '';
-    if (item.install_type === 'script' && (item.install_script || item.install_args_template)) {
-      typeBadgeHtml = '<span class="badge-tag badge-script">Script</span>';
-    } else if (item.install_type === 'script' || item.install_type === 'git') {
-      typeBadgeHtml = '<span class="badge-tag badge-git">Git</span>';
-    } else if (item.install_type === 'zip-static') {
-      typeBadgeHtml = '<span class="badge-tag badge-zip">Zip</span>';
-    }
-
     return `
       <div class="theme-card is-installed ${isSelected ? 'is-selected' : ''}" data-id="${item.id}">
         <div class="card-thumbnail-container">
@@ -284,10 +284,9 @@ window.UninstallView = {
             </svg>
             <span class="card-fallback-name">${item.name}</span>
           </div>
+
           <div class="card-badges-floating">
-            <div class="badge-type-slot">
-              ${typeBadgeHtml}
-            </div>
+            <div class="badge-type-slot"></div>
             <div class="badge-installed-slot">
               <span class="badge-tag badge-installed">Installed</span>
             </div>
@@ -379,8 +378,11 @@ window.UninstallView = {
           if (res && res.success) {
             showToast(`${item.name} uninstalled successfully`, 'success');
             this.selectedIds.delete(item.id);
-            await this.fetchCacheSize();
             await this.loadItems();
+            this.fetchCacheSize().then(() => {
+              const cacheBadge = document.querySelector('.cache-badge');
+              if (cacheBadge) cacheBadge.textContent = this.cacheSize;
+            });
             if (typeof window.refreshAppState === 'function') {
               window.refreshAppState();
             }
@@ -421,8 +423,11 @@ window.UninstallView = {
           if (res && res.success) {
             showToast(`Successfully uninstalled ${res.removedCount} items!`, 'success');
             this.selectedIds.clear();
-            await this.fetchCacheSize();
             await this.loadItems();
+            this.fetchCacheSize().then(() => {
+              const cacheBadge = document.querySelector('.cache-badge');
+              if (cacheBadge) cacheBadge.textContent = this.cacheSize;
+            });
             if (typeof window.refreshAppState === 'function') {
               window.refreshAppState();
             }
@@ -450,7 +455,8 @@ window.UninstallView = {
           if (res && res.success) {
             showToast('Download cache cleared successfully!', 'success');
             await this.fetchCacheSize();
-            this.renderSubtabsAndToolbar();
+            const cacheBadge = document.querySelector('.cache-badge');
+            if (cacheBadge) cacheBadge.textContent = this.cacheSize;
           } else {
             showToast(`Failed to clear cache: ${res ? res.error : 'Unknown error'}`, 'warning');
           }
