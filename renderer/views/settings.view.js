@@ -1,10 +1,30 @@
 // Settings View Component for Theme Studio
 window.SettingsView = {
   container: null,
+  cacheSize: '0 B',
 
   async render(containerEl) {
     this.container = containerEl;
     await this.loadSettings();
+
+    // Fetch cache size asynchronously in background
+    this.fetchCacheSize().then(() => {
+      const badge = this.container?.querySelector('.settings-cache-badge');
+      if (badge) badge.textContent = this.cacheSize;
+    });
+  },
+
+  async fetchCacheSize() {
+    try {
+      if (window.electronAPI && window.electronAPI.uninstall && window.electronAPI.uninstall.getCacheSize) {
+        const res = await window.electronAPI.uninstall.getCacheSize();
+        if (res && res.success) {
+          this.cacheSize = res.formatted || '0 B';
+        }
+      }
+    } catch (err) {
+      console.warn('[SettingsView] Failed to fetch cache size:', err);
+    }
   },
 
   async loadSettings() {
@@ -195,11 +215,17 @@ window.SettingsView = {
 
           <div class="settings-card">
             <div class="settings-card-left">
-              <strong>Clear Download Cache</strong>
-              <p class="settings-option-desc">Clears all cached git clones and downloaded zip archives from <code>~/.cache/themestudio</code> to free disk space.</p>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <strong>Clear Download Cache</strong>
+                <span class="cache-badge settings-cache-badge">${this.cacheSize}</span>
+              </div>
+              <p class="settings-option-desc">Clears all cached git clones and downloaded zip archives from <code>~/.cache/themestudio</code> to free disk space without affecting installed themes.</p>
             </div>
             <div class="settings-card-right">
-              <button class="card-btn btn-secondary" id="btn-settings-clear-cache">
+              <button class="card-btn btn-secondary" id="btn-settings-clear-cache" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                </svg>
                 Clear Cache
               </button>
             </div>
@@ -236,16 +262,33 @@ window.SettingsView = {
       });
     });
 
-    // Wire Clear Cache Button
+    // Wire Clear Cache Button with identical confirmation dialog
     const clearCacheBtn = this.container.querySelector('#btn-settings-clear-cache');
     if (clearCacheBtn) {
-      clearCacheBtn.addEventListener('click', async () => {
-        try {
-          await window.electronAPI.settings.clearCache();
-          showToast('Download cache cleared successfully!', 'success');
-        } catch (err) {
-          showToast(`Failed to clear cache: ${err.message}`, 'warning');
-        }
+      clearCacheBtn.addEventListener('click', () => {
+        window.ConfirmDialog.show({
+          title: 'Clear Download Cache',
+          subtitle: `Freed space: ${this.cacheSize}`,
+          message: 'Are you sure you want to delete all cached download archives (.zip, .tar.xz) and temporary Git clones? This frees up disk space and will NOT affect your installed themes.',
+          confirmText: 'Clear Cache',
+          cancelText: 'Cancel',
+          onConfirm: async () => {
+            showToast('Clearing download and extraction cache...', 'info');
+            try {
+              const res = await window.electronAPI.uninstall.clearCache();
+              if (res && res.success) {
+                showToast('Download cache cleared successfully!', 'success');
+                await this.fetchCacheSize();
+                const badge = this.container?.querySelector('.settings-cache-badge');
+                if (badge) badge.textContent = this.cacheSize;
+              } else {
+                showToast(`Failed to clear cache: ${res ? res.error : 'Unknown error'}`, 'warning');
+              }
+            } catch (err) {
+              showToast(`Error clearing cache: ${err.message}`, 'warning');
+            }
+          }
+        });
       });
     }
 
@@ -303,4 +346,3 @@ window.SettingsView = {
     }
   }
 };
-
