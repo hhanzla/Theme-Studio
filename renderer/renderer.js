@@ -97,7 +97,10 @@ function restoreDefaultSubtabs() {
 async function loadCategory(category) {
   AppState.activeCategory = category;
   AppState.activeSubtab = 'browse'; // Always start on Browse when switching categories
-  try { sessionStorage.setItem('activeCategory', category); } catch (_) {}
+  try { 
+    sessionStorage.setItem('activeCategory', category); 
+    document.documentElement.setAttribute('data-initial-category', category);
+  } catch (_) {}
 
   // Update Active Sidebar Item
   document.querySelectorAll('.sidebar-nav .nav-item').forEach((btn) => {
@@ -697,7 +700,10 @@ function initEvents() {
 
 function openUninstallManager() {
   AppState.activeCategory = 'uninstall';
-  try { sessionStorage.setItem('activeCategory', 'uninstall'); } catch (_) {}
+  try { 
+    sessionStorage.setItem('activeCategory', 'uninstall'); 
+    document.documentElement.setAttribute('data-initial-category', 'uninstall');
+  } catch (_) {}
   pageTitleEl.textContent = 'Uninstall Manager';
   pageSubtitleEl.textContent = 'Manage, apply, or safely remove installed desktop themes';
 

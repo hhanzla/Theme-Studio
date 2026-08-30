@@ -154,13 +154,31 @@ body {
   color: #000000;
 }
 
-.nav-item.active {
+.nav-item.active,
+html[data-initial-category="looks"] .sidebar-nav [data-category="looks"],
+html[data-initial-category="gtk-theme"] .sidebar-nav [data-category="gtk-theme"],
+html[data-initial-category="shell-theme"] .sidebar-nav [data-category="shell-theme"],
+html[data-initial-category="icon-theme"] .sidebar-nav [data-category="icon-theme"],
+html[data-initial-category="cursor-theme"] .sidebar-nav [data-category="cursor-theme"],
+html[data-initial-category="wallpaper"] .sidebar-nav [data-category="wallpaper"],
+html[data-initial-category="extensions"] .sidebar-nav [data-category="extensions"],
+html[data-initial-category="settings"] .sidebar-nav [data-category="settings"],
+html[data-initial-category="uninstall"] #btn-uninstall-mgr {
   background: #ffffff;
   color: #000000;
   border-color: var(--border-subtle);
 }
 
-.nav-item.active .nav-icon {
+.nav-item.active .nav-icon,
+html[data-initial-category="looks"] .sidebar-nav [data-category="looks"] .nav-icon,
+html[data-initial-category="gtk-theme"] .sidebar-nav [data-category="gtk-theme"] .nav-icon,
+html[data-initial-category="shell-theme"] .sidebar-nav [data-category="shell-theme"] .nav-icon,
+html[data-initial-category="icon-theme"] .sidebar-nav [data-category="icon-theme"] .nav-icon,
+html[data-initial-category="cursor-theme"] .sidebar-nav [data-category="cursor-theme"] .nav-icon,
+html[data-initial-category="wallpaper"] .sidebar-nav [data-category="wallpaper"] .nav-icon,
+html[data-initial-category="extensions"] .sidebar-nav [data-category="extensions"] .nav-icon,
+html[data-initial-category="settings"] .sidebar-nav [data-category="settings"] .nav-icon,
+html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
   stroke: #000000;
 }
 
