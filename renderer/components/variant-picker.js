@@ -483,7 +483,8 @@ window.LookVariantPicker = {
       { value: 'orange', label: 'Orange' },
       { value: 'yellow', label: 'Yellow' },
       { value: 'green', label: 'Green' },
-      { value: 'grey', label: 'Grey' }
+      { value: 'grey', label: 'Grey' },
+      { value: 'all', label: 'All Colors (-a)' }
     ];
 
     const orchisModeOptions = [
@@ -495,6 +496,17 @@ window.LookVariantPicker = {
     const orchisSizeOptions = [
       { value: 'compact', label: 'Compact' },
       { value: 'standard', label: 'Standard' }
+    ];
+
+    const orchisIconOptions = [
+      { value: 'default', label: 'Default (Standard)' },
+      { value: 'ubuntu', label: 'Ubuntu Circle' },
+      { value: 'gnome', label: 'GNOME Footprint' },
+      { value: 'apple', label: 'Apple Logo' },
+      { value: 'arch', label: 'Arch Linux' },
+      { value: 'fedora', label: 'Fedora' },
+      { value: 'debian', label: 'Debian' },
+      { value: 'manjaro', label: 'Manjaro' }
     ];
 
     const telaColorOptions = [
@@ -512,7 +524,8 @@ window.LookVariantPicker = {
       { value: 'ubuntu', label: 'Ubuntu (Orange)' },
       { value: 'manjaro', label: 'Manjaro (Teal)' },
       { value: 'yellow', label: 'Yellow' },
-      { value: 'brown', label: 'Brown' }
+      { value: 'brown', label: 'Brown' },
+      { value: 'all', label: 'All 15 Folders (-a)' }
     ];
 
     const bibataStyleOptions = [
@@ -527,7 +540,7 @@ window.LookVariantPicker = {
     ];
 
     overlay.innerHTML = `
-      <div class="modal-dialog" style="max-width: 540px; width: 100%;">
+      <div class="modal-dialog" style="max-width: 580px; width: 100%; max-height: 88vh; display: flex; flex-direction: column;">
         <div class="modal-header">
           <div>
             <h3 class="modal-title">${item.name}</h3>
@@ -536,7 +549,7 @@ window.LookVariantPicker = {
           <button class="modal-close-btn" id="look-variant-close" title="Close">×</button>
         </div>
 
-        <div class="modal-body" style="padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; overflow: visible;">
+        <div class="modal-body" style="padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1;">
           <!-- Section 1: Orchis GTK & Shell -->
           <div style="background: #fbfbfc; border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 12px 14px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
@@ -550,7 +563,7 @@ window.LookVariantPicker = {
               <strong style="font-size: 12.5px; color: var(--text-primary);">1. Orchis Theme (GTK & Shell)</strong>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px;">
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
               <div class="form-group">
                 <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Color Accent</label>
                 ${renderCustomSelect('look-orchis-color', 'default', orchisColorOptions)}
@@ -564,6 +577,35 @@ window.LookVariantPicker = {
               <div class="form-group">
                 <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Size</label>
                 ${renderCustomSelect('look-orchis-size', 'compact', orchisSizeOptions)}
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 8px;">
+              <div class="form-group">
+                <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Top Panel Logo Icon</label>
+                ${renderCustomSelect('look-orchis-icon', 'default', orchisIconOptions)}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" style="font-size: 10.5px; margin-bottom: 4px;">Theme Tweaks <small style="color: var(--text-muted); font-weight: normal;">(Multi-select)</small></label>
+              <div class="tweaks-grid-container" style="grid-template-columns: 1fr 1fr; gap: 6px;">
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="macos" />
+                  <span class="tweak-checkbox-label">macOS Controls</span>
+                </label>
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="black" />
+                  <span class="tweak-checkbox-label">Deep Black (OLED)</span>
+                </label>
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="solid" />
+                  <span class="tweak-checkbox-label">Solid Panel</span>
+                </label>
+                <label class="tweak-checkbox-item">
+                  <input type="checkbox" class="look-tweak-checkbox" value="primary" />
+                  <span class="tweak-checkbox-label">Primary Accent</span>
+                </label>
               </div>
             </div>
           </div>
@@ -683,6 +725,9 @@ window.LookVariantPicker = {
       const orchisColor = overlay.querySelector('#look-orchis-color')?.getAttribute('data-value') || 'default';
       const orchisMode = overlay.querySelector('#look-orchis-mode')?.getAttribute('data-value') || 'dark';
       const orchisSize = overlay.querySelector('#look-orchis-size')?.getAttribute('data-value') || 'compact';
+      const orchisIcon = overlay.querySelector('#look-orchis-icon')?.getAttribute('data-value') || 'default';
+
+      const checkedTweaks = Array.from(overlay.querySelectorAll('.look-tweak-checkbox:checked')).map(cb => cb.value);
 
       const telaColor = overlay.querySelector('#look-tela-color')?.getAttribute('data-value') || 'dracula';
 
@@ -693,7 +738,9 @@ window.LookVariantPicker = {
         theme: {
           color: orchisColor,
           mode: orchisMode,
-          size: orchisSize
+          size: orchisSize,
+          icon: orchisIcon,
+          tweaks: checkedTweaks.join(' ') || 'none'
         },
         icon: {
           color: telaColor
