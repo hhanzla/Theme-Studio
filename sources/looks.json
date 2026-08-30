@@ -1,112 +1,13 @@
 [
   {
-    "id": "look-orchis-dark",
-    "name": "Orchis Modern Dark",
-    "description": "Sleek and polished dark setup featuring Orchis GTK & Shell with Reversal dark icons and crisp Bibata Ice cursor.",
+    "id": "look-orchis-tela",
+    "name": "Orchis with Tela & Bibata",
+    "description": "Complete curated desktop setup combining Orchis GTK & Shell, Tela colorful icons, Bibata sleek cursor, and 4K mountain wallpaper.",
     "thumbnail": "assets/previews/orchis.png",
     "author": "Theme Studio Team",
-    "gtk_theme": "orchis",
-    "gtk_variant": {
-      "mode": "dark",
-      "size": "compact",
-      "color": "default"
-    },
-    "shell_theme": "orchis-shell",
-    "shell_variant": {
-      "mode": "dark",
-      "size": "compact",
-      "color": "default"
-    },
-    "icon_theme": "reversal-icon-theme",
-    "icon_variant": {
-      "color": "black"
-    },
-    "cursor_theme": "bibata-modern-ice",
-    "cursor_variant": {
-      "style": "modern",
-      "color": "ice"
-    },
+    "theme_id": "orchis",
+    "icon_id": "tela-icon-theme",
+    "cursor_id": "bibata-modern-ice",
     "wallpaper": "assets/wallpapers/snowy-mountain-peak.jpg"
-  },
-  {
-    "id": "look-sweet-neon",
-    "name": "Sweet Cyber Neon",
-    "description": "Vibrant gradient theme with sweet neon colors, candy icons, and futuristic cyber glow wallpaper.",
-    "thumbnail": "assets/previews/sweet-theme.png",
-    "author": "Theme Studio Team",
-    "gtk_theme": "sweet-theme",
-    "gtk_variant": {
-      "color": "dark"
-    },
-    "shell_theme": "sweet-shell",
-    "shell_variant": {
-      "color": "dark"
-    },
-    "icon_theme": "candy-icons",
-    "icon_variant": {},
-    "cursor_theme": "bibata-modern-ice",
-    "cursor_variant": {
-      "style": "modern",
-      "color": "amber"
-    },
-    "wallpaper": "assets/wallpapers/neon-cyber-glow-4k.jpg"
-  },
-  {
-    "id": "look-whitesur-nord",
-    "name": "WhiteSur Cupertino",
-    "description": "Refined macOS-inspired aesthetic with WhiteSur Big Sur icons and classic Bibata pointers.",
-    "thumbnail": "assets/previews/whitesur-icon-theme.png",
-    "author": "Theme Studio Team",
-    "gtk_theme": "orchis",
-    "gtk_variant": {
-      "mode": "dark",
-      "size": "standard",
-      "color": "nord"
-    },
-    "shell_theme": "orchis-shell",
-    "shell_variant": {
-      "mode": "dark",
-      "size": "standard",
-      "color": "nord"
-    },
-    "icon_theme": "whitesur-icon-theme",
-    "icon_variant": {
-      "color": "nord"
-    },
-    "cursor_theme": "bibata-modern-ice",
-    "cursor_variant": {
-      "style": "modern",
-      "color": "classic"
-    },
-    "wallpaper": "assets/wallpapers/macOS-Big-Sur-Spectrum.jpg"
-  },
-  {
-    "id": "look-papirus-breeze",
-    "name": "Papirus Minimalist",
-    "description": "Clean, highly-readable desktop preset featuring Papirus dark icons and serene nature landscape.",
-    "thumbnail": "assets/previews/papirus-icon-theme.png",
-    "author": "Theme Studio Team",
-    "gtk_theme": "orchis",
-    "gtk_variant": {
-      "mode": "dark",
-      "size": "compact",
-      "color": "teal"
-    },
-    "shell_theme": "orchis-shell",
-    "shell_variant": {
-      "mode": "dark",
-      "size": "compact",
-      "color": "teal"
-    },
-    "icon_theme": "papirus-icon-theme",
-    "icon_variant": {
-      "mode": "dark"
-    },
-    "cursor_theme": "bibata-modern-ice",
-    "cursor_variant": {
-      "style": "original",
-      "color": "ice"
-    },
-    "wallpaper": "assets/wallpapers/lake-mountain-fog-mist-scenery-ai-4k-wallpaper-uhdpaper.com-709@1@l.jpg"
   }
 ]

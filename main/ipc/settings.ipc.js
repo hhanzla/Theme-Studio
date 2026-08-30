@@ -87,7 +87,7 @@ function registerSettingsIpc() {
       const { id } = payload;
       if (!id) return { success: false, error: 'Look ID is required' };
 
-      const result = await looks.applyLookPreset(id, (p) => {
+      const result = await looks.applyLookPreset(payload, (p) => {
         event.sender.send('install:progress', { id, ...p });
       });
 

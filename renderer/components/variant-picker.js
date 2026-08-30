@@ -399,3 +399,202 @@ window.ApplyVariantPicker = {
     }
   }
 };
+
+// Look Variant Picker Component - Lets user configure variants for bundled Look components before applying
+window.LookVariantPicker = {
+  open(item, onConfirm) {
+    this.close();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'look-variant-picker-modal';
+
+    overlay.innerHTML = `
+      <div class="modal-dialog" style="max-width: 580px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title">${item.name}</h3>
+            <p class="modal-subtitle">Select variants for each bundled theme before applying</p>
+          </div>
+          <button class="modal-close" id="look-variant-close" title="Close">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body" style="overflow-y: auto; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px;">
+          <!-- Section 1: Orchis GTK & Shell -->
+          <div class="look-component-section" style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="display: inline-flex; padding: 4px; border-radius: 4px; background: rgba(207, 65, 16, 0.1); color: #cf4110;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                  <path d="M3 9h18"></path>
+                  <path d="M9 21V9"></path>
+                </svg>
+              </span>
+              <strong style="font-size: 13.5px;">1. Orchis Theme (GTK & Shell)</strong>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Theme Color</label>
+                <select id="look-orchis-color" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
+                  <option value="default" selected>Default (Blue)</option>
+                  <option value="purple">Purple</option>
+                  <option value="nord">Nord</option>
+                  <option value="teal">Teal</option>
+                  <option value="pink">Pink</option>
+                  <option value="red">Red</option>
+                  <option value="orange">Orange</option>
+                  <option value="yellow">Yellow</option>
+                  <option value="green">Green</option>
+                  <option value="grey">Grey</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Mode</label>
+                <select id="look-orchis-mode" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
+                  <option value="dark" selected>Dark</option>
+                  <option value="light">Light</option>
+                  <option value="standard">Standard</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Size</label>
+                <select id="look-orchis-size" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
+                  <option value="compact" selected>Compact</option>
+                  <option value="standard">Standard</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Tela Icon Theme -->
+          <div class="look-component-section" style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="display: inline-flex; padding: 4px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: #2563eb;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="7" height="7" x="3" y="3" rx="1"></rect>
+                  <rect width="7" height="7" x="14" y="3" rx="1"></rect>
+                  <rect width="7" height="7" x="14" y="14" rx="1"></rect>
+                  <rect width="7" height="7" x="3" y="14" rx="1"></rect>
+                </svg>
+              </span>
+              <strong style="font-size: 13.5px;">2. Tela Icon Theme</strong>
+            </div>
+
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Folder Color Scheme</label>
+              <select id="look-tela-color" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
+                <option value="dracula" selected>Dracula</option>
+                <option value="nord">Nord</option>
+                <option value="standard">Standard Blue</option>
+                <option value="black">Black</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="grey">Grey</option>
+                <option value="orange">Orange</option>
+                <option value="pink">Pink</option>
+                <option value="purple">Purple</option>
+                <option value="red">Red</option>
+                <option value="ubuntu">Ubuntu</option>
+                <option value="manjaro">Manjaro</option>
+                <option value="yellow">Yellow</option>
+                <option value="brown">Brown</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Section 3: Bibata Modern Cursor -->
+          <div class="look-component-section" style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span style="display: inline-flex; padding: 4px; border-radius: 4px; background: rgba(16, 185, 129, 0.1); color: #059669;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path>
+                  <path d="m13 13 6 6"></path>
+                </svg>
+              </span>
+              <strong style="font-size: 13.5px;">3. Bibata Cursor</strong>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Style</label>
+                <select id="look-bibata-style" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
+                  <option value="modern" selected>Modern (Rounded)</option>
+                  <option value="original">Original (Sharp)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Color</label>
+                <select id="look-bibata-color" class="setting-select" style="width: 100%; padding: 6px 8px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-subtle); background: #ffffff;">
+                  <option value="ice" selected>Ice (White)</option>
+                  <option value="classic">Classic (Black)</option>
+                  <option value="amber">Amber (Gold)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: flex-end; gap: 8px;">
+          <button class="btn btn-secondary" id="look-variant-cancel">Cancel</button>
+          <button class="btn btn-primary" id="look-variant-confirm" style="background: #cf4110; border-color: #cf4110; color: #ffffff;">
+            Install & Apply Full Look
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const close = () => this.close();
+    overlay.querySelector('#look-variant-close').addEventListener('click', close);
+    overlay.querySelector('#look-variant-cancel').addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+    overlay.querySelector('#look-variant-confirm').addEventListener('click', () => {
+      const orchisColor = overlay.querySelector('#look-orchis-color').value;
+      const orchisMode = overlay.querySelector('#look-orchis-mode').value;
+      const orchisSize = overlay.querySelector('#look-orchis-size').value;
+
+      const telaColor = overlay.querySelector('#look-tela-color').value;
+
+      const bibataStyle = overlay.querySelector('#look-bibata-style').value;
+      const bibataColor = overlay.querySelector('#look-bibata-color').value;
+
+      const chosenVariants = {
+        theme: {
+          color: orchisColor,
+          mode: orchisMode,
+          size: orchisSize
+        },
+        icon: {
+          color: telaColor
+        },
+        cursor: {
+          style: bibataStyle,
+          color: bibataColor
+        }
+      };
+
+      close();
+      if (typeof onConfirm === 'function') {
+        onConfirm(chosenVariants);
+      }
+    });
+  },
+
+  close() {
+    const existing = document.getElementById('look-variant-picker-modal');
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+  }
+};

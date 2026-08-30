@@ -420,6 +420,32 @@ async function handleCardAction(item, card) {
       return;
     }
 
+    if (window.LookVariantPicker && typeof window.LookVariantPicker.open === 'function') {
+      window.LookVariantPicker.open(item, async (chosenVariants) => {
+        AppState.activeInstalls.add(item.id);
+        window.ThemeCard.setProgress(card, 15, 'applying', `Applying ${item.name}...`);
+        showToast(`Installing & applying ${item.name}...`, 'info');
+
+        try {
+          const res = await window.electronAPI.looks.apply({ id: item.id, variants: chosenVariants });
+          AppState.activeInstalls.delete(item.id);
+
+          if (res && res.success) {
+            window.ThemeCard.setInstalled(card, true);
+            showToast(`${item.name} applied successfully!`, 'success');
+          } else {
+            window.ThemeCard.setProgress(card, 0, 'error', res ? res.error : 'Failed to apply look');
+            showToast(`Failed to apply look: ${res ? res.error : 'Error'}`, 'warning');
+          }
+        } catch (err) {
+          AppState.activeInstalls.delete(item.id);
+          window.ThemeCard.setProgress(card, 0, 'error', err.message);
+          showToast(`Error applying look: ${err.message}`, 'warning');
+        }
+      });
+      return;
+    }
+
     AppState.activeInstalls.add(item.id);
     window.ThemeCard.setProgress(card, 15, 'applying', `Applying ${item.name}...`);
     showToast(`Applying ${item.name} preset...`, 'info');

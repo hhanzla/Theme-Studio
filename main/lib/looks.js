@@ -22,11 +22,14 @@ function getLookPresets() {
 }
 
 /**
- * Applies a full look preset (installs missing components and sets GNOME appearance)
- * @param {string} lookId - Preset ID
+ * Applies a full look preset (installs components with chosen variants and sets GNOME appearance)
+ * @param {object|string} payload - Preset ID or object { id, variants }
  * @param {function} onProgress - Callback ({ percent, stage, message })
  */
-async function applyLookPreset(lookId, onProgress = () => {}) {
+async function applyLookPreset(payload, onProgress = () => {}) {
+  const lookId = typeof payload === 'string' ? payload : (payload.id || payload);
+  const selectedVariants = (typeof payload === 'object' && payload.variants) || {};
+
   const presets = getLookPresets();
   const look = presets.find(l => l.id === lookId);
 
@@ -36,69 +39,105 @@ async function applyLookPreset(lookId, onProgress = () => {}) {
 
   onProgress({ percent: 10, stage: 'checking_components', message: `Preparing ${look.name}...` });
 
-  // 1. Check & Install GTK Theme if needed
+  // 1. Check & Install GTK Theme (Orchis) with selected or preset variant
+  let installedGtkTarget = null;
   if (look.theme_id) {
     const themeItem = catalog.findItemById(look.theme_id, 'gtk-theme');
-    if (themeItem && !stateStore.isInstalled(themeItem.id)) {
-      onProgress({ percent: 25, stage: 'installing_theme', message: `Installing theme: ${themeItem.name}...` });
-      await installer.installItem(themeItem, { variant: look.variant }, () => {});
+    const gtkVar = selectedVariants.theme || look.gtk_variant || { color: 'default', mode: 'dark', size: 'compact' };
+    onProgress({ percent: 25, stage: 'installing_theme', message: `Installing theme: ${themeItem ? themeItem.name : 'Theme'}...` });
+    if (themeItem) {
+      const res = await installer.installItem(themeItem, { variant: gtkVar }, (p) => {
+        onProgress({ percent: 20 + Math.round(p.percent * 0.2), stage: 'installing_theme', message: p.message });
+      });
+      if (res && res.item && res.item.installed_folders && res.item.installed_folders.length > 0) {
+        installedGtkTarget = res.item.installed_folders[0];
+      }
     }
   }
 
-  // 2. Check & Install Icons if needed
+  // 2. Check & Install Icons (Tela) with selected or preset variant
+  let installedIconTarget = null;
   if (look.icon_id) {
     const iconItem = catalog.findItemById(look.icon_id, 'icon-theme');
-    if (iconItem && !stateStore.isInstalled(iconItem.id)) {
-      onProgress({ percent: 50, stage: 'installing_icons', message: `Installing icon pack: ${iconItem.name}...` });
-      await installer.installItem(iconItem, {}, () => {});
+    const iconVar = selectedVariants.icon || look.icon_variant || { color: 'dracula' };
+    onProgress({ percent: 50, stage: 'installing_icons', message: `Installing icon pack: ${iconItem ? iconItem.name : 'Icons'}...` });
+    if (iconItem) {
+      const res = await installer.installItem(iconItem, { variant: iconVar }, (p) => {
+        onProgress({ percent: 45 + Math.round(p.percent * 0.2), stage: 'installing_icons', message: p.message });
+      });
+      if (res && res.item && res.item.installed_folders && res.item.installed_folders.length > 0) {
+        installedIconTarget = res.item.installed_folders[0];
+      }
     }
   }
 
-  // 3. Check & Install Cursors if needed
+  // 3. Check & Install Cursors (Bibata) with selected or preset variant
+  let installedCursorTarget = null;
   if (look.cursor_id) {
     const cursorItem = catalog.findItemById(look.cursor_id, 'cursor-theme');
-    if (cursorItem && !stateStore.isInstalled(cursorItem.id)) {
-      onProgress({ percent: 70, stage: 'installing_cursors', message: `Installing cursor set: ${cursorItem.name}...` });
-      await installer.installItem(cursorItem, {}, () => {});
+    const cursorVar = selectedVariants.cursor || look.cursor_variant || { style: 'modern', color: 'ice' };
+    onProgress({ percent: 70, stage: 'installing_cursors', message: `Installing cursor set: ${cursorItem ? cursorItem.name : 'Cursors'}...` });
+    if (cursorItem) {
+      const res = await installer.installItem(cursorItem, { variant: cursorVar }, (p) => {
+        onProgress({ percent: 65 + Math.round(p.percent * 0.15), stage: 'installing_cursors', message: p.message });
+      });
+      if (res && res.item && res.item.installed_folders && res.item.installed_folders.length > 0) {
+        installedCursorTarget = res.item.installed_folders[0];
+      }
     }
   }
 
   // 4. Download and Apply Wallpaper if specified
-  if (look.wallpaper_url) {
-    onProgress({ percent: 85, stage: 'applying_wallpaper', message: 'Downloading & setting wallpaper...' });
-    const wallpapersDir = path.join(DOWNLOAD_CACHE, 'wallpapers');
-    if (!fs.existsSync(wallpapersDir)) {
-      fs.mkdirSync(wallpapersDir, { recursive: true });
+  const wallpaperRelOrUrl = look.wallpaper || look.wallpaper_url;
+  if (wallpaperRelOrUrl) {
+    onProgress({ percent: 85, stage: 'applying_wallpaper', message: 'Setting desktop wallpaper...' });
+    let localWpPath = null;
+    if (wallpaperRelOrUrl.startsWith('http://') || wallpaperRelOrUrl.startsWith('https://')) {
+      const wallpapersDir = path.join(DOWNLOAD_CACHE, 'wallpapers');
+      if (!fs.existsSync(wallpapersDir)) fs.mkdirSync(wallpapersDir, { recursive: true });
+      const wpFile = path.join(wallpapersDir, `${look.id}.jpg`);
+      if (!fs.existsSync(wpFile)) {
+        await downloader.downloadFile(wallpaperRelOrUrl, wpFile);
+      }
+      localWpPath = wpFile;
+    } else {
+      localWpPath = path.resolve(__dirname, '../../renderer', wallpaperRelOrUrl);
     }
-    const wallpaperPath = path.join(wallpapersDir, `${look.id}.png`);
-    if (!fs.existsSync(wallpaperPath)) {
+    if (localWpPath && fs.existsSync(localWpPath)) {
       try {
-        await downloader.downloadFile(look.wallpaper_url, wallpaperPath);
+        await gnome.setWallpaper(localWpPath);
       } catch (err) {
-        console.error('[Looks] Failed to download wallpaper:', err);
+        console.error('[Looks] Failed to set wallpaper:', err);
       }
     }
-    if (fs.existsSync(wallpaperPath)) {
-      await gnome.setWallpaper(wallpaperPath);
-    }
   }
 
-  // 5. Apply multi-gsettings
+  // 5. Apply GNOME Appearance
   onProgress({ percent: 95, stage: 'applying_settings', message: 'Applying desktop appearance...' });
 
-  if (look.gtk_theme_name) {
-    await gnome.setGtkTheme(look.gtk_theme_name);
+  const targetGtk = installedGtkTarget || look.gtk_theme_name || 'Orchis-Dark-Compact';
+  const targetIcon = installedIconTarget || look.icon_theme_name || 'Tela-dracula';
+  const targetCursor = installedCursorTarget || look.cursor_theme_name || 'Bibata-Modern-Ice';
+
+  if (targetGtk) {
+    try {
+      await gnome.setGtkTheme(targetGtk);
+      await gnome.setShellTheme(targetGtk);
+    } catch (_) {}
   }
-  if (look.icon_theme_name) {
-    await gnome.setIconTheme(look.icon_theme_name);
+  if (targetIcon) {
+    try {
+      await gnome.setIconTheme(targetIcon);
+    } catch (_) {}
   }
-  if (look.cursor_theme_name) {
-    await gnome.setCursorTheme(look.cursor_theme_name);
+  if (targetCursor) {
+    try {
+      await gnome.setCursorTheme(targetCursor);
+    } catch (_) {}
   }
 
   // 6. Record active look in settings
   stateStore.setSetting('active_look', look.id);
-
   onProgress({ percent: 100, stage: 'completed', message: `${look.name} applied successfully!` });
 
   return {
