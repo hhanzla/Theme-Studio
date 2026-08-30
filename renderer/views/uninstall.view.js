@@ -126,7 +126,8 @@ window.UninstallView = {
       ? `${item.variant.color || ''} ${item.variant.mode ? '(' + item.variant.mode + ')' : ''}`.trim()
       : (item.installed_folders && item.installed_folders.length > 0 ? item.installed_folders.join(', ') : 'Standard');
 
-    const thumbnailSrc = item.thumbnail || `assets/previews/${item.id}.png`;
+    const baseId = (item.id || '').replace(/-shell$/, '');
+    const thumbnailSrc = item.thumbnail || `assets/previews/${baseId}.png`;
 
     return `
       <div class="theme-card is-installed" data-id="${item.id}">

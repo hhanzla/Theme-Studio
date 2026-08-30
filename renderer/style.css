@@ -1324,31 +1324,110 @@ body {
 
 .settings-paths-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
 }
 
 .path-card {
   background: #ffffff;
   border: 1px solid var(--border-card);
   border-radius: var(--radius);
-  padding: 12px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.path-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.path-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  overflow: hidden;
+}
+
+.path-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .path-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: #1e293b;
+}
+
+.path-tag {
+  font-size: 9.5px;
+  font-weight: 600;
   text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.path-tag-user {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.path-tag-system {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.path-tag-config {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.path-tag-cache {
+  background: #fae8ff;
+  color: #86198f;
 }
 
 .path-value {
   font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: #000000;
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: all;
+}
+
+.path-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-open-path {
+  background: #f8fafc;
+  border: 1px solid var(--border-card);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-open-path:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
 }
 
 /* Minimalist Toggle Switch */

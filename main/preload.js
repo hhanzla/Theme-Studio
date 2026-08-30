@@ -38,7 +38,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
-    set: (payload) => ipcRenderer.invoke('settings:set', payload)
+    set: (payload) => ipcRenderer.invoke('settings:set', payload),
+    openPath: (targetPath) => ipcRenderer.invoke('system:open-path', targetPath),
+    clearCache: () => ipcRenderer.invoke('system:clear-cache')
   },
   looks: {
     apply: (payload) => ipcRenderer.invoke('look:apply', payload)

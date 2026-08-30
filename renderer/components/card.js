@@ -179,14 +179,19 @@ window.ThemeCard = {
     btn.disabled = true;
     btn.className = 'card-btn btn-secondary action-trigger-btn is-loading';
     
-    if (stage === 'downloading') {
-      btn.textContent = `Downloading ${percent}%`;
-    } else if (stage === 'cloning_repo') {
-      btn.textContent = `Cloning ${percent}%`;
+    if (stage === 'downloading' || stage === 'cloning_repo') {
+      if (message && (message.includes('MiB') || message.includes('KiB') || message.includes('%') || message.includes('MB') || message.includes('KB'))) {
+        let cleanMsg = message.replace(/^Downloading repository\s*/i, 'Downloading ').replace(/^Cloning repository\s*/i, 'Cloning ').replace(/^Connecting to repository\s*/i, 'Connecting...');
+        btn.textContent = cleanMsg;
+      } else if (percent === 0 || !percent) {
+        btn.textContent = 'Connecting...';
+      } else {
+        btn.textContent = `Downloading ${percent}%`;
+      }
     } else if (stage === 'extracting') {
-      btn.textContent = 'Extracting...';
+      btn.textContent = message || 'Extracting...';
     } else if (stage === 'running_script' || stage === 'applying' || stage === 'applying_fixes') {
-      btn.textContent = 'Installing...';
+      btn.textContent = message || 'Installing...';
     } else {
       btn.textContent = message || 'Processing...';
     }

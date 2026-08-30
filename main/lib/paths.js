@@ -13,8 +13,14 @@ const HOME = os.homedir();
 
 const GTK_THEMES = path.join(HOME, '.themes');
 const ICON_THEMES = path.join(HOME, '.icons');
+const LOCAL_THEMES = path.join(HOME, '.local', 'share', 'themes');
+const LOCAL_ICONS = path.join(HOME, '.local', 'share', 'icons');
+const SYSTEM_THEMES = '/usr/share/themes';
+const SYSTEM_ICONS = '/usr/share/icons';
 const GTK4_CONFIG = path.join(HOME, '.config', 'gtk-4.0');
+const GTK3_CONFIG = path.join(HOME, '.config', 'gtk-3.0');
 const EXTENSIONS_DIR = path.join(HOME, '.local', 'share', 'gnome-shell', 'extensions');
+const BACKGROUNDS_DIR = path.join(HOME, '.local', 'share', 'backgrounds');
 const DOWNLOAD_CACHE = path.join(HOME, '.cache', 'themestudio', 'downloads');
 
 // When app is not initialized yet or in standalone test, fallback to ~/.config/themestudio
@@ -37,8 +43,14 @@ module.exports = {
   THEMES_DIR: GTK_THEMES,
   ICON_THEMES,
   ICONS_DIR: ICON_THEMES,
+  LOCAL_THEMES,
+  LOCAL_ICONS,
+  SYSTEM_THEMES,
+  SYSTEM_ICONS,
   GTK4_CONFIG,
+  GTK3_CONFIG,
   EXTENSIONS_DIR,
+  BACKGROUNDS_DIR,
   DOWNLOAD_CACHE,
   STATE_FILE,
   getUserDataPath

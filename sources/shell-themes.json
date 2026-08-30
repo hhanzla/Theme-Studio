@@ -22,5 +22,41 @@
     "gtk4_fix": false,
     "gdm_eligible": true,
     "notes": "Customizes the GNOME top bar, quick settings toggle menu, calendar popup, and OSD volume sliders with rounded Material design."
+  },
+  {
+    "id": "sweet-shell",
+    "name": "Sweet Shell",
+    "category": "shell-theme",
+    "thumbnail": "assets/previews/sweet.png",
+    "author": "EliverLara",
+    "source_url": "https://github.com/EliverLara/Sweet",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-Dark-v40.tar.xz",
+      "variant_urls": {
+        "dark": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-Dark-v40.tar.xz",
+        "ambar-blue-dark": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-Ambar-Blue-Dark-v40.tar.xz",
+        "ambar-blue": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-Ambar-Blue-v40.tar.xz",
+        "ambar": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-Ambar-v40.tar.xz",
+        "mars": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-mars-v40.tar.xz",
+        "light": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-v40.tar.xz"
+      }
+    },
+    "variants": {
+      "color": [
+        "dark",
+        "ambar-blue-dark",
+        "ambar-blue",
+        "ambar",
+        "mars",
+        "light"
+      ]
+    },
+    "target_dir": "~/.themes",
+    "gtk4_fix": false,
+    "gdm_eligible": true,
+    "notes": "Neon dark aesthetic for the GNOME Shell top panel, quick settings dropdown, and system notifications."
   }
 ]

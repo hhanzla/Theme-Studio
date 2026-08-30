@@ -38,5 +38,90 @@
     },
     "install_script": "./install.sh",
     "install_args_template": "{color} -d {dest_dir}"
+  },
+  {
+    "id": "whitesur-icon-theme",
+    "name": "WhiteSur Icon Theme",
+    "category": "icon-theme",
+    "author": "vinceliuice",
+    "install_type": "script",
+    "notes": "MacOS Big Sur aesthetic icon theme for Linux desktops with vibrant rounded-corner app icons and multiple color variants.",
+    "thumbnail": "assets/previews/whitesur-icon-theme.png",
+    "source": {
+      "type": "git",
+      "repo": "https://github.com/vinceliuice/WhiteSur-icon-theme.git",
+      "branch": "master"
+    },
+    "dependencies": [
+      "git",
+      "bash"
+    ],
+    "variants": {
+      "color": [
+        "default",
+        "purple",
+        "pink",
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "grey",
+        "nord",
+        "all"
+      ]
+    },
+    "install_script": "./install.sh",
+    "install_args_template": "-t {color} -d {dest_dir}"
+  },
+  {
+    "id": "reversal-icon-theme",
+    "name": "Reversal Icon Theme",
+    "category": "icon-theme",
+    "author": "yeyushengfan258",
+    "install_type": "script",
+    "notes": "A sleek, colorful rectangle-shaped icon theme for Linux desktops with 12 vibrant color accents.",
+    "thumbnail": "assets/previews/reversal-icon-theme.png",
+    "source": {
+      "type": "git",
+      "repo": "https://github.com/yeyushengfan258/Reversal-icon-theme.git",
+      "branch": "master"
+    },
+    "dependencies": [
+      "git",
+      "bash"
+    ],
+    "variants": {
+      "color": [
+        "default",
+        "black",
+        "blue",
+        "brown",
+        "cyan",
+        "green",
+        "grey",
+        "lightblue",
+        "orange",
+        "pink",
+        "purple",
+        "red",
+        "all"
+      ]
+    },
+    "install_script": "./install.sh",
+    "install_args_template": "-t {color} -d {dest_dir}"
+  },
+  {
+    "id": "candy-icons",
+    "name": "Candy Icons",
+    "category": "icon-theme",
+    "author": "EliverLara",
+    "install_type": "zip-static",
+    "notes": "Sweet, vibrant gradient icons with bold colors designed to match Sweet theme aesthetics.",
+    "thumbnail": "assets/previews/candy-icons.png",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/EliverLara/candy-icons/archive/refs/heads/master.zip"
+    },
+    "target_dir": "~/.local/share/icons"
   }
 ]

@@ -183,6 +183,19 @@ function updateView() {
   if (countInstalledEl) countInstalledEl.textContent = installedItems.length;
   if (countBrowseEl) countBrowseEl.textContent = browseItems.length;
 
+  // Sync Subtab Buttons Active Class
+  const instBtn = document.getElementById('tab-installed');
+  const brwBtn = document.getElementById('tab-browse');
+  if (instBtn && brwBtn) {
+    if (AppState.activeSubtab === 'installed') {
+      instBtn.classList.add('active');
+      brwBtn.classList.remove('active');
+    } else {
+      brwBtn.classList.add('active');
+      instBtn.classList.remove('active');
+    }
+  }
+
   // Filter items based on active subtab and search query
   let displayItems = AppState.activeSubtab === 'installed' ? installedItems : browseItems;
 
@@ -349,7 +362,7 @@ async function cancelInstallItem(itemId, itemName) {
 async function executeInstall(item, card, variant = null) {
   AppState.activeInstalls.add(item.id);
   const onCancel = () => cancelInstallItem(item.id, item.name);
-  window.ThemeCard.setProgress(card, 5, 'downloading', 'Starting installation...', onCancel);
+  window.ThemeCard.setProgress(card, 0, 'downloading', 'Connecting...', onCancel);
   showToast(`Installing ${item.name}...`, 'info');
 
   try {
@@ -375,9 +388,11 @@ async function executeInstall(item, card, variant = null) {
 
       // Auto-switch to Installed subtab and refresh
       AppState.activeSubtab = 'installed';
-      if (tabInstalledBtn) {
-        tabInstalledBtn.classList.add('active');
-        tabBrowseBtn.classList.remove('active');
+      const instBtn = document.getElementById('tab-installed');
+      const brwBtn = document.getElementById('tab-browse');
+      if (instBtn && brwBtn) {
+        instBtn.classList.add('active');
+        brwBtn.classList.remove('active');
       }
       updateView();
     } else {

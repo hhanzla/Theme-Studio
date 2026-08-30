@@ -221,34 +221,48 @@ function registerSystemIpc() {
       const rawName = typeof payload === 'string' ? payload : (payload.name || payload.id);
       const category = (typeof payload === 'object' && payload.category) || 'gtk-theme';
       const isGtkOrShell = category === 'gtk-theme' || category === 'shell-theme';
-      const baseDir = isGtkOrShell ? GTK_THEMES : ICON_THEMES;
-
-      if (!fs.existsSync(baseDir)) {
-        return { success: true, variants: [] };
-      }
+      const baseDirs = isGtkOrShell
+        ? [GTK_THEMES, path.join(HOME, '.local', 'share', 'themes'), '/usr/share/themes']
+        : [ICON_THEMES, path.join(HOME, '.local', 'share', 'icons'), '/usr/share/icons'];
 
       const cleanBaseSlug = (rawName || '').toLowerCase()
         .replace(/shell|gtk|theme|themes/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
 
-      const entries = fs.readdirSync(baseDir);
+      const seen = new Set();
+      const matchedFolders = [];
 
-      const matchedFolders = entries.filter(e => {
-        const eLower = e.toLowerCase();
-        if (eLower.endsWith('-hdpi') || eLower.endsWith('-xhdpi')) return false;
+      for (const baseDir of baseDirs) {
+        if (!fs.existsSync(baseDir)) continue;
+        try {
+          const entries = fs.readdirSync(baseDir);
+          for (const e of entries) {
+            if (seen.has(e)) continue;
+            const eLower = e.toLowerCase();
+            if (eLower.endsWith('-hdpi') || eLower.endsWith('-xhdpi')) continue;
 
-        const matches = cleanBaseSlug && (eLower === cleanBaseSlug || eLower.includes(cleanBaseSlug) || cleanBaseSlug.includes(eLower));
-        if (category === 'shell-theme') {
-          return matches && fs.existsSync(path.join(baseDir, e, 'gnome-shell'));
-        }
-        return matches;
-      });
+            const matches = cleanBaseSlug && (eLower === cleanBaseSlug || eLower.includes(cleanBaseSlug) || cleanBaseSlug.includes(eLower));
+            if (!matches) continue;
+            if (category === 'shell-theme' && !fs.existsSync(path.join(baseDir, e, 'gnome-shell'))) continue;
+
+            seen.add(e);
+            matchedFolders.push(e);
+          }
+        } catch (_) {}
+      }
 
       const variants = matchedFolders.map(folder => {
         let label = folder;
         if (folder.toLowerCase().includes('compact')) {
           label = `Compact (${folder})`;
+        } else if (folder.includes('-')) {
+          const part = folder.split('-').slice(1).join('-');
+          if (part) {
+            label = `${part.charAt(0).toUpperCase() + part.slice(1)} (${folder})`;
+          } else {
+            label = folder;
+          }
         } else {
           label = `Standard (${folder})`;
         }

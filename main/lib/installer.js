@@ -14,7 +14,9 @@ const activeInstallations = new Map();
  * @returns {boolean}
  */
 function cancelInstall(id) {
+  let wasActive = false;
   if (activeInstallations.has(id)) {
+    wasActive = true;
     const tracker = activeInstallations.get(id);
     activeInstallations.delete(id);
     if (typeof tracker.cancel === 'function') {
@@ -22,9 +24,30 @@ function cancelInstall(id) {
         tracker.cancel();
       } catch (_) {}
     }
-    return true;
   }
-  return downloader.cancelDownload(id);
+
+  // Always cancel any active download/git process
+  downloader.cancelDownload(id);
+
+  // Clear all cache folders and archives for this id
+  try {
+    const repoCache = path.join(DOWNLOAD_CACHE, 'repos', id);
+    if (fs.existsSync(repoCache)) {
+      fs.rmSync(repoCache, { recursive: true, force: true });
+    }
+    const zipCache = path.join(DOWNLOAD_CACHE, `${id}.zip`);
+    if (fs.existsSync(zipCache)) {
+      fs.unlinkSync(zipCache);
+    }
+    const extractCache = path.join(DOWNLOAD_CACHE, 'extract', id);
+    if (fs.existsSync(extractCache)) {
+      fs.rmSync(extractCache, { recursive: true, force: true });
+    }
+  } catch (err) {
+    console.error(`[Installer] Error cleaning cache for ${id}:`, err);
+  }
+
+  return wasActive;
 }
 
 /**
@@ -164,7 +187,7 @@ function copyDirRecursive(src, dest) {
  * @param {function} onProgress - Callback ({ percent, stage, message })
  * @returns {Promise<object>} - Result object
  */
-async function installZipStatic(item, onProgress = () => {}) {
+async function installZipStatic(item, onProgress = () => {}, options = {}) {
   const targetDir = resolveTargetDir(item.target_dir, item.category);
 
   if (!fs.existsSync(targetDir)) {
@@ -174,15 +197,24 @@ async function installZipStatic(item, onProgress = () => {}) {
     fs.mkdirSync(DOWNLOAD_CACHE, { recursive: true });
   }
 
-  const zipUrl = item.source && (item.source.zip_url || item.source.url);
+  let zipUrl = item.source && (item.source.zip_url || item.source.url);
+  const variant = options.variant || {};
+
+  if (item.source && item.source.variant_urls && variant.color) {
+    zipUrl = item.source.variant_urls[variant.color] || zipUrl;
+  } else if (item.source && item.source.url_template && variant.color) {
+    zipUrl = item.source.url_template.replace(/\{color\}/g, variant.color);
+  }
+
   if (!zipUrl) {
     throw new Error(`Catalog item "${item.id}" does not have a valid zip_url in source`);
   }
 
+  const variantSlug = variant.color ? `-${variant.color}` : '';
   const isTarXz = zipUrl.endsWith('.tar.xz') || zipUrl.endsWith('.tar.gz') || zipUrl.endsWith('.tar');
   const fileExt = isTarXz ? (zipUrl.endsWith('.tar.gz') ? '.tar.gz' : '.tar.xz') : '.zip';
-  const archivePath = path.join(DOWNLOAD_CACHE, `${item.id}${fileExt}`);
-  const extractTempDir = path.join(DOWNLOAD_CACHE, 'temp_extract', item.id);
+  const archivePath = path.join(DOWNLOAD_CACHE, `${item.id}${variantSlug}${fileExt}`);
+  const extractTempDir = path.join(DOWNLOAD_CACHE, 'temp_extract', `${item.id}${variantSlug}`);
 
   try {
     // 1. Download (or use cache if present)
@@ -216,19 +248,21 @@ async function installZipStatic(item, onProgress = () => {}) {
     onProgress({ id: item.id, percent: 90, stage: 'applying', message: 'Installing files...' });
 
     const themeFolders = findThemeDirectories(extractTempDir);
+    if (themeFolders.length === 0) {
+      throw new Error(`Could not find valid theme directory in extracted archive for "${item.id}"`);
+    }
+
     const installedFolderNames = [];
     let primaryInstalledPath = null;
 
     for (const folder of themeFolders) {
       let destFolderName = path.basename(folder);
-      // Clean up common master/main suffixes if root folder
       if (destFolderName.endsWith('-master') || destFolderName.endsWith('-main')) {
         destFolderName = destFolderName.replace(/-(master|main)$/, '');
       }
       if (destFolderName === 'temp_extract' || destFolderName === item.id) {
         destFolderName = item.name.replace(/\s+/g, '-');
       }
-
       const destPath = path.join(targetDir, destFolderName);
 
       // Remove existing installation of same folder if any
@@ -241,6 +275,13 @@ async function installZipStatic(item, onProgress = () => {}) {
 
       if (!primaryInstalledPath) {
         primaryInstalledPath = destPath;
+      }
+
+      if (item.category === 'icon-theme' || item.category === 'cursor-theme') {
+        try {
+          const { execFile: execF } = require('child_process');
+          execF('gtk-update-icon-cache', [destPath], () => {});
+        } catch (_) {}
       }
     }
 
@@ -256,6 +297,7 @@ async function installZipStatic(item, onProgress = () => {}) {
       name: item.name,
       category: item.category,
       install_type: item.install_type,
+      variant: options.variant || {},
       target_dir: targetDir,
       installed_folders: installedFolderNames,
       primary_path: primaryInstalledPath,
@@ -329,11 +371,15 @@ async function installScript(item, options = {}, onProgress = () => {}) {
 
   try {
     // 1. Git Clone / Update
-    onProgress({ id: item.id, percent: 15, stage: 'cloning_repo', message: 'Cloning repository...' });
+    onProgress({ id: item.id, percent: 0, stage: 'cloning_repo', message: 'Connecting...' });
 
     await downloader.gitClone(repoUrl, cloneDir, (percent, msg) => {
-      onProgress({ id: item.id, percent: Math.round(15 + (percent * 0.45)), stage: 'cloning_repo', message: msg });
-    });
+      onProgress({ id: item.id, percent: percent, stage: 'cloning_repo', message: msg });
+    }, item.id);
+
+    if (tracker.isCancelled) {
+      throw new Error('Installation cancelled by user');
+    }
 
     // 2. Prepare script arguments from template
     onProgress({ id: item.id, percent: 65, stage: 'running_script', message: 'Preparing installation...' });
@@ -526,6 +572,7 @@ function registerCompanionThemes(item, targetDir, installedFolders = [], primary
           name: companion.name,
           category: 'shell-theme',
           install_type: item.install_type,
+          thumbnail: companion.thumbnail || item.thumbnail || `assets/previews/${item.id}.png`,
           target_dir: targetDir,
           installed_folders: installedFolders,
           primary_path: primaryPath,
@@ -542,6 +589,7 @@ function registerCompanionThemes(item, targetDir, installedFolders = [], primary
           name: companion.name,
           category: 'gtk-theme',
           install_type: item.install_type,
+          thumbnail: companion.thumbnail || item.thumbnail || `assets/previews/${g.id}.png`,
           target_dir: targetDir,
           installed_folders: installedFolders,
           primary_path: primaryPath,
@@ -560,7 +608,7 @@ function registerCompanionThemes(item, targetDir, installedFolders = [], primary
  */
 async function installItem(item, options = {}, onProgress = () => {}) {
   if (item.install_type === 'zip-static') {
-    return installZipStatic(item, onProgress);
+    return installZipStatic(item, onProgress, options);
   }
 
   if (item.install_type === 'script') {
