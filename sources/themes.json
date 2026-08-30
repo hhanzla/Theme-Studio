@@ -16,6 +16,7 @@
       "tweaks": ["none", "solid", "compact", "black", "primary", "macos", "submenu", "nord", "dracula"],
       "icon": ["default", "apple", "gnome", "ubuntu", "arch", "fedora", "debian", "manjaro"]
     },
+    "install_script": "./install.sh",
     "install_args_template": "-t {color} -c {mode} -s {size} {tweaks} {icon} -l",
     "dependencies": ["sassc"],
     "target_dir": "~/.themes",

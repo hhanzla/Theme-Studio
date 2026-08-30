@@ -8,7 +8,7 @@ window.ThemeCard = {
 
     // Badges calculation
     let typeBadgeHtml = '';
-    if (item.install_type === 'script' && item.install_script) {
+    if (item.install_type === 'script' && (item.install_script || item.install_args_template)) {
       typeBadgeHtml = '<span class="badge-tag badge-script">Script</span>';
     } else if (item.install_type === 'script' || item.install_type === 'git') {
       typeBadgeHtml = '<span class="badge-tag badge-git">Git</span>';
