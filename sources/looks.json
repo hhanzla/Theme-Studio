@@ -2,6 +2,8 @@
   {
     "id": "look-orchis-tela",
     "name": "Orchis with Tela & Bibata",
+    "category": "looks",
+    "install_type": "script",
     "description": "Complete curated desktop setup combining Orchis GTK & Shell, Tela colorful icons, Bibata sleek cursor, and 4K mountain wallpaper.",
     "thumbnail": "assets/previews/orchis.png",
     "author": "Theme Studio Team",

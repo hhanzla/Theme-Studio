@@ -414,7 +414,7 @@ async function executeInstall(item, card, variant = null) {
 
 async function handleCardAction(item, card) {
   // Looks Preset Application
-  if (item.category === 'looks') {
+  if (item.category === 'looks' || (item.id && item.id.startsWith('look-')) || AppState.activeCategory === 'looks') {
     if (AppState.activeInstalls.has(item.id)) {
       showToast(`Applying ${item.name}...`, 'warning');
       return;
