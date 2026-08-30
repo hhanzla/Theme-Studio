@@ -141,5 +141,24 @@
       "bash"
     ],
     "target_dir": "~/.local/share/icons"
+  },
+  {
+    "id": "papirus-icon-theme",
+    "name": "Papirus Icon Theme",
+    "category": "icon-theme",
+    "author": "PapirusDevelopmentTeam",
+    "install_type": "script",
+    "notes": "One of the most popular open-source SVG icon themes for Linux, featuring pixel-perfect icons for thousands of apps.",
+    "thumbnail": "assets/previews/papirus-icon-theme.png",
+    "source": {
+      "type": "git",
+      "repo": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme.git",
+      "branch": "master"
+    },
+    "dependencies": [
+      "git",
+      "bash"
+    ],
+    "target_dir": "~/.local/share/icons"
   }
 ]
