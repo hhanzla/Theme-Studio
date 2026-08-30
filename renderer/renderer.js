@@ -97,6 +97,7 @@ function restoreDefaultSubtabs() {
 async function loadCategory(category) {
   AppState.activeCategory = category;
   AppState.activeSubtab = 'browse'; // Always start on Browse when switching categories
+  try { sessionStorage.setItem('activeCategory', category); } catch (_) {}
 
   // Update Active Sidebar Item
   document.querySelectorAll('.sidebar-nav .nav-item').forEach((btn) => {
@@ -696,6 +697,7 @@ function initEvents() {
 
 function openUninstallManager() {
   AppState.activeCategory = 'uninstall';
+  try { sessionStorage.setItem('activeCategory', 'uninstall'); } catch (_) {}
   pageTitleEl.textContent = 'Uninstall Manager';
   pageSubtitleEl.textContent = 'Manage, apply, or safely remove installed desktop themes';
 
@@ -717,10 +719,21 @@ window.refreshAppState = () => {
   }
 };
 
-// Startup — Always default to GTK Themes on every start
+// Startup — Preserve active category on reload, default to Looks on fresh start
 document.addEventListener('DOMContentLoaded', () => {
   initEvents();
-  AppState.activeCategory = 'gtk-theme';
+  let initialCat = 'looks';
+  try {
+    const saved = sessionStorage.getItem('activeCategory');
+    if (saved) initialCat = saved;
+  } catch (_) {}
+
+  AppState.activeCategory = initialCat;
   AppState.activeSubtab = 'browse';
-  loadCategory('gtk-theme');
+
+  if (initialCat === 'uninstall') {
+    openUninstallManager();
+  } else {
+    loadCategory(initialCat);
+  }
 });
