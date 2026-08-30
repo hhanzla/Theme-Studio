@@ -1,0 +1,71 @@
+{
+  "name": "themestudio",
+  "version": "1.0.0",
+  "description": "Theme Studio - Linux Theme & Customization Manager",
+  "main": "main/main.js",
+  "homepage": "https://hanzlamasood.me",
+  "author": "Hanzla Masood <hello@hanzlamasood.me> (https://hanzlamasood.me)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hhanzla/Theme-Studio"
+  },
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron .",
+    "build": "electron-builder --linux deb",
+    "build:appimage": "electron-builder --linux AppImage",
+    "build:all": "electron-builder --linux deb AppImage",
+    "test": "electron test/phase1-verify.js --no-sandbox && electron test/phase2-verify.js --no-sandbox && electron test/phase3-verify.js --no-sandbox && electron test/phase4-verify.js --no-sandbox && electron test/phase5-verify.js --no-sandbox"
+  },
+  "keywords": [
+    "theme",
+    "gtk",
+    "icons",
+    "gnome",
+    "electron"
+  ],
+  "license": "GPL-3.0",
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "tar": "^7.4.3"
+  },
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^26.0.20"
+  },
+  "desktopName": "themestudio.desktop",
+  "build": {
+    "appId": "com.themestudio.app",
+    "productName": "Theme Studio",
+    "executableName": "themestudio",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main/**/*",
+      "renderer/**/*",
+      "sources/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "icon": "build/icon.png",
+      "syncDesktopName": true,
+      "target": [
+        "deb"
+      ],
+      "maintainer": "Hanzla Masood <hello@hanzlamasood.me>",
+      "category": "Utility",
+      "synopsis": "Linux Theme & Customization Studio",
+      "description": "Modern GTK, GNOME Shell, Icons, Cursors and Wallpaper manager for Linux."
+    },
+    "deb": {
+      "priority": "optional",
+      "depends": [
+        "libnotify4",
+        "libxtst6",
+        "libnss3",
+        "libsecret-1-0"
+      ]
+    }
+  }
+}

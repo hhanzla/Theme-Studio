@@ -1,0 +1,18 @@
+[
+  {
+    "id": "bibata-modern-ice",
+    "name": "Bibata Modern Ice",
+    "category": "cursor-theme",
+    "thumbnail": "assets/previews/bibata-modern-ice.png",
+    "author": "ful1e5",
+    "source_url": "https://www.gnome-look.org/p/1197198",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "tar.xz",
+      "url": "https://github.com/ful1e5/Bibata_Cursor/releases/latest/download/Bibata-Modern-Ice.tar.xz"
+    },
+    "target_dir": "~/.icons",
+    "notes": "Crisp white minimalist and rounded material cursor theme."
+  }
+]

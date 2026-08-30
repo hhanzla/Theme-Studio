@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad-GruvboxCozyWarm" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#282828"/>
+      <stop offset="50%" stop-color="#d79921"/>
+      <stop offset="100%" stop-color="#fe8019"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" fill="url(#grad-GruvboxCozyWarm)" rx="6"/>
+  <circle cx="320" cy="80" r="40" fill="#ffffff" opacity="0.15"/>
+  <path d="M 0,180 Q 100,120 200,170 T 400,150 L 400,240 L 0,240 Z" fill="#000000" opacity="0.25"/>
+  <path d="M 0,200 Q 120,160 250,190 T 400,180 L 400,240 L 0,240 Z" fill="#000000" opacity="0.4"/>
+  <text x="200" y="125" fill="#ffffff" font-size="16" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" text-anchor="middle" letter-spacing="1">Gruvbox Cozy Warm</text>
+</svg>

@@ -1,0 +1,227 @@
+[
+  {
+    "id": "wallpaper-artowave-grey",
+    "name": "ArtoWave Material Grey",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/ArtoWave-Material-Grey.jpg",
+    "url": "assets/wallpapers/ArtoWave-Material-Grey.PNG",
+    "author": "Community",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-artowave-multic",
+    "name": "ArtoWave Material Multicolor",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/ArtoWave-Material-MultiC.jpg",
+    "url": "assets/wallpapers/ArtoWave-Material-MultiC.PNG",
+    "author": "Community",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-gdwp-spectrum",
+    "name": "Geometric Spectrum HD",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/GDWP-955-HD-No-Logo.jpg",
+    "url": "assets/wallpapers/GDWP-955-HD-No-Logo.jpg",
+    "author": "Community",
+    "resolution": "1920x1080"
+  },
+  {
+    "id": "wallpaper-linux-abstract",
+    "name": "Linux Abstract Artwork",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/abstract-artwork-logo-linux-wallpaper-d374163633f1709651b1b381ada0e928.jpg",
+    "url": "assets/wallpapers/abstract-artwork-logo-linux-wallpaper-d374163633f1709651b1b381ada0e928.jpg",
+    "author": "Linux Artist",
+    "resolution": "1920x1080"
+  },
+  {
+    "id": "wallpaper-cyber-digital-art",
+    "name": "Cyber Abstract Digital Art",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/digital-digital-art-artwork-illustration-abstract-hd-wallpaper-28f60d7850600cb8e04c418e2872141a.jpg",
+    "url": "assets/wallpapers/digital-digital-art-artwork-illustration-abstract-hd-wallpaper-28f60d7850600cb8e04c418e2872141a.jpg",
+    "author": "Digital Artist",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-misty-lake",
+    "name": "Misty Mountain Lake 4K",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/lake-mountain-fog-mist-scenery-ai-4k-wallpaper-uhdpaper.com-709@1@l.jpg",
+    "url": "assets/wallpapers/lake-mountain-fog-mist-scenery-ai-4k-wallpaper-uhdpaper.com-709@1@l.jpg",
+    "author": "Nature Art",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-anime-fantasy",
+    "name": "Fantasy Anime Landscape",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/landscape-anime-digital-art-fantasy-art-wallpaper-9b468c3dc3116f4905f43bc9cddc0cf0.jpg",
+    "url": "assets/wallpapers/landscape-anime-digital-art-fantasy-art-wallpaper-9b468c3dc3116f4905f43bc9cddc0cf0.jpg",
+    "author": "Anime Art",
+    "resolution": "1920x1080"
+  },
+  {
+    "id": "wallpaper-macos-big-sur",
+    "name": "macOS Big Sur Spectrum",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/mac-os-x-os-x-big-sur-hd-wallpaper-863ba887a4a08dd3896af12ae4bd7792.jpg",
+    "url": "assets/wallpapers/mac-os-x-os-x-big-sur-hd-wallpaper-863ba887a4a08dd3896af12ae4bd7792.jpg",
+    "author": "Apple",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-macos-mojave-night",
+    "name": "macOS Mojave Night Dunes",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/macos-mojave-night-wallpaper-33048d6dbcf8413fb105175654ac0812.jpg",
+    "url": "assets/wallpapers/macos-mojave-night-wallpaper-33048d6dbcf8413fb105175654ac0812.jpg",
+    "author": "Apple",
+    "resolution": "5120x2880"
+  },
+  {
+    "id": "wallpaper-surface-waves",
+    "name": "Microsoft Surface Waves",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/microsoft-surface-3840x2160-26736.jpg",
+    "url": "assets/wallpapers/microsoft-surface-3840x2160-26736.jpg",
+    "author": "Surface",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-neon-glow",
+    "name": "Neon Cyber Glow 4K",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/neon-4k-hd-best-for-desktop-wallpaper-b896bd6800903c48d09c01fed852c41a.jpg",
+    "url": "assets/wallpapers/neon-4k-hd-best-for-desktop-wallpaper-b896bd6800903c48d09c01fed852c41a.jpg",
+    "author": "Cyber Art",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-minimal-curve-1",
+    "name": "Minimal Wave Curve 01",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/nhSoftWallpaper01.jpg",
+    "url": "assets/wallpapers/nhSoftWallpaper01.jpg",
+    "author": "NH Soft",
+    "resolution": "1920x1080"
+  },
+  {
+    "id": "wallpaper-minimal-curve-2",
+    "name": "Minimal Wave Curve 02",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/nhSoftWallpaper02.jpg.jpg",
+    "url": "assets/wallpapers/nhSoftWallpaper02.jpg.jpg",
+    "author": "NH Soft",
+    "resolution": "1920x1080"
+  },
+  {
+    "id": "wallpaper-ocean-horizon",
+    "name": "Scenic Ocean Horizon",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/pexels-kaique-rocha-105250.jpg",
+    "url": "assets/wallpapers/pexels-kaique-rocha-105250.jpg",
+    "author": "Kaique Rocha",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-desert-sand",
+    "name": "Desert Sand Ridges",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/pexels-kelly-2918152.jpg",
+    "url": "assets/wallpapers/pexels-kelly-2918152.jpg",
+    "author": "Kelly",
+    "resolution": "4000x2667"
+  },
+  {
+    "id": "wallpaper-moody-sunset",
+    "name": "Moody Sunset Reflections",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/pexels-oleksandra-zelena-17049234.jpg",
+    "url": "assets/wallpapers/pexels-oleksandra-zelena-17049234.jpg",
+    "author": "Oleksandra Zelena",
+    "resolution": "5472x3648"
+  },
+  {
+    "id": "wallpaper-forest-river",
+    "name": "Forest River Flow",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/pexels-pixabay-210349.jpg",
+    "url": "assets/wallpapers/pexels-pixabay-210349.jpg",
+    "author": "Pixabay",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-mountain-pines",
+    "name": "Mountain Summit Pines",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/pexels-ryan-baker-129574.jpg",
+    "url": "assets/wallpapers/pexels-ryan-baker-129574.jpg",
+    "author": "Ryan Baker",
+    "resolution": "2400x1600"
+  },
+  {
+    "id": "wallpaper-sea-link-bridge",
+    "name": "Sea Link Suspension Bridge",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/rajiv-gandhi-sea-link-suspension-bridge-bandra-worli-sea-link-bridge-091abbf4cc75d6db309da8e8ba6c5d1c.jpg",
+    "url": "assets/wallpapers/rajiv-gandhi-sea-link-suspension-bridge-bandra-worli-sea-link-bridge-091abbf4cc75d6db309da8e8ba6c5d1c.jpg",
+    "author": "Cityscape",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-kerala-backwaters",
+    "name": "Lush Green Palm Backwaters",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/trees-green-trees-with-water-kerala-gods-own-country-bed6b044350fbd514c84889fe6984717.jpg",
+    "url": "assets/wallpapers/trees-green-trees-with-water-kerala-gods-own-country-bed6b044350fbd514c84889fe6984717.jpg",
+    "author": "Nature",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-ubuntu-4k",
+    "name": "Ubuntu 4K Brand Emblem",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/ubuntu-4k.jpg",
+    "url": "assets/wallpapers/ubuntu-4k.jpg",
+    "author": "Canonical",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-ubuntu-lucid",
+    "name": "Ubuntu Lucid Lynx Heritage",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/ubuntu-lucid-wallpaper-50e4967776637252c18bd3cf0d283e19.jpg",
+    "url": "assets/wallpapers/ubuntu-lucid-wallpaper-50e4967776637252c18bd3cf0d283e19.jpg",
+    "author": "Canonical",
+    "resolution": "1920x1200"
+  },
+  {
+    "id": "wallpaper-minimal-gradient",
+    "name": "Minimalist Clean Gradient",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/wallpaper.jpg",
+    "url": "assets/wallpapers/wallpaper.jpg",
+    "author": "Design Studio",
+    "resolution": "2560x1440"
+  },
+  {
+    "id": "wallpaper-dark-curves",
+    "name": "Dark Gradient Abstract Curves",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/wallpaperflare.com_wallpaper.jpg",
+    "url": "assets/wallpapers/wallpaperflare.com_wallpaper.jpg",
+    "author": "WallpaperFlare",
+    "resolution": "3840x2160"
+  },
+  {
+    "id": "wallpaper-snowy-mountain",
+    "name": "Snowy Mountain Peak",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/thumbs/wallpapersden.com_snowy-mountain-hd-photography-2022_1920x1080.jpg",
+    "url": "assets/wallpapers/wallpapersden.com_snowy-mountain-hd-photography-2022_1920x1080.jpg",
+    "author": "Photography",
+    "resolution": "1920x1080"
+  }
+]

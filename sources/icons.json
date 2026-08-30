@@ -1,0 +1,42 @@
+[
+  {
+    "id": "tela-icon-theme",
+    "name": "Tela Icon Theme",
+    "category": "icon-theme",
+    "author": "vinceliuice",
+    "install_type": "script",
+    "notes": "A modern, colorful, and flat icon theme for Linux desktops with rounded folder accents.",
+    "thumbnail": "assets/previews/tela-icon-theme.png",
+    "source": {
+      "type": "git",
+      "repo": "https://github.com/vinceliuice/Tela-icon-theme.git",
+      "branch": "master"
+    },
+    "dependencies": [
+      "git",
+      "bash"
+    ],
+    "variants": {
+      "color": [
+        "standard",
+        "blue",
+        "nord",
+        "dracula",
+        "ubuntu",
+        "manjaro",
+        "black",
+        "grey",
+        "green",
+        "orange",
+        "pink",
+        "purple",
+        "red",
+        "yellow",
+        "brown",
+        "all"
+      ]
+    },
+    "install_script": "./install.sh",
+    "install_args_template": "{color} -d {dest_dir}"
+  }
+]

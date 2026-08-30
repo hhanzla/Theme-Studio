@@ -1,0 +1,26 @@
+[
+  {
+    "id": "orchis",
+    "name": "Orchis",
+    "category": "gtk-theme",
+    "thumbnail": "assets/previews/orchis.png",
+    "author": "vinceliuice",
+    "source_url": "https://github.com/vinceliuice/Orchis-theme",
+    "license": "GPL-3.0",
+    "install_type": "script",
+    "source": { "type": "git", "repo": "https://github.com/vinceliuice/Orchis-theme.git" },
+    "variants": {
+      "color": ["default", "purple", "pink", "red", "orange", "yellow", "green", "teal", "grey", "all"],
+      "mode": ["dark", "light", "standard"],
+      "size": ["standard", "compact"],
+      "tweaks": ["none", "solid", "compact", "black", "primary", "macos", "submenu", "nord", "dracula"],
+      "icon": ["default", "apple", "gnome", "ubuntu", "arch", "fedora", "debian", "manjaro"]
+    },
+    "install_args_template": "-t {color} -c {mode} -s {size} {tweaks} {icon} -l",
+    "dependencies": ["sassc"],
+    "target_dir": "~/.themes",
+    "gtk4_fix": true,
+    "gdm_eligible": true,
+    "notes": "Orchis official script supports color, mode, size, tweaks, and panel icon variants."
+  }
+]
