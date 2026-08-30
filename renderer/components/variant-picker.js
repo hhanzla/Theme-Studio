@@ -194,8 +194,10 @@ window.VariantPicker = {
       `;
     });
 
+    const isLargeModal = Boolean(item.id && (item.id.includes('orchis') || item.id.includes('whitesur')));
+
     overlay.innerHTML = `
-      <div class="modal-dialog">
+      <div class="modal-dialog ${isLargeModal ? 'modal-large' : ''}">
         <div class="modal-header">
           <div>
             <h3 class="modal-title">Theme Options</h3>
