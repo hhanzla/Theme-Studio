@@ -25,6 +25,33 @@
     "notes": "Orchis official script supports color, mode, size, tweaks, and panel icon variants."
   },
   {
+    "id": "whitesur-gtk-theme",
+    "name": "WhiteSur",
+    "category": "gtk-theme",
+    "thumbnail": "assets/previews/whitesur.png",
+    "author": "vinceliuice",
+    "source_url": "https://github.com/vinceliuice/WhiteSur-gtk-theme",
+    "license": "MIT",
+    "install_type": "script",
+    "source": { "type": "git", "repo": "https://github.com/vinceliuice/WhiteSur-gtk-theme.git" },
+    "variants": {
+      "color": ["default", "blue", "purple", "pink", "red", "orange", "yellow", "green", "grey", "all"],
+      "mode": ["dark", "light"],
+      "opacity": ["normal", "solid"],
+      "alt": ["normal", "alt"],
+      "scheme": ["standard", "nord"],
+      "icon": ["apple", "simple", "gnome", "ubuntu", "tux", "arch", "manjaro", "fedora", "debian"],
+      "nautilus": ["stable", "normal", "mojave", "glassy", "right"]
+    },
+    "install_script": "./install.sh",
+    "install_args_template": "-t {color} -c {mode} -o {opacity} -a {alt} -s {scheme} {icon} -N {nautilus} -d {dest_dir} -l",
+    "dependencies": ["sassc", "glib-compile-schemas"],
+    "target_dir": "~/.themes",
+    "gtk4_fix": true,
+    "gdm_eligible": true,
+    "notes": "MacOS Big Sur and Monterey style theme for GTK 2/3/4 and GNOME Shell with rich customization."
+  },
+  {
     "id": "sweet-theme",
     "name": "Sweet",
     "category": "gtk-theme",
