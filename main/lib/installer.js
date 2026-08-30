@@ -428,27 +428,20 @@ async function installScript(item, options = {}, onProgress = () => {}) {
     let executable = 'bash';
     let execArgs = [];
 
-    const installShPath = path.join(cloneDir, 'install.sh');
-    const installPyPath = path.join(cloneDir, 'install.py');
-    const buildShPath = path.join(cloneDir, 'build.sh');
+    const explicitScript = item.install_script;
 
-    if (fs.existsSync(installPyPath)) {
+    if (explicitScript && explicitScript.endsWith('.py') && fs.existsSync(path.join(cloneDir, explicitScript))) {
       executable = 'python3';
-      execArgs = ['install.py', ...rawArgs];
-    } else if (fs.existsSync(installShPath)) {
+      execArgs = [explicitScript, ...rawArgs];
+    } else if (explicitScript && fs.existsSync(path.join(cloneDir, explicitScript))) {
+      const scriptPath = path.join(cloneDir, explicitScript);
       try {
-        fs.chmodSync(installShPath, 0o755);
+        fs.chmodSync(scriptPath, 0o755);
       } catch (_) {}
       executable = 'bash';
-      execArgs = ['./install.sh', ...rawArgs];
-    } else if (buildShPath && fs.existsSync(buildShPath)) {
-      try {
-        fs.chmodSync(buildShPath, 0o755);
-      } catch (_) {}
-      executable = 'bash';
-      execArgs = ['./build.sh', ...rawArgs];
+      execArgs = [explicitScript, ...rawArgs];
     } else {
-      // Direct repo with theme subdirectories (e.g. Breeze Chameleon)
+      // Direct repo with theme subdirectories (e.g. Papirus, Breeze Chameleon)
       const themeDirs = findThemeDirectories(cloneDir);
       if (themeDirs.length > 0) {
         onProgress({ id: item.id, percent: 80, stage: 'applying', message: 'Installing theme folders...' });
@@ -489,7 +482,7 @@ async function installScript(item, options = {}, onProgress = () => {}) {
         return { success: true, item: installedItem };
       }
 
-      throw new Error(`Could not find install.sh or install.py in ${cloneDir}`);
+      throw new Error(`Could not find valid theme directory in ${cloneDir}`);
     }
 
     // 4. Run installation process
