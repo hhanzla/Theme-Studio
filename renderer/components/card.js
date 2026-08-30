@@ -8,8 +8,10 @@ window.ThemeCard = {
 
     // Badges calculation
     let typeBadgeHtml = '';
-    if (item.install_type === 'script') {
+    if (item.install_type === 'script' && item.install_script) {
       typeBadgeHtml = '<span class="badge-tag badge-script">Script</span>';
+    } else if (item.install_type === 'script' || item.install_type === 'git') {
+      typeBadgeHtml = '<span class="badge-tag badge-git">Git</span>';
     } else if (item.install_type === 'zip-static') {
       typeBadgeHtml = '<span class="badge-tag badge-zip">Zip</span>';
     }

@@ -459,6 +459,11 @@ body {
   color: #ffffff;
 }
 
+.badge-git {
+  background: #0284c7;
+  color: #ffffff;
+}
+
 .badge-zip {
   background: #f4f4f5;
   color: #000000;
