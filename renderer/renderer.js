@@ -193,19 +193,19 @@ async function loadCategory(category) {
         try {
           const sysRes = await window.electronAPI.system.current();
           if (sysRes && sysRes.success && sysRes.settings && sysRes.settings.wallpaper) {
-            const currentWp = sysRes.settings.wallpaper.toLowerCase();
-            const getCleanBase = (p) => {
+            const currentWp = sysRes.settings.wallpaper;
+            const getFilename = (p) => {
               if (!p) return '';
               const decoded = decodeURIComponent(p.replace(/^file:\/\//, ''));
-              const file = decoded.split('/').pop() || '';
-              return file.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              const base = decoded.split('/').pop() || '';
+              return base.toLowerCase().replace(/\.[^/.]+$/, '');
             };
-            const currentBase = getCleanBase(currentWp);
+            const currentBase = getFilename(currentWp);
 
             AppState.items.forEach(item => {
-              const raw = item.url || (item.source && (item.source.file || item.source.url)) || item.thumbnail || item.id || '';
-              const itemBase = getCleanBase(raw);
-              const isMatch = (currentBase && itemBase && (currentBase === itemBase || currentBase.includes(itemBase) || itemBase.includes(currentBase)));
+              const raw = (item.source && item.source.file) || item.thumbnail || item.url || '';
+              const itemBase = getFilename(raw);
+              const isMatch = !!(currentBase && itemBase && currentBase === itemBase);
               item.installed = isMatch;
               item.applied = isMatch;
             });
@@ -323,20 +323,20 @@ function updateView() {
             if (!cardEl) return;
 
             if (item.category === 'wallpaper') {
-              const currentWp = (s.wallpaper || '').toLowerCase();
-              const getCleanBase = (p) => {
+              const currentWp = s.wallpaper || '';
+              const getFilename = (p) => {
                 if (!p) return '';
                 const decoded = decodeURIComponent(p.replace(/^file:\/\//, ''));
-                const file = decoded.split('/').pop() || '';
-                return file.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                const base = decoded.split('/').pop() || '';
+                return base.toLowerCase().replace(/\.[^/.]+$/, '');
               };
 
-              const currentBase = getCleanBase(currentWp);
-              const raw = item.url || (item.source && (item.source.file || item.source.url)) || item.thumbnail || item.id || '';
-              const itemBase = getCleanBase(raw);
+              const currentBase = getFilename(currentWp);
+              const raw = (item.source && item.source.file) || item.thumbnail || item.url || '';
+              const itemBase = getFilename(raw);
 
-              const isMatch = (currentBase && itemBase && (currentBase === itemBase || currentBase.includes(itemBase) || itemBase.includes(currentBase)));
-              if (isMatch || item.applied) {
+              const isMatch = !!(currentBase && itemBase && currentBase === itemBase);
+              if (isMatch) {
                 item.installed = true;
                 item.applied = true;
                 window.ThemeCard.setApplied(cardEl, true);
