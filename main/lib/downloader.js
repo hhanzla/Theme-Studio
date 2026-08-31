@@ -49,10 +49,9 @@ function downloadFile(url, destPath, onProgress = () => {}, id = null, expectedB
         return reject(new Error(`Download failed with HTTP ${res.statusCode} ${res.statusMessage}`));
       }
 
-      let totalBytes = parseInt(res.headers['content-length'] || '0', 10);
-      if (totalBytes <= 0 && expectedBytes > 0) {
-        totalBytes = expectedBytes;
-      }
+      const rawContentLength = res.headers['content-length'];
+      const hasRealContentLength = !!(rawContentLength && parseInt(rawContentLength, 10) > 0);
+      let totalBytes = hasRealContentLength ? parseInt(rawContentLength, 10) : (expectedBytes > 0 ? expectedBytes : 0);
       let downloadedBytes = 0;
 
       const tempPartPath = `${destPath}.part`;
@@ -75,7 +74,7 @@ function downloadFile(url, destPath, onProgress = () => {}, id = null, expectedB
 
       fileStream.on('finish', () => {
         fileStream.close(() => {
-          if (totalBytes > 0 && downloadedBytes < totalBytes) {
+          if (hasRealContentLength && downloadedBytes < totalBytes) {
             try { fs.unlinkSync(tempPartPath); } catch (_) {}
             if (id) activeDownloads.delete(id);
             return reject(new Error(`Download interrupted: received ${downloadedBytes} of ${totalBytes} bytes`));
@@ -265,6 +264,7 @@ function gitClone(repoUrl, destDir, onProgress = () => {}, id = null) {
       gitProcess.on('close', async (code) => {
         if (code !== 0) {
           if (id) activeDownloads.delete(id);
+          try { fs.rmSync(destDir, { recursive: true, force: true }); } catch (_) {}
           return reject(new Error(`Git clone failed with code ${code}: ${lastMessage}`));
         }
 
