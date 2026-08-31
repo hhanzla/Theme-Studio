@@ -9,12 +9,8 @@ const LockscreenView = {
 
   async render(containerEl) {
     if (containerEl) this.container = containerEl;
-    if (this.container) {
-      this.container.innerHTML = `
-        <div class="settings-view-container" style="display: flex; align-items: center; justify-content: center; padding: 40px; color: var(--text-secondary);">
-          <span>Loading Lock Screen settings...</span>
-        </div>
-      `;
+    if (this.gdmStatus) {
+      this.renderUI();
     }
     await this.loadData();
     this.renderUI();

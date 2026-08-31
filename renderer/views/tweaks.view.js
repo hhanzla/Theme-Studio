@@ -10,13 +10,7 @@ window.TweaksView = {
 
   async render(containerEl) {
     if (containerEl) this.container = containerEl;
-    if (this.container) {
-      this.container.innerHTML = `
-        <div class="settings-view-container" style="display: flex; align-items: center; justify-content: center; padding: 40px; color: var(--text-secondary);">
-          <span>Loading desktop tweaks...</span>
-        </div>
-      `;
-    }
+    this.renderUI();
     await this.loadData();
     this.renderUI();
   },
