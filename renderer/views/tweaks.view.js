@@ -91,8 +91,9 @@ window.TweaksView = {
             <div class="settings-card-left">
               <div class="settings-option-title">
                 <strong>Compact Desktop UI Mode</strong>
-                <span class="badge-tag ${isCompact ? 'badge-installed' : 'badge-script'}">
-                  ${isCompact ? 'Active' : 'Standard'}
+                <span class="badge-tag badge-experimental">Experimental</span>
+                <span class="badge-tag ${isCompact ? 'badge-installed' : 'badge-zip'}">
+                  ${isCompact ? 'Active' : 'Off'}
                 </span>
               </div>
               <p class="settings-option-desc">
