@@ -229,11 +229,12 @@ async function installZipStatic(item, onProgress = () => {}, options = {}) {
     } else {
       onProgress({ id: item.id, percent: 0, stage: 'downloading', message: 'Connecting...' });
 
+      const approxBytes = item.source && (item.source.approx_bytes || item.source.size_bytes || 0);
       await downloader.downloadFile(zipUrl, archivePath, (percent, downloaded, total, msg) => {
         // Map download 0..100 to overall 5..75%
         const overallPercent = Math.round(5 + (percent * 0.7));
         onProgress({ id: item.id, percent: overallPercent, stage: 'downloading', message: msg || `Downloading (${percent}%)...` });
-      }, item.id);
+      }, item.id, approxBytes);
     }
 
     // 2. Extract

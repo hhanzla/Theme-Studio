@@ -63,6 +63,7 @@
     "source": {
       "type": "zip",
       "zip_url": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula.tar.xz",
+      "approx_bytes": 1500000,
       "variant_urls": {
         "standard": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula.tar.xz",
         "pink": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula-pink-accent.tar.xz"
@@ -91,6 +92,7 @@
     "source": {
       "type": "zip",
       "zip_url": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-Dark-v40.tar.xz",
+      "approx_bytes": 1900000,
       "variant_urls": {
         "dark": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-Dark-v40.tar.xz",
         "ambar-blue-dark": "https://github.com/EliverLara/Sweet/releases/download/v6.0/Sweet-Ambar-Blue-Dark-v40.tar.xz",
@@ -127,6 +129,7 @@
     "source": {
       "type": "zip",
       "zip_url": "https://github.com/EliverLara/Space/archive/refs/heads/dark.zip",
+      "approx_bytes": 4400000,
       "variant_urls": {
         "dark": "https://github.com/EliverLara/Space/archive/refs/heads/dark.zip",
         "light": "https://github.com/EliverLara/Space/archive/refs/heads/master.zip",

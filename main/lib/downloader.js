@@ -16,7 +16,7 @@ const activeDownloads = new Map();
  * @param {string} [id] - Optional ID for cancellation
  * @returns {Promise<string>} - Resolves with destPath
  */
-function downloadFile(url, destPath, onProgress = () => {}, id = null) {
+function downloadFile(url, destPath, onProgress = () => {}, id = null, expectedBytes = 0) {
   return new Promise((resolve, reject) => {
     // Ensure parent dir exists
     const parentDir = path.dirname(destPath);
@@ -39,7 +39,7 @@ function downloadFile(url, destPath, onProgress = () => {}, id = null) {
           redirectUrl = new URL(redirectUrl, url).toString();
         }
         res.resume(); // Drain stream
-        return downloadFile(redirectUrl, destPath, onProgress, id)
+        return downloadFile(redirectUrl, destPath, onProgress, id, expectedBytes)
           .then(resolve)
           .catch(reject);
       }
@@ -49,7 +49,10 @@ function downloadFile(url, destPath, onProgress = () => {}, id = null) {
         return reject(new Error(`Download failed with HTTP ${res.statusCode} ${res.statusMessage}`));
       }
 
-      const totalBytes = parseInt(res.headers['content-length'] || '0', 10);
+      let totalBytes = parseInt(res.headers['content-length'] || '0', 10);
+      if (totalBytes <= 0 && expectedBytes > 0) {
+        totalBytes = expectedBytes;
+      }
       let downloadedBytes = 0;
 
       const tempPartPath = `${destPath}.part`;
@@ -61,15 +64,11 @@ function downloadFile(url, destPath, onProgress = () => {}, id = null) {
 
       res.on('data', (chunk) => {
         downloadedBytes += chunk.length;
-        if (totalBytes > 0) {
-          const percent = Math.min(99, Math.round((downloadedBytes / totalBytes) * 100));
-          const mbs = (downloadedBytes / (1024 * 1024)).toFixed(1);
-          const totalMbs = (totalBytes / (1024 * 1024)).toFixed(1);
-          onProgress(percent, downloadedBytes, totalBytes, `Downloading ${mbs}/${totalMbs} MB (${percent}%)`);
-        } else {
-          const mbs = (downloadedBytes / (1024 * 1024)).toFixed(1);
-          onProgress(50, downloadedBytes, 0, `Downloading ${mbs} MB`);
-        }
+        const effectiveTotal = totalBytes > 0 ? Math.max(totalBytes, downloadedBytes) : Math.max(downloadedBytes, 3.5 * 1024 * 1024);
+        const percent = Math.min(99, Math.round((downloadedBytes / effectiveTotal) * 100));
+        const mbs = (downloadedBytes / (1024 * 1024)).toFixed(1);
+        const totalMbs = (effectiveTotal / (1024 * 1024)).toFixed(1);
+        onProgress(percent, downloadedBytes, effectiveTotal, `Downloading ${mbs}/${totalMbs} MB (${percent}%)`);
       });
 
       res.pipe(fileStream);
