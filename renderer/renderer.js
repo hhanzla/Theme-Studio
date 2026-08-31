@@ -156,6 +156,17 @@ async function loadCategory(category) {
     return;
   }
 
+  if (category === 'lockscreen') {
+    pageTitleEl.textContent = 'GDM / Lock Screen';
+    pageSubtitleEl.textContent = 'Apply themes, icons, and customization to the GNOME Login and Lock Screen (Requires root)';
+    const subtabsBar = document.querySelector('.subtabs-bar');
+    if (subtabsBar) subtabsBar.style.display = 'none';
+    cardsGridEl.style.display = 'block';
+    emptyStateEl.classList.add('hidden');
+    window.LockscreenView.render(cardsGridEl);
+    return;
+  }
+
   // Update Header Meta
   const meta = CATEGORY_META[category] || { title: category, subtitle: '' };
   pageTitleEl.textContent = meta.title;
