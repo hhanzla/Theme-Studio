@@ -69,7 +69,9 @@ window.ExtensionsView = {
 
     const installedCount = this.installedExtensions.length;
     const onlineCount = this.onlineExtensions.length;
-    const onlineCountDisplay = onlineCount >= 100 ? '100+' : (onlineCount > 0 ? String(onlineCount) : '100+');
+    const onlineCountDisplay = this.isLoading
+      ? '...'
+      : (onlineCount >= 100 ? '100+' : (onlineCount > 0 ? String(onlineCount) : '0'));
 
     subtabsBar.innerHTML = `
       <div class="subtabs">
