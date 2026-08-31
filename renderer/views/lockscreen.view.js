@@ -65,40 +65,39 @@ const LockscreenView = {
     const curLogoBase = curLogo ? curLogo.split('/').pop() : '(Default System Logo)';
 
     this.container.innerHTML = `
-      <div class="settings-view-container lockscreen-view-wrapper">
-        <!-- Top Status Card -->
-        <div class="settings-section">
-          <div class="settings-card" style="padding: 16px 20px;">
-            <div class="settings-card-left">
-              <div class="settings-option-title">
-                <strong>GDM Login Screen Extension</strong>
-                <span class="badge-tag ${isGseInstalled ? 'badge-installed' : 'badge-script'}">
-                  ${isGseInstalled ? 'Installed &amp; Active' : 'Setup Needed'}
-                </span>
-              </div>
-              <p class="settings-option-desc">
-                ${isGseInstalled 
-                  ? 'GSE-GDM integration is active. Background blur, custom wallpaper, welcome message, and lock screen settings are fully unlocked.' 
-                  : 'Install the GSE-GDM extension in 1 click below to unlock background blur, custom wallpaper, and login screen customization.'}
-              </p>
+      <div class="lockscreen-view-wrapper">
+        <!-- Top Status Header Card -->
+        <div class="lockscreen-header-card">
+          <div class="lockscreen-header-left">
+            <div class="lockscreen-status-row">
+              <span class="badge-tag ${isGseInstalled ? 'badge-installed' : 'badge-script'}">
+                ${isGseInstalled ? 'Installed &amp; Active' : 'Setup Needed'}
+              </span>
+              <span class="lockscreen-version-text">GNOME Shell ${status.gnomeVersion || '46'}</span>
             </div>
-            <div class="settings-card-right" style="display: flex; flex-direction: column; gap: 6px; min-width: 96px;">
-              ${!isGseInstalled ? `
-                <button class="btn btn-primary" id="btn-clone-install-gdm" style="padding: 7px 14px; font-size: 11.5px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; text-align: center; justify-content: center; width: 100%;">
-                  Install
-                </button>
-                <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 6px 14px; font-size: 11.5px; text-align: center; justify-content: center; width: 100%;">
-                  Re-check
-                </button>
-              ` : `
-                <button class="btn btn-primary" id="btn-enable-gdm-custom" style="padding: 7px 14px; font-size: 11.5px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; text-align: center; justify-content: center; width: 100%;">
-                  Enable
-                </button>
-                <button class="btn btn-secondary" id="btn-uninstall-gse-gdm" style="padding: 6px 14px; font-size: 11.5px; color: #ef4444; text-align: center; justify-content: center; width: 100%;" title="Uninstall GSE-GDM extension">
-                  Uninstall
-                </button>
-              `}
-            </div>
+            <h3 class="lockscreen-header-title">GDM Customization Studio</h3>
+            <p class="lockscreen-header-desc">
+              ${isGseInstalled 
+                ? 'GSE-GDM integration is active. Background blur, custom wallpaper, welcome message, and lock screen settings are fully unlocked.' 
+                : 'Install the GSE-GDM extension in 1 click below to unlock background blur, custom wallpaper, and login screen customization.'}
+            </p>
+          </div>
+          <div class="lockscreen-header-actions">
+            ${!isGseInstalled ? `
+              <button class="btn btn-primary" id="btn-clone-install-gdm">
+                Install
+              </button>
+              <button class="btn btn-secondary" id="btn-recheck-gdm">
+                Re-check
+              </button>
+            ` : `
+              <button class="btn btn-primary" id="btn-enable-gdm-custom">
+                Enable
+              </button>
+              <button class="btn btn-secondary" id="btn-uninstall-gse-gdm" style="color: #ef4444;" title="Uninstall GSE-GDM extension">
+                Uninstall
+              </button>
+            `}
           </div>
         </div>
 
@@ -111,15 +110,15 @@ const LockscreenView = {
               Select login screen wallpaper, adjust blur radius and brightness, and configure image scaling.
             </p>
 
-            <div class="settings-card lockscreen-form-card" style="z-index: 30;">
+            <div class="lockscreen-card" style="z-index: 30;">
               <!-- Custom Wallpaper Dropdown -->
-              <div class="lockscreen-form-row">
+              <div class="lockscreen-row">
                 <div class="lockscreen-row-info">
                   <strong>Background Image</strong>
                   <span>Select wallpaper from <code>/usr/share/backgrounds</code></span>
                 </div>
                 <div class="lockscreen-row-control">
-                  <div class="custom-select lockscreen-custom-select" id="gdm-bg-select" data-value="${curBg}" style="min-width: 240px; max-width: 320px;">
+                  <div class="custom-select lockscreen-custom-select" id="gdm-bg-select" data-value="${curBg}">
                     <button type="button" class="custom-select-trigger">
                       <span class="custom-select-label">${curBgBase}</span>
                       <svg class="custom-select-arrow" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -143,37 +142,41 @@ const LockscreenView = {
               </div>
 
               <!-- Blur Radius -->
-              <div class="lockscreen-form-row">
+              <div class="lockscreen-row">
                 <div class="lockscreen-row-info">
                   <strong>Blur Radius</strong>
                   <span>Intensity of login screen blur (0px = disabled)</span>
                 </div>
-                <div class="lockscreen-slider-control">
-                  <input type="range" id="gdm-blur-radius" min="0" max="100" value="${current.blurRadius || 0}" ${!isGseInstalled ? 'disabled' : ''}>
-                  <span id="lbl-blur-radius" class="slider-badge">${current.blurRadius || 0}px</span>
+                <div class="lockscreen-row-control">
+                  <div class="lockscreen-slider-control">
+                    <input type="range" id="gdm-blur-radius" min="0" max="100" value="${current.blurRadius || 0}" ${!isGseInstalled ? 'disabled' : ''}>
+                    <span id="lbl-blur-radius" class="slider-badge">${current.blurRadius || 0}px</span>
+                  </div>
                 </div>
               </div>
 
               <!-- Blur Brightness -->
-              <div class="lockscreen-form-row">
+              <div class="lockscreen-row">
                 <div class="lockscreen-row-info">
                   <strong>Blur Brightness</strong>
                   <span>Brightness level when blur is active</span>
                 </div>
-                <div class="lockscreen-slider-control">
-                  <input type="range" id="gdm-blur-brightness" min="0" max="1" step="0.05" value="${current.blurBrightness || 0.65}" ${!isGseInstalled ? 'disabled' : ''}>
-                  <span id="lbl-blur-brightness" class="slider-badge">${current.blurBrightness || 0.65}</span>
+                <div class="lockscreen-row-control">
+                  <div class="lockscreen-slider-control">
+                    <input type="range" id="gdm-blur-brightness" min="0" max="1" step="0.05" value="${current.blurBrightness || 0.65}" ${!isGseInstalled ? 'disabled' : ''}>
+                    <span id="lbl-blur-brightness" class="slider-badge">${current.blurBrightness || 0.65}</span>
+                  </div>
                 </div>
               </div>
 
               <!-- Custom Scaling Dropdown -->
-              <div class="lockscreen-form-row">
+              <div class="lockscreen-row">
                 <div class="lockscreen-row-info">
                   <strong>Scaling Mode</strong>
                   <span>Image fitting format on login screen</span>
                 </div>
                 <div class="lockscreen-row-control">
-                  <div class="custom-select lockscreen-custom-select" id="gdm-bg-size" data-value="${curScale}" style="min-width: 140px;">
+                  <div class="custom-select lockscreen-custom-select" id="gdm-bg-size" data-value="${curScale}">
                     <button type="button" class="custom-select-trigger">
                       <span class="custom-select-label">${curScaleLabel}</span>
                       <svg class="custom-select-arrow" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -196,38 +199,40 @@ const LockscreenView = {
               Display a custom welcome title message and brand logo on the GDM login screen.
             </p>
 
-            <div class="settings-card lockscreen-form-card" style="z-index: 20;">
+            <div class="lockscreen-card" style="z-index: 20;">
               <!-- Banner Message Toggle -->
-              <div class="lockscreen-form-row">
+              <div class="lockscreen-row">
                 <div class="lockscreen-row-info">
                   <strong>Show Banner Message Title</strong>
                   <span>Enable custom text greeting above login username</span>
                 </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="chk-gdm-banner-enable" ${current.bannerMessageEnable ? 'checked' : ''} ${!isGseInstalled ? 'disabled' : ''}>
-                  <span class="slider"></span>
-                </label>
+                <div class="lockscreen-row-control">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="chk-gdm-banner-enable" ${current.bannerMessageEnable ? 'checked' : ''} ${!isGseInstalled ? 'disabled' : ''}>
+                    <span class="slider"></span>
+                  </label>
+                </div>
               </div>
 
               <!-- Banner Text Input -->
-              <div class="lockscreen-form-row" id="banner-text-row">
+              <div class="lockscreen-row" id="banner-text-row">
                 <div class="lockscreen-row-info">
                   <strong>Banner Title Text</strong>
                   <span>Heading text displayed on login screen</span>
                 </div>
-                <div class="lockscreen-row-control" style="flex: 1; max-width: 320px;">
-                  <input type="text" id="txt-gdm-banner" class="form-input" placeholder="e.g. Welcome to Ubuntu" value="${current.bannerMessageText || ''}" ${!isGseInstalled ? 'disabled' : ''} style="width: 100%; box-sizing: border-box;">
+                <div class="lockscreen-row-control">
+                  <input type="text" id="txt-gdm-banner" class="lockscreen-input" placeholder="e.g. Welcome to Ubuntu" value="${current.bannerMessageText || ''}" ${!isGseInstalled ? 'disabled' : ''}>
                 </div>
               </div>
 
               <!-- Custom Logo Dropdown -->
-              <div class="lockscreen-form-row">
+              <div class="lockscreen-row">
                 <div class="lockscreen-row-info">
                   <strong>Login Screen Logo</strong>
                   <span>Bottom logo icon from <code>/usr/share/pixmaps</code></span>
                 </div>
                 <div class="lockscreen-row-control">
-                  <div class="custom-select lockscreen-custom-select" id="gdm-logo-select" data-value="${curLogo}" style="min-width: 240px; max-width: 320px;">
+                  <div class="custom-select lockscreen-custom-select" id="gdm-logo-select" data-value="${curLogo}">
                     <button type="button" class="custom-select-trigger">
                       <span class="custom-select-label">${curLogoBase}</span>
                       <svg class="custom-select-arrow" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -259,7 +264,7 @@ const LockscreenView = {
               Configure clock format, battery indicator, and touchpad behavior on the login screen.
             </p>
 
-            <div class="settings-card lockscreen-form-card" style="z-index: 10;">
+            <div class="lockscreen-card" style="z-index: 10;">
               <div class="lockscreen-grid-2col">
                 <div class="lockscreen-grid-cell">
                   <span class="lockscreen-cell-label">Show Date in Clock</span>
@@ -311,8 +316,8 @@ const LockscreenView = {
               </div>
 
               <!-- Dedicated Card Action Footer -->
-              <div class="lockscreen-form-row" style="background: #fafafa; padding: 14px 20px; justify-content: flex-end; border-top: 1px solid var(--border-subtle, #f4f4f5);">
-                <button class="btn btn-primary" id="btn-save-gdm-all" ${!isGseInstalled ? 'disabled' : ''} style="padding: 8px 22px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; border-radius: var(--radius); cursor: pointer;">
+              <div class="lockscreen-card-footer">
+                <button class="btn btn-primary" id="btn-save-gdm-all" ${!isGseInstalled ? 'disabled' : ''}>
                   Apply All Lock Screen Settings
                 </button>
               </div>
@@ -329,18 +334,18 @@ const LockscreenView = {
 
           <div class="gdm-items-list">
             ${shellThemes.length === 0 ? `
-              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius);">
+              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius-lg);">
                 No installed shell themes found. Install <strong>Orchis</strong> or <strong>WhiteSur</strong> from the Shell Themes tab first.
               </div>
             ` : shellThemes.map(theme => `
-              <div class="gdm-item-row" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius); margin-bottom: 8px;">
+              <div class="gdm-item-row">
                 <div>
-                  <strong style="font-size: 13px; color: #000000;">${theme.name}</strong>
-                  <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 1px;">
+                  <strong>${theme.name}</strong>
+                  <span>
                     ${theme.installed_folders && theme.installed_folders[0] ? theme.installed_folders[0] : theme.name}
                   </span>
                 </div>
-                <button class="btn btn-primary btn-apply-gdm-theme" data-id="${theme.id}" data-name="${theme.installed_folders && theme.installed_folders[0] ? theme.installed_folders[0] : theme.name}" data-category="shell-theme" style="padding: 6px 12px; font-size: 11.5px; background: #cf4110; color: #fff; border: none;">
+                <button class="btn btn-primary btn-apply-gdm-theme" data-id="${theme.id}" data-name="${theme.installed_folders && theme.installed_folders[0] ? theme.installed_folders[0] : theme.name}" data-category="shell-theme">
                   Apply to Lock Screen
                 </button>
               </div>
@@ -357,18 +362,18 @@ const LockscreenView = {
 
           <div class="gdm-items-list">
             ${iconsAndCursors.length === 0 ? `
-              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius);">
+              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius-lg);">
                 No installed icons or cursors found. Install icons from the Icons/Cursors tabs first.
               </div>
             ` : iconsAndCursors.map(item => `
-              <div class="gdm-item-row" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius); margin-bottom: 8px;">
+              <div class="gdm-item-row">
                 <div>
-                  <strong style="font-size: 13px; color: #000000;">${item.name}</strong>
-                  <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 1px;">
+                  <strong>${item.name}</strong>
+                  <span>
                     ${item.category === 'cursor' ? 'Cursor Pack' : 'Icon Theme'}
                   </span>
                 </div>
-                <button class="btn btn-secondary btn-copy-gdm-icon" data-id="${item.id}" data-category="icon" style="padding: 6px 12px; font-size: 11.5px;">
+                <button class="btn btn-secondary btn-copy-gdm-icon" data-id="${item.id}" data-category="icon">
                   Copy to System
                 </button>
               </div>
@@ -379,7 +384,7 @@ const LockscreenView = {
         <!-- Section 6: Safety & Reset Recovery -->
         <div class="settings-section">
           <h3 class="settings-section-title">Safety &amp; Recovery</h3>
-          <div class="settings-card" style="border-left: 3px solid #71717a;">
+          <div class="lockscreen-reset-card">
             <div class="settings-card-left">
               <div class="settings-option-title">
                 <strong>Reset Lock Screen to Default</strong>

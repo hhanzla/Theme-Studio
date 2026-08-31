@@ -9,26 +9,97 @@
 .lockscreen-view-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
   width: 100%;
   max-width: 100%;
   padding-bottom: 40px;
 }
 
+/* Header Status Card */
+.lockscreen-header-card {
+  background: #ffffff;
+  border: 1px solid var(--border-card, #e4e4e7);
+  border-radius: var(--radius-lg, 8px);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.lockscreen-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.lockscreen-status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lockscreen-version-text {
+  font-size: 11px;
+  color: var(--text-secondary, #71717a);
+  font-weight: 500;
+}
+
+.lockscreen-header-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #18181b;
+  margin: 0;
+}
+
+.lockscreen-header-desc {
+  font-size: 12px;
+  color: var(--text-secondary, #71717a);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.lockscreen-header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.lockscreen-header-actions .btn {
+  width: 100%;
+  justify-content: center;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Customization Controls Wrapper */
 .lockscreen-controls-group {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
   width: 100%;
 }
 
 .lockscreen-disabled-area {
-  opacity: 0.55;
+  opacity: 0.52;
   pointer-events: none;
-  filter: grayscale(0.2);
+  filter: grayscale(0.25);
   user-select: none;
   cursor: not-allowed;
   transition: opacity 0.2s ease;
+}
+
+/* Sections */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
 .settings-section-title {
@@ -36,42 +107,40 @@
   font-weight: 700;
   color: #18181b;
   letter-spacing: -0.01em;
-  margin-bottom: 2px;
+  margin: 0;
 }
 
 .settings-section-desc {
   font-size: 12px;
   color: #71717a;
   line-height: 1.4;
-  margin-bottom: 8px;
+  margin: 0 0 4px 0;
 }
 
-.lockscreen-form-card {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  padding: 0 !important;
-  overflow: visible !important;
-  position: relative;
-  border-radius: var(--radius);
-  border: 1px solid var(--border-card, #e4e4e7);
+/* Clean Lock Screen Card */
+.lockscreen-card {
   background: #ffffff;
+  border: 1px solid var(--border-card, #e4e4e7);
+  border-radius: var(--radius-lg, 8px);
+  overflow: visible;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   width: 100%;
 }
 
-.lockscreen-form-row {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  min-height: 56px;
-  padding: 8px 20px !important;
+/* Form Rows inside Card */
+.lockscreen-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 20px;
   border-bottom: 1px solid var(--border-subtle, #f4f4f5);
   gap: 16px;
-  position: relative;
+  min-height: 58px;
+  box-sizing: border-box;
 }
 
-.lockscreen-form-row:last-child {
+.lockscreen-row:last-child {
   border-bottom: none;
 }
 
@@ -79,11 +148,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
+  flex: 1;
 }
 
 .lockscreen-row-info strong {
-  display: block;
   font-size: 13px;
   font-weight: 600;
   color: #18181b;
@@ -93,22 +162,28 @@
 .lockscreen-row-info span {
   font-size: 11.5px;
   color: #71717a;
-  display: block;
   line-height: 1.3;
 }
 
+.lockscreen-row-info code {
+  font-family: var(--font-mono, monospace);
+  background: #f4f4f5;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
 .lockscreen-row-control {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin: 0;
+  flex-shrink: 0;
 }
 
 /* Scoped Custom Select in Lock Screen */
 .lockscreen-custom-select {
   position: relative;
-  width: 260px;
+  width: 270px;
 }
 
 .lockscreen-custom-select.is-open {
@@ -117,11 +192,11 @@
 
 .lockscreen-custom-select .custom-select-trigger {
   width: 100%;
-  height: 32px;
+  height: 34px;
   background: #ffffff;
   border: 1px solid var(--border-card, #e4e4e7);
-  border-radius: var(--radius);
-  padding: 0 10px;
+  border-radius: var(--radius, 6px);
+  padding: 0 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -156,9 +231,9 @@
   right: 0;
   background: #ffffff !important;
   border: 1px solid var(--border-card, #e4e4e7);
-  border-radius: var(--radius);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-  max-height: 200px;
+  border-radius: var(--radius, 6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  max-height: 210px;
   overflow-y: auto;
   z-index: 999999 !important;
   display: none;
@@ -171,7 +246,7 @@
 
 .lockscreen-custom-select .custom-select-option {
   padding: 7px 10px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: #18181b;
   border-radius: 4px;
   cursor: pointer;
@@ -180,6 +255,7 @@
 
 .lockscreen-custom-select .custom-select-option:hover {
   background: #f4f4f5;
+  color: #cf4110;
 }
 
 .lockscreen-custom-select .custom-select-option.selected {
@@ -193,8 +269,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 260px;
-  height: 32px;
+  width: 270px;
+  height: 34px;
 }
 
 .lockscreen-slider-control input[type="range"] {
@@ -210,26 +286,26 @@
   color: #cf4110;
   min-width: 44px;
   text-align: right;
-  font-family: monospace;
+  font-family: var(--font-mono, monospace);
 }
 
-/* Form text input */
-.lockscreen-form-row input.form-input {
+/* Text input */
+.lockscreen-input {
   background: #ffffff;
   color: #18181b;
   border: 1px solid var(--border-card, #e4e4e7);
-  border-radius: var(--radius);
-  padding: 0 10px;
-  height: 32px;
+  border-radius: var(--radius, 6px);
+  padding: 0 12px;
+  height: 34px;
   font-size: 12px;
   font-family: inherit;
   outline: none;
-  width: 260px;
+  width: 270px;
   box-sizing: border-box;
   transition: border-color 0.15s ease;
 }
 
-.lockscreen-form-row input.form-input:focus {
+.lockscreen-input:focus {
   border-color: #cf4110;
 }
 
@@ -243,11 +319,11 @@
 
 .lockscreen-grid-cell {
   background: #ffffff;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  min-height: 50px;
-  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 12px 20px;
 }
 
 .lockscreen-cell-label {
@@ -257,9 +333,7 @@
 }
 
 /* Scoped Toggle Switch */
-.lockscreen-view-wrapper .toggle-switch,
-.lockscreen-form-row .toggle-switch,
-.lockscreen-grid-cell .toggle-switch {
+.toggle-switch {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -270,14 +344,14 @@
   margin: 0;
 }
 
-.lockscreen-view-wrapper .toggle-switch input {
+.toggle-switch input {
   opacity: 0;
   width: 0;
   height: 0;
   position: absolute;
 }
 
-.lockscreen-view-wrapper .toggle-switch .slider {
+.toggle-switch .slider {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -286,10 +360,10 @@
   bottom: 0;
   background-color: #e4e4e7;
   transition: 0.18s ease;
-  border-radius: var(--radius);
+  border-radius: 20px;
 }
 
-.lockscreen-view-wrapper .toggle-switch .slider:before {
+.toggle-switch .slider:before {
   position: absolute;
   content: "";
   height: 14px;
@@ -298,54 +372,91 @@
   bottom: 3px;
   background-color: #ffffff;
   transition: 0.18s ease;
-  border-radius: var(--radius);
+  border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-.lockscreen-view-wrapper .toggle-switch input:checked + .slider {
+.toggle-switch input:checked + .slider {
   background-color: #cf4110;
 }
 
-.lockscreen-view-wrapper .toggle-switch input:checked + .slider:before {
+.toggle-switch input:checked + .slider:before {
   transform: translateX(18px);
 }
 
-.lockscreen-view-wrapper .toggle-switch input:disabled + .slider {
+.toggle-switch input:disabled + .slider {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Buttons in lockscreen */
-.lockscreen-view-wrapper .btn {
-  border-radius: var(--radius);
-  font-family: inherit;
-  transition: all 0.15s ease;
-  box-shadow: none !important;
-  cursor: pointer;
+/* Card Action Footer */
+.lockscreen-card-footer {
+  background: #fafafa;
+  border-top: 1px solid var(--border-subtle, #f4f4f5);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  border-bottom-left-radius: var(--radius-lg, 8px);
+  border-bottom-right-radius: var(--radius-lg, 8px);
 }
 
-.lockscreen-view-wrapper .btn-primary {
+.lockscreen-card-footer .btn-primary {
+  padding: 8px 22px;
+  font-size: 12.5px;
+  font-weight: 600;
   background: #cf4110 !important;
   color: #ffffff !important;
   border: none !important;
+  border-radius: var(--radius, 6px);
+  cursor: pointer;
 }
 
-.lockscreen-view-wrapper .btn-primary:hover:not(:disabled) {
+.lockscreen-card-footer .btn-primary:hover:not(:disabled) {
   background: #b3360b !important;
 }
 
-.lockscreen-view-wrapper .btn-secondary {
-  background: #f4f4f5 !important;
-  color: #18181b !important;
-  border: 1px solid var(--border-card, #e4e4e7) !important;
+/* Shell Themes & Icons Lists */
+.gdm-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
-.lockscreen-view-wrapper .btn-secondary:hover:not(:disabled) {
-  background: #e4e4e7 !important;
-  border-color: #d4d4d8 !important;
+.gdm-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #ffffff;
+  border: 1px solid var(--border-card, #e4e4e7);
+  border-radius: var(--radius-lg, 8px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-.lockscreen-view-wrapper .btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.gdm-item-row strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: #18181b;
+}
+
+.gdm-item-row span {
+  font-size: 11.5px;
+  color: #71717a;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Reset / Safety Recovery Card */
+.lockscreen-reset-card {
+  background: #ffffff;
+  border: 1px solid var(--border-card, #e4e4e7);
+  border-left: 3px solid #71717a;
+  border-radius: var(--radius-lg, 8px);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
