@@ -125,6 +125,19 @@ function registerGdmIpc() {
   });
 
   /**
+   * Logout session helper to test GDM login screen
+   */
+  ipcMain.handle('gdm:logoutSession', async () => {
+    try {
+      const { exec } = require('child_process');
+      exec('gnome-session-quit --logout', () => {});
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  /**
    * Reset GDM session settings to defaults
    */
   ipcMain.handle('gdm:resetDefault', async () => {

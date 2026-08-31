@@ -68,6 +68,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     setShellTheme: (payload) => ipcRenderer.invoke('gdm:setShellTheme', payload),
     setBackground: (payload) => ipcRenderer.invoke('gdm:setBackground', payload),
     lockSession: () => ipcRenderer.invoke('gdm:lockSession'),
+    logoutSession: () => ipcRenderer.invoke('gdm:logoutSession'),
     resetDefault: () => ipcRenderer.invoke('gdm:resetDefault')
   },
   on: (channel, callback) => {

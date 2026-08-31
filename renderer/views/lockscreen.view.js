@@ -55,11 +55,11 @@ const LockscreenView = {
               </span>
               <span class="lockscreen-version-text">GNOME Shell 46</span>
             </div>
-            <h3 class="lockscreen-header-title">GDM Lock Screen Extension</h3>
+            <h3 class="lockscreen-header-title">GDM Login &amp; Logout Screen Customizer</h3>
             <p class="lockscreen-header-desc">
               ${isGseInstalled 
-                ? 'GSE-GDM extension is installed and compiled on your system. You can customize wallpaper, blur, and login styles directly on the lock screen.' 
-                : 'Install the bundled GSE-GDM extension in 1 click below to unlock live login screen wallpaper, blur effects, and on-screen controls.'}
+                ? 'GSE-GDM extension is installed. First sync your themes/wallpapers below, then log out to customize GDM directly on the login screen.' 
+                : 'Install the bundled GSE-GDM extension in 1 click below to unlock live login/logout screen wallpaper, blur effects, and on-screen controls.'}
             </p>
           </div>
           <div class="lockscreen-header-actions">
@@ -76,12 +76,13 @@ const LockscreenView = {
                 Re-check
               </button>
             ` : `
-              <button class="btn btn-primary" id="btn-test-lock-screen">
+              <button class="btn btn-primary" id="btn-test-logout-screen" title="Log out of user session to test GDM login screen">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
-                <span>Lock Screen (Test)</span>
+                <span>Logout (Test GDM)</span>
               </button>
               <button class="btn btn-secondary" id="btn-recheck-gdm">
                 Re-check
@@ -95,57 +96,57 @@ const LockscreenView = {
 
         <!-- Visual Step-by-Step Instructions & Guide -->
         <div class="settings-section">
-          <h3 class="settings-section-title">How to Customize on Lock Screen</h3>
+          <h3 class="settings-section-title">How to Customize GDM Login / Logout Screen</h3>
           <p class="settings-section-desc">
-            GSE-GDM allows seamless on-screen configuration directly on the GNOME Login and Lock Screen.
+            GSE-GDM runs inside the <strong>GDM Display Manager</strong> (the screen that appears after logging out, switching user, or booting up).
           </p>
 
           <div class="lockscreen-guide-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 14px;">
             <!-- Guide Card 1 -->
             <div class="lockscreen-card" style="display: flex; flex-direction: column; gap: 10px; padding: 16px;">
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="font-size: 20px;">🔒</div>
+                <div style="font-size: 20px;">🔄</div>
                 <span class="badge-tag badge-script">Step 1</span>
               </div>
-              <strong style="font-size: 13.5px; color: var(--text-primary);">Lock Your Screen</strong>
+              <strong style="font-size: 13.5px; color: var(--text-primary);">Sync Themes &amp; Wallpapers</strong>
               <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
-                Press the keyboard shortcut <kbd style="background: #f4f4f5; border: 1px solid #d4d4d8; padding: 2px 5px; border-radius: 4px; font-weight: 600; font-size: 11px;">Super + L</kbd> (or click the <strong>Lock Screen (Test)</strong> button above) to go to the lock screen.
+                Click the <strong>"Sync to GDM System"</strong> button below to copy all your installed themes (Orchis, etc.) and wallpapers into <code>/usr/local/share/</code> so GDM can read them.
               </p>
             </div>
 
             <!-- Guide Card 2 -->
             <div class="lockscreen-card" style="display: flex; flex-direction: column; gap: 10px; padding: 16px;">
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="font-size: 20px;">⚙️</div>
+                <div style="font-size: 20px;">🚪</div>
                 <span class="badge-tag badge-script">Step 2</span>
               </div>
-              <strong style="font-size: 13.5px; color: var(--text-primary);">Open Lock Screen Settings</strong>
+              <strong style="font-size: 13.5px; color: var(--text-primary);">Log Out to GDM Screen</strong>
               <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
-                On the lock/login screen, look at the top-right panel bar. Click the <strong>GDM Extension (gear/sliders) icon</strong> to open the live settings popup.
+                Click <strong>"Logout (Test GDM)"</strong> above or log out of your GNOME session. The GDM login screen will load.
               </p>
             </div>
 
             <!-- Guide Card 3 -->
             <div class="lockscreen-card" style="display: flex; flex-direction: column; gap: 10px; padding: 16px;">
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="font-size: 20px;">🎨</div>
+                <div style="font-size: 20px;">⚙️</div>
                 <span class="badge-tag badge-script">Step 3</span>
               </div>
-              <strong style="font-size: 13.5px; color: var(--text-primary);">Live Wallpaper &amp; Blur</strong>
+              <strong style="font-size: 13.5px; color: var(--text-primary);">Open GDM Customization Menu</strong>
               <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
-                Select custom background wallpapers, adjust blur radius and brightness sliders, change scaling, or set a custom welcome banner in real time.
+                On the login/logout screen, look at the top-right panel bar. Click the <strong>gear/sliders icon</strong> to open the live dropdown menus.
               </p>
             </div>
 
             <!-- Guide Card 4 -->
             <div class="lockscreen-card" style="display: flex; flex-direction: column; gap: 10px; padding: 16px;">
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="font-size: 20px;">💾</div>
+                <div style="font-size: 20px;">🎨</div>
                 <span class="badge-tag badge-script">Step 4</span>
               </div>
-              <strong style="font-size: 13.5px; color: var(--text-primary);">Instant Auto-Save</strong>
+              <strong style="font-size: 13.5px; color: var(--text-primary);">Pick Wallpaper, Blur &amp; Theme</strong>
               <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
-                Your chosen settings are automatically stored in the GDM system database and will persist across every system reboot and login session.
+                Select any synced wallpaper, shell theme, blur radius, or custom banner. All changes are auto-saved in the GDM database permanently.
               </p>
             </div>
           </div>
@@ -241,16 +242,17 @@ const LockscreenView = {
       });
     }
 
-    // 2. Lock Screen Test
-    const lockBtn = this.container.querySelector('#btn-test-lock-screen');
-    if (lockBtn) {
-      lockBtn.addEventListener('click', async () => {
-        showToast('Locking screen in 2 seconds...', 'info');
+    // 2. Logout / GDM Test
+    const logoutBtn = this.container.querySelector('#btn-test-logout-screen');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        if (!confirm('Log out of current user session to open the GDM login screen? (Please save any open files first)')) return;
+        showToast('Logging out to GDM screen...', 'info');
         setTimeout(async () => {
-          if (window.electronAPI && window.electronAPI.gdm && window.electronAPI.gdm.lockSession) {
-            await window.electronAPI.gdm.lockSession();
+          if (window.electronAPI && window.electronAPI.gdm && window.electronAPI.gdm.logoutSession) {
+            await window.electronAPI.gdm.logoutSession();
           }
-        }, 1500);
+        }, 800);
       });
     }
 
