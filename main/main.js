@@ -1,5 +1,11 @@
 const { app, BrowserWindow, nativeImage } = require('electron');
 const path = require('path');
+
+// Hardware acceleration & smooth scrolling flags for silky performance on Linux
+app.commandLine.appendSwitch('enable-smooth-scrolling');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('enable-zero-copy');
+
 const { registerCatalogIpc } = require('./ipc/catalog.ipc');
 const { registerInstallerIpc } = require('./ipc/installer.ipc');
 const { registerDepsIpc } = require('./ipc/deps.ipc');
