@@ -574,7 +574,7 @@ window.LookVariantPicker = {
     ];
 
     overlay.innerHTML = `
-      <div class="modal-dialog" style="max-width: 580px; width: 100%; max-height: 88vh; display: flex; flex-direction: column;">
+      <div class="modal-dialog">
         <div class="modal-header">
           <div>
             <h3 class="modal-title">${item.name}</h3>
@@ -583,7 +583,7 @@ window.LookVariantPicker = {
           <button class="modal-close-btn" id="look-variant-close" title="Close">×</button>
         </div>
 
-        <div class="modal-body" style="padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1;">
+        <div class="modal-body">
           <!-- Section 1: Orchis GTK & Shell -->
           <div style="background: #fbfbfc; border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 12px 14px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
