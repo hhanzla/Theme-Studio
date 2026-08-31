@@ -90,16 +90,7 @@ function removeGtk4Fix(themeDir = null) {
     const destItemPath = path.join(GTK4_CONFIG, item);
     try {
       if (fs.existsSync(destItemPath) || fs.lstatSync(destItemPath).isSymbolicLink()) {
-        if (!themeDir) {
-          // Full reset: remove all symlinks and override files
-          fs.rmSync(destItemPath, { recursive: true, force: true });
-        } else if (fs.lstatSync(destItemPath).isSymbolicLink()) {
-          const linkTarget = fs.readlinkSync(destItemPath);
-          const resolvedTarget = path.resolve(GTK4_CONFIG, linkTarget);
-          if (resolvedTarget.startsWith(themeDir)) {
-            fs.unlinkSync(destItemPath);
-          }
-        }
+        fs.rmSync(destItemPath, { recursive: true, force: true });
       }
     } catch (_) {
       // Ignore if file doesn't exist

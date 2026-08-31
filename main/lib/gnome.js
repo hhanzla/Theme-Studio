@@ -202,6 +202,11 @@ async function setWallpaper(wallpaperPath) {
  * Resets all appearance settings to Ubuntu / GNOME defaults
  */
 async function resetToDefaults() {
+  const { removeGtk4Fix } = require('./fixes/gtk4-libadwaita');
+  try {
+    removeGtk4Fix();
+  } catch (_) {}
+
   await setGtkTheme('Yaru');
   await setIconTheme('Yaru');
   await setCursorTheme('Yaru');
@@ -211,6 +216,7 @@ async function resetToDefaults() {
   await execGsettings(['reset', 'org.gnome.desktop.interface', 'color-scheme']);
   await execGsettings(['reset', 'org.gnome.desktop.background', 'picture-uri']);
   await execGsettings(['reset', 'org.gnome.desktop.background', 'picture-uri-dark']);
+  await execGsettings(['set', 'org.gnome.desktop.wm.preferences', 'button-layout', ':minimize,maximize,close']);
   try {
     await execGsettings(['reset', 'org.gnome.shell.extensions.user-theme', 'name']);
     await execGsettings(['set', 'org.gnome.shell.extensions.user-theme', 'name', '']);
