@@ -241,9 +241,13 @@ window.VariantPicker = {
       trigger.addEventListener('click', (e) => {
         e.stopPropagation();
         const isOpen = selectEl.classList.contains('is-open');
-        overlay.querySelectorAll('.custom-select').forEach(s => s.classList.remove('is-open'));
+        overlay.querySelectorAll('.custom-select').forEach(s => {
+          s.classList.remove('is-open');
+          s.closest('.form-group')?.classList.remove('has-open-select');
+        });
         if (!isOpen) {
           selectEl.classList.add('is-open');
+          selectEl.closest('.form-group')?.classList.add('has-open-select');
         }
       });
 
@@ -264,13 +268,17 @@ window.VariantPicker = {
           optEl.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>');
 
           selectEl.classList.remove('is-open');
+          selectEl.closest('.form-group')?.classList.remove('has-open-select');
         });
       });
     });
 
     // Close any custom select when clicking elsewhere inside the modal
     overlay.querySelector('.modal-dialog')?.addEventListener('click', () => {
-      overlay.querySelectorAll('.custom-select').forEach(s => s.classList.remove('is-open'));
+      overlay.querySelectorAll('.custom-select').forEach(s => {
+        s.classList.remove('is-open');
+        s.closest('.form-group')?.classList.remove('has-open-select');
+      });
     });
 
     overlay.querySelector('#variant-confirm-btn').addEventListener('click', () => {
@@ -749,11 +757,16 @@ window.LookVariantPicker = {
 
       trigger.addEventListener('click', (e) => {
         e.stopPropagation();
+        const isOpen = selectEl.classList.contains('is-open');
         // Close other open dropdowns
         overlay.querySelectorAll('.look-custom-select').forEach(s => {
-          if (s !== selectEl) s.classList.remove('is-open');
+          s.classList.remove('is-open');
+          s.parentElement.style.zIndex = '';
         });
-        selectEl.classList.toggle('is-open');
+        if (!isOpen) {
+          selectEl.classList.add('is-open');
+          selectEl.parentElement.style.zIndex = '1000';
+        }
       });
 
       selectEl.querySelectorAll('.custom-select-option').forEach((optEl) => {

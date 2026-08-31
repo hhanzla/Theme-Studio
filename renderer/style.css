@@ -970,7 +970,9 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
 
 .modal-dialog.modal-large .modal-body {
   overflow-y: auto;
+  overflow-x: visible;
   max-height: calc(85vh - 120px);
+  padding-bottom: 30px;
 }
 
 .modal-text {
@@ -986,9 +988,15 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
 }
 
 .form-group {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.form-group:has(.custom-select.is-open),
+.form-group.has-open-select {
+  z-index: 1000 !important;
 }
 
 .form-label {
@@ -1001,6 +1009,10 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
   position: relative;
   width: 100%;
   user-select: none;
+}
+
+.custom-select.is-open {
+  z-index: 1001 !important;
 }
 
 .custom-select-trigger {
@@ -1048,21 +1060,22 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
   background: #ffffff;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
-  max-height: 140px; /* Clean compact height! */
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+  max-height: 180px;
   overflow-y: auto;
-  z-index: 100000;
+  z-index: 9999999 !important;
   display: none;
   padding: 4px;
 }
 
-.custom-select.is-open .custom-select-menu {
+.custom-select.is-open .custom-select-menu,
+.look-custom-select.is-open .custom-select-menu {
   display: block;
   animation: fadeIn 0.12s ease;
 }
 
 .custom-select-option {
-  padding: 5px 8px;
+  padding: 6px 10px;
   font-size: 11px;
   color: var(--text-primary);
   border-radius: 4px;
