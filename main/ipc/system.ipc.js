@@ -166,12 +166,32 @@ function registerSystemIpc() {
   ipcMain.handle('apply:wallpaper', async (_event, payload) => {
     try {
       let wallpaperPath = typeof payload === 'string' ? payload : (payload.path || payload.url);
-      if (wallpaperPath && !wallpaperPath.startsWith('/') && !wallpaperPath.startsWith('file://')) {
+      if (!wallpaperPath) return { success: false, error: 'No wallpaper path or URL provided' };
+
+      // On-demand live download for online/remote wallpaper URLs
+      if (wallpaperPath.startsWith('http://') || wallpaperPath.startsWith('https://')) {
+        const downloader = require('../lib/downloader');
+        const os = require('os');
+        const bgDir = path.join(os.homedir(), '.local', 'share', 'backgrounds');
+        if (!fs.existsSync(bgDir)) fs.mkdirSync(bgDir, { recursive: true });
+
+        // Clean filename from URL
+        let urlFileName = path.basename(new URL(wallpaperPath).pathname);
+        if (!urlFileName || urlFileName === '/') urlFileName = 'wallpaper_' + Date.now() + '.jpg';
+        const targetPath = path.join(bgDir, urlFileName);
+
+        // Download only if not already cached
+        if (!fs.existsSync(targetPath)) {
+          await downloader.downloadFile(wallpaperPath, targetPath);
+        }
+        wallpaperPath = targetPath;
+      } else if (!wallpaperPath.startsWith('/') && !wallpaperPath.startsWith('file://')) {
         const absPath = path.resolve(__dirname, '../../renderer', wallpaperPath);
         if (fs.existsSync(absPath)) {
           wallpaperPath = absPath;
         }
       }
+
       const res = await gnome.setWallpaper(wallpaperPath);
       return res;
     } catch (err) {

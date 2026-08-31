@@ -46,7 +46,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     clearCache: () => ipcRenderer.invoke('system:clear-cache')
   },
   looks: {
-    apply: (payload) => ipcRenderer.invoke('look:apply', payload)
+    apply: (payload) => ipcRenderer.invoke('look:apply', payload),
+    setWallpaper: (path) => ipcRenderer.invoke('apply:wallpaper', path)
   },
   tweaks: {
     getAppFolders: () => ipcRenderer.invoke('tweaks:get-app-folders'),
