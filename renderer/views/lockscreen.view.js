@@ -70,24 +70,19 @@ const LockscreenView = {
                   : 'Install the GSE-GDM extension in 1 click to enable background blur and visual customization on GNOME 42+.'}
               </p>
             </div>
-            <div class="settings-card-right" style="display: flex; gap: 8px;">
+            <div class="settings-card-right" style="display: flex; flex-direction: column; gap: 6px; min-width: 92px;">
               ${!isGseInstalled ? `
-                <button class="btn btn-primary" id="btn-clone-install-gdm" style="padding: 8px 16px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                  1-Click Install GSE-GDM
+                <button class="btn btn-primary" id="btn-clone-install-gdm" style="padding: 7px 12px; font-size: 11.5px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; text-align: center; justify-content: center; width: 100%;">
+                  Install
                 </button>
-                <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 7px 12px; font-size: 11.5px;">
+                <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 6px 12px; font-size: 11.5px; text-align: center; justify-content: center; width: 100%;">
                   Re-check
                 </button>
               ` : `
-                <button class="btn btn-primary" id="btn-enable-gdm-custom" style="padding: 7px 14px; font-size: 11.5px; background: #cf4110; color: #ffffff; border: none; font-weight: 600;">
-                  Enable GDM Theming
+                <button class="btn btn-primary" id="btn-enable-gdm-custom" style="padding: 7px 12px; font-size: 11.5px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; text-align: center; justify-content: center; width: 100%;">
+                  Enable
                 </button>
-                <button class="btn btn-secondary" id="btn-uninstall-gse-gdm" style="padding: 7px 12px; font-size: 11.5px; color: #ef4444;" title="Uninstall GSE-GDM extension">
+                <button class="btn btn-secondary" id="btn-uninstall-gse-gdm" style="padding: 6px 12px; font-size: 11.5px; color: #ef4444; text-align: center; justify-content: center; width: 100%;" title="Uninstall GSE-GDM extension">
                   Uninstall
                 </button>
               `}
@@ -178,7 +173,7 @@ const LockscreenView = {
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" id="chk-gdm-banner-enable" ${current.bannerMessageEnable ? 'checked' : ''}>
-                <span class="toggle-slider"></span>
+                <span class="slider"></span>
               </label>
             </div>
 
@@ -222,63 +217,51 @@ const LockscreenView = {
 
           <div class="settings-card lockscreen-form-card">
             <div class="lockscreen-grid-2col">
-              <div class="lockscreen-form-row no-border">
-                <div class="lockscreen-row-info">
-                  <strong>Show Date in Clock</strong>
-                </div>
+              <div class="lockscreen-grid-cell">
+                <span class="lockscreen-cell-label">Show Date in Clock</span>
                 <label class="toggle-switch">
                   <input type="checkbox" id="chk-gdm-clock-date" ${current.clockShowDate !== false ? 'checked' : ''}>
-                  <span class="toggle-slider"></span>
+                  <span class="slider"></span>
                 </label>
               </div>
 
-              <div class="lockscreen-form-row no-border">
-                <div class="lockscreen-row-info">
-                  <strong>Show Seconds in Clock</strong>
-                </div>
+              <div class="lockscreen-grid-cell">
+                <span class="lockscreen-cell-label">Show Seconds in Clock</span>
                 <label class="toggle-switch">
                   <input type="checkbox" id="chk-gdm-clock-seconds" ${current.clockShowSeconds ? 'checked' : ''}>
-                  <span class="toggle-slider"></span>
+                  <span class="slider"></span>
                 </label>
               </div>
 
-              <div class="lockscreen-form-row no-border">
-                <div class="lockscreen-row-info">
-                  <strong>Show Weekday in Clock</strong>
-                </div>
+              <div class="lockscreen-grid-cell">
+                <span class="lockscreen-cell-label">Show Weekday in Clock</span>
                 <label class="toggle-switch">
                   <input type="checkbox" id="chk-gdm-clock-weekday" ${current.clockShowWeekday !== false ? 'checked' : ''}>
-                  <span class="toggle-slider"></span>
+                  <span class="slider"></span>
                 </label>
               </div>
 
-              <div class="lockscreen-form-row no-border">
-                <div class="lockscreen-row-info">
-                  <strong>Show Battery Percentage</strong>
-                </div>
+              <div class="lockscreen-grid-cell">
+                <span class="lockscreen-cell-label">Show Battery Percentage</span>
                 <label class="toggle-switch">
                   <input type="checkbox" id="chk-gdm-battery" ${current.showBatteryPercentage !== false ? 'checked' : ''}>
-                  <span class="toggle-slider"></span>
+                  <span class="slider"></span>
                 </label>
               </div>
 
-              <div class="lockscreen-form-row no-border">
-                <div class="lockscreen-row-info">
-                  <strong>Tap-to-Click on Login</strong>
-                </div>
+              <div class="lockscreen-grid-cell">
+                <span class="lockscreen-cell-label">Tap-to-Click on Login</span>
                 <label class="toggle-switch">
                   <input type="checkbox" id="chk-gdm-tap-click" ${current.tapToClick !== false ? 'checked' : ''}>
-                  <span class="toggle-slider"></span>
+                  <span class="slider"></span>
                 </label>
               </div>
 
-              <div class="lockscreen-form-row no-border">
-                <div class="lockscreen-row-info">
-                  <strong>Hide Extension Gear Button</strong>
-                </div>
+              <div class="lockscreen-grid-cell">
+                <span class="lockscreen-cell-label">Hide Extension Gear Button</span>
                 <label class="toggle-switch">
                   <input type="checkbox" id="chk-hide-gdm-btn" ${current.hideButton ? 'checked' : ''}>
-                  <span class="toggle-slider"></span>
+                  <span class="slider"></span>
                 </label>
               </div>
             </div>
@@ -374,7 +357,7 @@ const LockscreenView = {
   },
 
   bindEvents() {
-    // 0. 1-Click Install GSE-GDM Extension
+    // 0. Install GSE-GDM Extension
     const cloneInstallBtn = this.container.querySelector('#btn-clone-install-gdm');
     if (cloneInstallBtn) {
       cloneInstallBtn.addEventListener('click', async () => {
@@ -384,7 +367,7 @@ const LockscreenView = {
             <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
             <path d="M12 2a10 10 0 0 1 10 10"></path>
           </svg>
-          Installing GSE-GDM...
+          Installing...
         `;
         showToast('Installing GSE-GDM Extension (requires admin password)...', 'info');
 
@@ -404,14 +387,7 @@ const LockscreenView = {
         } finally {
           if (cloneInstallBtn) {
             cloneInstallBtn.disabled = false;
-            cloneInstallBtn.innerHTML = `
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              1-Click Install GSE-GDM
-            `;
+            cloneInstallBtn.textContent = 'Install';
           }
         }
       });
@@ -477,7 +453,7 @@ const LockscreenView = {
           showToast(`Error: ${err.message}`, 'warning');
         } finally {
           enableBtn.disabled = false;
-          enableBtn.textContent = 'Enable GDM Theming';
+          enableBtn.textContent = 'Enable';
         }
       });
     }

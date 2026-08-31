@@ -1694,7 +1694,8 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
   height: 0;
 }
 
-.slider {
+.slider,
+.toggle-slider {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -1706,7 +1707,8 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
   border-radius: var(--radius);
 }
 
-.slider:before {
+.slider:before,
+.toggle-slider:before {
   position: absolute;
   content: "";
   height: 16px;
@@ -1718,11 +1720,13 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
   border-radius: var(--radius);
 }
 
-input:checked + .slider {
+input:checked + .slider,
+input:checked + .toggle-slider {
   background-color: #cf4110;
 }
 
-input:checked + .slider:before {
+input:checked + .slider:before,
+input:checked + .toggle-slider:before {
   transform: translateX(18px);
 }
 
@@ -2067,7 +2071,22 @@ input:checked + .slider:before {
 .lockscreen-grid-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: 6px 10px;
+  gap: 1px;
+  background: var(--border-subtle, #f4f4f5);
+}
+
+.lockscreen-grid-cell {
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 18px;
+}
+
+.lockscreen-cell-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #18181b;
 }
 
 .lockscreen-save-bar {
