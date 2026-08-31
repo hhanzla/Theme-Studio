@@ -1468,6 +1468,8 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
 
 /* Cards Grid Full Width Override for Views */
 .cards-grid > .settings-view-container,
+.cards-grid > .extensions-view-container,
+.cards-grid > .tweaks-view-container,
 .cards-grid > .uninstall-view-wrapper {
   grid-column: 1 / -1;
   width: 100%;

@@ -140,7 +140,7 @@ async function loadCategory(category) {
     const subtabsBar = document.querySelector('.subtabs-bar');
     if (subtabsBar) subtabsBar.style.display = 'none';
     emptyStateEl.classList.add('hidden');
-    window.TweaksView.init(cardsGridEl);
+    window.TweaksView.render(cardsGridEl);
     return;
   }
 

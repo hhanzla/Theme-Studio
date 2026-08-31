@@ -7,10 +7,21 @@ const TweaksView = {
   desktopTweaks: null,
   isOrganizing: false,
 
-  async init(containerEl) {
-    this.container = containerEl;
+  async render(containerEl) {
+    if (containerEl) this.container = containerEl;
+    if (this.container) {
+      this.container.innerHTML = `
+        <div class="tweaks-view-container" style="display: flex; align-items: center; justify-content: center; padding: 40px; color: var(--text-secondary);">
+          <span>Loading desktop tweaks...</span>
+        </div>
+      `;
+    }
     await this.loadData();
-    this.render();
+    this.renderUI();
+  },
+
+  async init(containerEl) {
+    return this.render(containerEl);
   },
 
   async loadData() {
@@ -28,7 +39,7 @@ const TweaksView = {
     }
   },
 
-  render() {
+  renderUI() {
     if (!this.container) return;
 
     const status = this.appFoldersStatus || {};
@@ -181,7 +192,7 @@ const TweaksView = {
     if (organizeBtn) {
       organizeBtn.addEventListener('click', async () => {
         this.isOrganizing = true;
-        this.render();
+        this.renderUI();
         try {
           showToast('Scanning applications and organizing App Grid...', 'info');
           const res = await window.electronAPI.tweaks.organizeAppFolders();
@@ -195,7 +206,7 @@ const TweaksView = {
         } finally {
           this.isOrganizing = false;
           await this.loadData();
-          this.render();
+          this.renderUI();
         }
       });
     }
@@ -205,7 +216,7 @@ const TweaksView = {
     if (resetBtn) {
       resetBtn.addEventListener('click', async () => {
         this.isOrganizing = true;
-        this.render();
+        this.renderUI();
         try {
           showToast('Restoring default App Grid layout...', 'info');
           const res = await window.electronAPI.tweaks.resetAppFolders();
@@ -217,7 +228,7 @@ const TweaksView = {
         } finally {
           this.isOrganizing = false;
           await this.loadData();
-          this.render();
+          this.renderUI();
         }
       });
     }
