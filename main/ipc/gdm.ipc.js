@@ -3,8 +3,8 @@
 
 const { ipcMain } = require('electron');
 const path = require('path');
-const fs = require('fs');
 const gdmAssets = require('../lib/fixes/gdm-assets');
+const gdm = require('../lib/gdm');
 const stateStore = require('../lib/state-store');
 
 function registerGdmIpc() {
@@ -39,19 +39,42 @@ function registerGdmIpc() {
    */
   ipcMain.handle('gdm:status', async () => {
     try {
-      const gseSystemPath = '/usr/local/share/gnome-shell/extensions/gdm-extension@pratap.fastmail.fm';
-      const gseAltPath = '/usr/share/gnome-shell/extensions/gdm-extension@pratap.fastmail.fm';
-      const gseUserPath = path.join(require('os').homedir(), '.local/share/gnome-shell/extensions/gdm-extension@pratap.fastmail.fm');
-      
-      const isInstalled = fs.existsSync(gseSystemPath) || fs.existsSync(gseAltPath) || fs.existsSync(gseUserPath);
-
-      return {
-        success: true,
-        gseGdmInstalled: isInstalled,
-        gseGdmPath: isInstalled ? (fs.existsSync(gseSystemPath) ? gseSystemPath : (fs.existsSync(gseAltPath) ? gseAltPath : gseUserPath)) : null
-      };
+      return await gdm.checkGdmStatus();
     } catch (err) {
       return { success: false, error: err.message, gseGdmInstalled: false };
+    }
+  });
+
+  /**
+   * Enable GDM session login-screen customization
+   */
+  ipcMain.handle('gdm:enableExtension', async () => {
+    try {
+      return await gdm.enableGdmCustomization();
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  /**
+   * Set GDM Shell Theme in gdm user dconf
+   */
+  ipcMain.handle('gdm:setShellTheme', async (_event, payload = {}) => {
+    try {
+      return await gdm.setGdmShellTheme(payload.themeName || payload.name);
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  /**
+   * Set GDM Background in gdm user dconf
+   */
+  ipcMain.handle('gdm:setBackground', async (_event, payload = {}) => {
+    try {
+      return await gdm.setGdmBackground(payload.bgPath || payload.path);
+    } catch (err) {
+      return { success: false, error: err.message };
     }
   });
 }
