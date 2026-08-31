@@ -105,12 +105,13 @@ window.VariantPicker = {
           };
 
           return `
-            <label class="tweak-checkbox-card">
+            <label class="tweak-checkbox-item">
               <input type="checkbox" class="tweak-checkbox-input" value="${opt}">
-              <div class="tweak-checkbox-content">
-                <span class="tweak-checkbox-title">${detail.title}</span>
-                <span class="tweak-checkbox-desc">${detail.desc}</span>
-              </div>
+              <span class="tweak-checkbox-label">${detail.title}</span>
+              <span class="tweak-info-badge" onclick="event.preventDefault();" title="${detail.desc}">
+                ⓘ
+                <span class="tweak-tooltip">${detail.desc}</span>
+              </span>
             </label>
           `;
         }).join('');
@@ -118,13 +119,13 @@ window.VariantPicker = {
         formGroupsHtml += `
           <div class="form-group tweaks-section">
             <div class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
-              <span>${label}</span>
+              <span>${label} <small style="color: var(--text-muted); font-weight: normal; font-size: 10px;">(Multi-select)</small></span>
               <span class="tweak-info-badge" onclick="event.preventDefault();" title="${groupDesc}">
                 ⓘ
                 <span class="tweak-tooltip">${groupDesc}</span>
               </span>
             </div>
-            <div class="tweaks-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-top: 4px;">
+            <div class="tweaks-grid-container" style="margin-top: 2px;">
               ${tweakCheckboxesHtml}
             </div>
           </div>
@@ -227,8 +228,8 @@ window.VariantPicker = {
         </div>
 
         <div class="modal-footer">
-          <button class="modal-btn btn-secondary" id="variant-cancel-btn">Cancel</button>
-          <button class="modal-btn btn-primary" id="variant-confirm-btn">Install Theme</button>
+          <button class="btn btn-secondary" id="variant-cancel-btn">Cancel</button>
+          <button class="btn btn-primary" id="variant-confirm-btn">Install Theme</button>
         </div>
       </div>
     `;

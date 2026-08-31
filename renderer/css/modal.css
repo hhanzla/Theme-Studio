@@ -355,3 +355,21 @@
 .tweak-info-badge:hover .tweak-tooltip {
   display: block;
 }
+
+/* Modal Info Box */
+.modal-info-box {
+  background: #f4f4f5;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-info-box strong {
+  color: #18181b;
+  font-weight: 600;
+}
