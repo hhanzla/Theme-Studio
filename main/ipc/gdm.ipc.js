@@ -112,6 +112,19 @@ function registerGdmIpc() {
   });
 
   /**
+   * Lock screen session helper
+   */
+  ipcMain.handle('gdm:lockSession', async () => {
+    try {
+      const { exec } = require('child_process');
+      exec('loginctl lock-session', () => {});
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  /**
    * Reset GDM session settings to defaults
    */
   ipcMain.handle('gdm:resetDefault', async () => {
