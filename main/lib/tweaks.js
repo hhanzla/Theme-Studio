@@ -334,12 +334,104 @@ function applyCompactCssToFile(filePath, enable) {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
-function setCompactMode(enable) {
+const COMPACT_SHELL_CSS = `@import url("/usr/share/themes/Yaru-dark/gnome-shell/gnome-shell.css");
+
+/* Theme Studio - Compact GNOME Shell Quick Settings & Panel */
+.quick-settings {
+  padding: 10px !important;
+}
+
+.quick-settings-grid {
+  spacing-rows: 6px !important;
+  spacing-columns: 6px !important;
+}
+
+.quick-toggle, .quick-menu-toggle {
+  min-width: 10em !important;
+  max-width: 10em !important;
+  min-height: 2.35em !important;
+  border-radius: 999px !important;
+}
+
+.quick-toggle > StBoxLayout {
+  padding: 0 8px !important;
+  spacing: 6px !important;
+}
+
+.quick-toggle .quick-toggle-title {
+  font-size: 0.88em !important;
+}
+
+.quick-toggle StBoxLayout > .quick-toggle-subtitle {
+  font-size: 0.75em !important;
+}
+
+.quick-toggle .quick-toggle-icon {
+  icon-size: 0.95em !important;
+}
+
+.quick-slider {
+  padding: 2px 4px !important;
+}
+
+.quick-slider > StBoxLayout {
+  padding: 2px 8px !important;
+}
+
+.quick-slider .slider {
+  min-height: 18px !important;
+}
+
+.quick-settings-system-item > StBoxLayout {
+  padding: 4px 6px !important;
+}
+
+#panel {
+  height: 28px !important;
+}
+
+.panel-button {
+  padding: 0 6px !important;
+  font-size: 0.9em !important;
+}
+
+.popup-menu-item {
+  padding: 4px 10px !important;
+  min-height: 26px !important;
+  font-size: 0.9em !important;
+}
+`;
+
+async function setCompactMode(enable) {
   const gtk4Css = path.join(os.homedir(), '.config', 'gtk-4.0', 'gtk.css');
   const gtk3Css = path.join(os.homedir(), '.config', 'gtk-3.0', 'gtk.css');
 
   applyCompactCssToFile(gtk4Css, enable);
   applyCompactCssToFile(gtk3Css, enable);
+
+  // Manage GNOME Shell compact styling
+  const shellThemeDir = path.join(os.homedir(), '.themes', 'ThemeStudio-Compact', 'gnome-shell');
+  const shellThemeCss = path.join(shellThemeDir, 'gnome-shell.css');
+
+  if (enable) {
+    if (!fs.existsSync(shellThemeDir)) {
+      fs.mkdirSync(shellThemeDir, { recursive: true });
+    }
+    fs.writeFileSync(shellThemeCss, COMPACT_SHELL_CSS, 'utf8');
+
+    // If current shell theme is default or ThemeStudio-Compact, activate ThemeStudio-Compact
+    const currentShell = await execGsettings(['get', 'org.gnome.shell.extensions.user-theme', 'name']);
+    const curVal = currentShell.value || '';
+    if (!curVal || curVal === 'ThemeStudio-Compact') {
+      await execGsettings(['set', 'org.gnome.shell.extensions.user-theme', 'name', 'ThemeStudio-Compact']);
+    }
+  } else {
+    // If ThemeStudio-Compact is the active shell theme, revert back to default
+    const currentShell = await execGsettings(['get', 'org.gnome.shell.extensions.user-theme', 'name']);
+    if (currentShell.value === 'ThemeStudio-Compact') {
+      await execGsettings(['reset', 'org.gnome.shell.extensions.user-theme', 'name']);
+    }
+  }
 
   return { success: true, compactMode: enable };
 }
