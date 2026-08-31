@@ -275,6 +275,75 @@ async function resetAppFolders() {
   };
 }
 
+const COMPACT_START_TAG = '/* @themestudio:compact-mode:start */';
+const COMPACT_END_TAG = '/* @themestudio:compact-mode:end */';
+
+const COMPACT_CSS = `${COMPACT_START_TAG}
+/* Theme Studio - Compact Desktop UI Tweak */
+/* Non-destructive sizing: reduces titlebar & headerbar padding without overriding colors or custom themes */
+headerbar, .titlebar, windowtitle {
+  min-height: 34px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+headerbar windowcontrols {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+headerbar entry, headerbar button {
+  min-height: 26px;
+  padding: 3px 8px;
+}
+popover.background list, popover.background menu {
+  padding: 3px;
+}
+${COMPACT_END_TAG}`;
+
+function isCompactModeEnabled() {
+  const gtk4Css = path.join(os.homedir(), '.config', 'gtk-4.0', 'gtk.css');
+  if (fs.existsSync(gtk4Css)) {
+    try {
+      const content = fs.readFileSync(gtk4Css, 'utf8');
+      if (content.includes(COMPACT_START_TAG)) return true;
+    } catch (_) {}
+  }
+  return false;
+}
+
+function applyCompactCssToFile(filePath, enable) {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  let content = '';
+  if (fs.existsSync(filePath)) {
+    try {
+      content = fs.readFileSync(filePath, 'utf8');
+    } catch (_) {}
+  }
+
+  // Remove existing compact mode block if any
+  const regex = new RegExp(`${COMPACT_START_TAG.replace(/[*[\]()]/g, '\\$&')}[\\s\\S]*?${COMPACT_END_TAG.replace(/[*[\]()]/g, '\\$&')}\\n?`, 'g');
+  content = content.replace(regex, '').trim();
+
+  if (enable) {
+    content = content ? `${content}\n\n${COMPACT_CSS}\n` : `${COMPACT_CSS}\n`;
+  }
+
+  fs.writeFileSync(filePath, content, 'utf8');
+}
+
+function setCompactMode(enable) {
+  const gtk4Css = path.join(os.homedir(), '.config', 'gtk-4.0', 'gtk.css');
+  const gtk3Css = path.join(os.homedir(), '.config', 'gtk-3.0', 'gtk.css');
+
+  applyCompactCssToFile(gtk4Css, enable);
+  applyCompactCssToFile(gtk3Css, enable);
+
+  return { success: true, compactMode: enable };
+}
+
 /**
  * Quick desktop system tweaks
  */
@@ -282,15 +351,21 @@ async function getDesktopTweaks() {
   const clickAction = await execGsettings(['get', 'org.gnome.shell.extensions.dash-to-dock', 'click-action']);
   const buttonLayout = await execGsettings(['get', 'org.gnome.desktop.wm.preferences', 'button-layout']);
   const centerWindows = await execGsettings(['get', 'org.gnome.mutter', 'center-new-windows']);
+  const compactMode = isCompactModeEnabled();
 
   return {
+    success: true,
     clickToMinimize: clickAction.value === 'minimize',
     buttonLayout: buttonLayout.value || 'appmenu:close',
-    centerNewWindows: centerWindows.value === 'true'
+    centerNewWindows: centerWindows.value === 'true',
+    compactMode
   };
 }
 
 async function setDesktopTweak(key, value) {
+  if (key === 'compactMode') {
+    return setCompactMode(Boolean(value));
+  }
   if (key === 'clickToMinimize') {
     const val = value ? 'minimize' : 'focus-or-previews';
     return execGsettings(['set', 'org.gnome.shell.extensions.dash-to-dock', 'click-action', val]);

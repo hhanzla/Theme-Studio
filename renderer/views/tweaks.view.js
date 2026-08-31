@@ -1,5 +1,5 @@
 // renderer/views/tweaks.view.js
-// Handles desktop tweaks, App Grid auto-folders organization, and UI controls
+// Handles desktop tweaks, App Grid auto-folders organization, UI controls, and Compact Desktop Mode
 
 const TweaksView = {
   container: null,
@@ -28,8 +28,13 @@ const TweaksView = {
   async loadData() {
     try {
       if (window.electronAPI && window.electronAPI.tweaks) {
-        const foldersRes = await window.electronAPI.tweaks.getAppFolders();
+        const [foldersRes, desktopRes] = await Promise.all([
+          window.electronAPI.tweaks.getAppFolders(),
+          window.electronAPI.tweaks.getDesktopTweaks ? window.electronAPI.tweaks.getDesktopTweaks() : Promise.resolve({})
+        ]);
+
         this.appFoldersStatus = foldersRes || {};
+        this.desktopTweaks = desktopRes || {};
 
         // If system already has organized active folders, sync selection
         if (this.appFoldersStatus && Array.isArray(this.appFoldersStatus.activeFolders) && this.appFoldersStatus.activeFolders.length > 0) {
@@ -49,8 +54,9 @@ const TweaksView = {
     if (window.AppState && window.AppState.activeCategory !== 'tweaks') return;
 
     const status = this.appFoldersStatus || {};
-    const isOrganized = !!status.isOrganized;
     const totalApps = status.totalApps || 0;
+    const isCompact = !!(this.desktopTweaks && this.desktopTweaks.compactMode);
+
     const categories = Array.isArray(status.definedCategories) ? status.definedCategories : [
       { id: 'Internet', name: 'Internet & Web', icon: '🌐', count: 0 },
       { id: 'Development', name: 'Development', icon: '💻', count: 0 },
@@ -80,6 +86,34 @@ const TweaksView = {
 
     this.container.innerHTML = `
       <div class="settings-view-container tweaks-view-wrapper">
+        <!-- Section: Desktop Sizing & Density -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Desktop Sizing &amp; Compact Mode</h3>
+          <p class="settings-section-desc">
+            Fine-tune UI density, window titlebar height, and headerbar spacing across the GNOME desktop.
+          </p>
+
+          <div class="settings-card" style="margin-top: 4px;">
+            <div class="settings-card-left">
+              <div class="settings-option-title">
+                <strong>Compact Desktop UI Mode</strong>
+                <span class="badge-tag ${isCompact ? 'badge-installed' : 'badge-script'}">
+                  ${isCompact ? 'Active' : 'Standard'}
+                </span>
+              </div>
+              <p class="settings-option-desc">
+                Reduces window titlebars and headerbar heights (34px), buttons, and popover padding for high-density screens. Non-destructive and respects themes that already have built-in compact styling (like Orchis-Compact).
+              </p>
+            </div>
+            <div class="settings-card-right">
+              <label class="toggle-switch">
+                <input type="checkbox" id="chk-compact-mode" ${isCompact ? 'checked' : ''}>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
         <!-- Section: App Menu Auto-Categorizer -->
         <div class="settings-section">
           <h3 class="settings-section-title">App Menu Smart Categorizer</h3>
@@ -129,6 +163,30 @@ const TweaksView = {
   },
 
   bindEvents() {
+    // 0. Compact Mode Toggle Switch
+    const compactToggle = this.container.querySelector('#chk-compact-mode');
+    if (compactToggle) {
+      compactToggle.addEventListener('change', async (e) => {
+        const enable = e.target.checked;
+        showToast(enable ? 'Enabling Compact Desktop Mode...' : 'Restoring standard UI sizing...', 'info');
+        try {
+          const res = await window.electronAPI.tweaks.setDesktopTweak({ key: 'compactMode', value: enable });
+          if (res && res.success) {
+            showToast(enable ? 'Compact Desktop Mode enabled!' : 'Standard desktop UI spacing restored.', 'success');
+          } else {
+            e.target.checked = !enable;
+            showToast(`Failed to update compact mode: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          e.target.checked = !enable;
+          showToast(`Error: ${err.message}`, 'warning');
+        } finally {
+          await this.loadData();
+          this.renderUI();
+        }
+      });
+    }
+
     // 1. Selectable Folder Cards Click
     const folderCards = this.container.querySelectorAll('.tweak-folder-card');
     folderCards.forEach(card => {
@@ -198,18 +256,17 @@ const TweaksView = {
     const resetBtn = this.container.querySelector('#btn-reset-folders');
     if (resetBtn) {
       resetBtn.addEventListener('click', async () => {
-        this.isOrganizing = true;
-        this.renderUI();
         try {
           showToast('Restoring default App Grid layout...', 'info');
           const res = await window.electronAPI.tweaks.resetAppFolders();
           if (res && res.success) {
-            showToast('App Grid restored to default.', 'success');
+            showToast('App Grid restored to default unorganized layout', 'success');
+          } else {
+            showToast(res.error || 'Failed to restore default app grid', 'warning');
           }
         } catch (err) {
           showToast('Error resetting folders: ' + err.message, 'warning');
         } finally {
-          this.isOrganizing = false;
           await this.loadData();
           this.renderUI();
         }
@@ -217,5 +274,3 @@ const TweaksView = {
     }
   }
 };
-
-window.TweaksView = TweaksView;
