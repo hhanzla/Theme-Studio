@@ -200,44 +200,12 @@ async function installGseGdmExtension() {
     }
   }
 
-  const userThemes = path.join(os.homedir(), '.themes');
-  const userIcons = path.join(os.homedir(), '.icons');
-  const userBg = path.join(os.homedir(), '.local', 'share', 'backgrounds');
-  const appWallpapers = path.resolve(__dirname, '../../renderer/assets/wallpapers');
-  const extMediaBg = '/media/hanzla-masood/DATA/Wallpapers';
-
   const scriptContent = `#!/bin/bash
 set -e
 cd "${repoDir}"
 chmod +x install.sh
 ./install.sh
 
-mkdir -p /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/fonts /usr/local/share/pixmaps /usr/share/backgrounds
-
-if [ -d "${userThemes}" ] && [ "$(ls -A "${userThemes}" 2>/dev/null)" ]; then
-  cp -rf "${userThemes}"/* /usr/local/share/themes/ 2>/dev/null || true
-fi
-
-if [ -d "${userIcons}" ] && [ "$(ls -A "${userIcons}" 2>/dev/null)" ]; then
-  cp -rf "${userIcons}"/* /usr/local/share/icons/ 2>/dev/null || true
-fi
-
-if [ -d "${appWallpapers}" ] && [ "$(ls -A "${appWallpapers}" 2>/dev/null)" ]; then
-  cp -rf "${appWallpapers}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
-  cp -rf "${appWallpapers}"/* /usr/share/backgrounds/ 2>/dev/null || true
-fi
-
-if [ -d "${userBg}" ] && [ "$(ls -A "${userBg}" 2>/dev/null)" ]; then
-  cp -rf "${userBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
-  cp -rf "${userBg}"/* /usr/share/backgrounds/ 2>/dev/null || true
-fi
-
-if [ -d "${extMediaBg}" ] && [ "$(ls -A "${extMediaBg}" 2>/dev/null)" ]; then
-  cp -rf "${extMediaBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
-  cp -rf "${extMediaBg}"/* /usr/share/backgrounds/ 2>/dev/null || true
-fi
-
-chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/share/backgrounds 2>/dev/null || true
 cp -f src/v-45-46-47-48-49-50/schemas/*.xml /usr/share/glib-2.0/schemas/ 2>/dev/null || true
 glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true
 dconf update
@@ -251,6 +219,11 @@ dconf update
 
   if (!res.success) return res;
 
+  // Auto-sync currently installed themes and active wallpaper
+  await syncAssetsToSystem().catch(() => {});
+
+  if (!res.success) return res;
+
   const status = await checkGdmStatus();
   return {
     success: true,
@@ -260,48 +233,59 @@ dconf update
 }
 
 /**
- * Synchronizes user-installed themes, icons, and wallpapers into /usr/local/share/ so GDM can access them
+ * Synchronizes ONLY currently installed themes, installed icons, and currently applied wallpaper into /usr/local/share/
  */
 async function syncAssetsToSystem() {
+  const gnome = require('./gnome');
   const userThemes = path.join(os.homedir(), '.themes');
   const userIcons = path.join(os.homedir(), '.icons');
-  const userBg = path.join(os.homedir(), '.local', 'share', 'backgrounds');
-  const appWallpapers = path.resolve(__dirname, '../../renderer/assets/wallpapers');
-  const extMediaBg = '/media/hanzla-masood/DATA/Wallpapers';
+
+  // Get current active wallpaper file
+  let currentWpPath = '';
+  try {
+    const current = await gnome.getCurrentSettings();
+    if (current && current.wallpaper) {
+      let raw = current.wallpaper;
+      if (raw.startsWith('file://')) raw = decodeURIComponent(raw.replace('file://', ''));
+      if (fs.existsSync(raw)) currentWpPath = raw;
+    }
+  } catch (_) {}
+
+  // If not found from gsettings, look for applied wallpaper in ~/.local/share/backgrounds
+  if (!currentWpPath) {
+    const bgDir = path.join(os.homedir(), '.local', 'share', 'backgrounds');
+    if (fs.existsSync(bgDir)) {
+      try {
+        const files = fs.readdirSync(bgDir).filter(f => f.match(/\.(jpg|jpeg|png|webp)$/i));
+        if (files.length > 0) currentWpPath = path.join(bgDir, files[0]);
+      } catch (_) {}
+    }
+  }
 
   const scriptContent = `#!/bin/bash
 set -e
 mkdir -p /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/fonts /usr/local/share/pixmaps /usr/share/backgrounds
 
-# 1. Sync Themes
-if [ -d "${userThemes}" ] && [ "$(ls -A "${userThemes}" 2>/dev/null)" ]; then
-  cp -rf "${userThemes}"/* /usr/local/share/themes/ 2>/dev/null || true
+# 1. Clean previous sync folders so uninstalled/stale assets are removed
+rm -rf /usr/local/share/themes/* /usr/local/share/icons/* /usr/local/share/backgrounds/* 2>/dev/null || true
+
+# 2. Sync Installed Themes only (exclude mock/test)
+if [ -d "${userThemes}" ]; then
+  find "${userThemes}" -mindepth 1 -maxdepth 1 -type d ! -name "mock-*" -exec cp -rf {} /usr/local/share/themes/ \\; 2>/dev/null || true
 fi
 
-# 2. Sync Icons
-if [ -d "${userIcons}" ] && [ "$(ls -A "${userIcons}" 2>/dev/null)" ]; then
-  cp -rf "${userIcons}"/* /usr/local/share/icons/ 2>/dev/null || true
+# 3. Sync Installed Icons only
+if [ -d "${userIcons}" ]; then
+  find "${userIcons}" -mindepth 1 -maxdepth 1 -type d -exec cp -rf {} /usr/local/share/icons/ \\; 2>/dev/null || true
 fi
 
-# 3. Sync App Wallpapers
-if [ -d "${appWallpapers}" ] && [ "$(ls -A "${appWallpapers}" 2>/dev/null)" ]; then
-  cp -rf "${appWallpapers}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
-  cp -rf "${appWallpapers}"/* /usr/share/backgrounds/ 2>/dev/null || true
+# 4. Sync ONLY the currently applied wallpaper image (never copy thumbnails folder!)
+if [ -n "${currentWpPath}" ] && [ -f "${currentWpPath}" ]; then
+  cp -f "${currentWpPath}" /usr/local/share/backgrounds/ 2>/dev/null || true
+  cp -f "${currentWpPath}" /usr/share/backgrounds/ 2>/dev/null || true
 fi
 
-# 4. Sync User Applied Backgrounds
-if [ -d "${userBg}" ] && [ "$(ls -A "${userBg}" 2>/dev/null)" ]; then
-  cp -rf "${userBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
-  cp -rf "${userBg}"/* /usr/share/backgrounds/ 2>/dev/null || true
-fi
-
-# 5. Sync External Wallpapers if mounted
-if [ -d "${extMediaBg}" ] && [ "$(ls -A "${extMediaBg}" 2>/dev/null)" ]; then
-  cp -rf "${extMediaBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
-  cp -rf "${extMediaBg}"/* /usr/share/backgrounds/ 2>/dev/null || true
-fi
-
-# 6. Ensure read permissions for GDM
+# 5. Ensure read permissions for GDM
 chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/share/backgrounds 2>/dev/null || true
 `;
 
@@ -315,23 +299,37 @@ chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/ba
 
   return {
     success: true,
-    message: 'Successfully synced all installed themes, icons, and wallpapers to GDM (/usr/local/share)!'
+    message: 'Successfully synced installed themes, icons, and applied wallpaper to GDM!'
   };
 }
 
 /**
- * 1-Click Clean Uninstall of GSE-GDM Extension
+ * 1-Click Clean Uninstall of GSE-GDM Extension & all synced system folders
  */
 async function uninstallGseGdmExtension() {
-  const repoDir = getGseGdmSourceDir();
+  const scriptContent = `#!/bin/bash
+set -e
+# 1. Remove GSE-GDM extension
+rm -rf "/usr/local/share/gnome-shell/extensions/${GSE_GDM_UUID}" "/usr/share/gnome-shell/extensions/${GSE_GDM_UUID}" 2>/dev/null || true
 
-  let cmd = `sh -c 'rm -rf "/usr/local/share/gnome-shell/extensions/${GSE_GDM_UUID}" "/usr/share/gnome-shell/extensions/${GSE_GDM_UUID}" "${DCONF_GDM_FILE}" "/etc/dconf/db/gdm.d/99-gdm-extension" && rm -f /usr/share/glib-2.0/schemas/org.gnome.shell.extensions.gdm-extension.gschema.xml && glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true && dconf update'`;
-  
-  if (fs.existsSync(path.join(repoDir, 'uninstall.sh'))) {
-    cmd = `sh -c 'cd "${repoDir}" && chmod +x uninstall.sh && ./uninstall.sh && rm -f "${DCONF_GDM_FILE}" && dconf update'`;
-  }
+# 2. Clean all copied system assets folders created for GDM
+rm -rf /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds 2>/dev/null || true
 
-  return execPkexec(cmd);
+# 3. Clean dconf configurations
+rm -f "${DCONF_GDM_FILE}" "/etc/dconf/db/gdm.d/99-gdm-extension" 2>/dev/null || true
+rm -f /usr/share/glib-2.0/schemas/org.gnome.shell.extensions.gdm-extension.gschema.xml 2>/dev/null || true
+
+# 4. Recompile schemas & update dconf
+glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true
+dconf update 2>/dev/null || true
+`;
+
+  const scriptPath = path.join(os.tmpdir(), 'themestudio_gdm_uninstall.sh');
+  fs.writeFileSync(scriptPath, scriptContent, { mode: 0o755 });
+
+  const res = await execPkexec(`/bin/bash "${scriptPath}"`);
+  try { fs.unlinkSync(scriptPath); } catch (_) {}
+  return res;
 }
 
 /**

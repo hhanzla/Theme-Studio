@@ -193,6 +193,17 @@ function registerSystemIpc() {
       }
 
       const res = await gnome.setWallpaper(wallpaperPath);
+
+      // Auto-sync applied wallpaper to GDM if GDM extension is installed
+      try {
+        const gdm = require('../lib/gdm');
+        gdm.checkGdmStatus().then(status => {
+          if (status && status.gseGdmInstalled) {
+            gdm.syncAssetsToSystem().catch(() => {});
+          }
+        }).catch(() => {});
+      } catch (_) {}
+
       return res;
     } catch (err) {
       return { success: false, error: err.message };

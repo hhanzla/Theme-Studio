@@ -601,6 +601,16 @@ async function installScript(item, options = {}, onProgress = () => {}) {
     // Auto-register companion GTK / Shell theme if available
     registerCompanionThemes(item, targetDir, installedFolderNames, matchedDir);
 
+    // Auto-sync newly installed theme to GDM if GDM extension is installed
+    try {
+      const gdm = require('./gdm');
+      gdm.checkGdmStatus().then(status => {
+        if (status && status.gseGdmInstalled) {
+          gdm.syncAssetsToSystem().catch(() => {});
+        }
+      }).catch(() => {});
+    } catch (_) {}
+
     onProgress({ id: item.id, percent: 100, stage: 'completed', message: 'Installation complete!' });
 
     return {

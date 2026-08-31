@@ -67,10 +67,10 @@ async function removeInstalledItem(id) {
     removeGtk4Fix(item.primary_path || null);
   } catch (_) {}
 
-  // 3. Remove installed directories from all possible theme/icon locations
+  // 3. Remove installed directories from all possible theme/icon locations (including /usr/local/share)
   const searchDirs = isGtkOrShell
-    ? [GTK_THEMES, path.join(HOME, '.local', 'share', 'themes')]
-    : [ICON_THEMES, path.join(HOME, '.local', 'share', 'icons')];
+    ? [GTK_THEMES, path.join(HOME, '.local', 'share', 'themes'), '/usr/local/share/themes']
+    : [ICON_THEMES, path.join(HOME, '.local', 'share', 'icons'), '/usr/local/share/icons'];
 
   // Specific folders registered in item
   if (Array.isArray(item.installed_folders)) {
