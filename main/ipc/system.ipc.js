@@ -165,7 +165,7 @@ function registerSystemIpc() {
 
   ipcMain.handle('apply:wallpaper', async (_event, payload) => {
     try {
-      let wallpaperPath = typeof payload === 'string' ? payload : (payload.path || payload.url);
+      let wallpaperPath = typeof payload === 'string' ? payload : (payload ? (payload.path || payload.url || payload.file) : '');
       if (!wallpaperPath) return { success: false, error: 'No wallpaper path or URL provided' };
 
       // On-demand live download for online/remote wallpaper URLs

@@ -581,7 +581,8 @@ async function handleCardAction(item, card) {
 
     try {
       const applyFn = window.electronAPI.system?.applyWallpaper || window.electronAPI.looks?.setWallpaper;
-      const res = await applyFn(item.url);
+      const wallTarget = item.url || (item.source && (item.source.file || item.source.url)) || item.thumbnail;
+      const res = await applyFn(wallTarget);
       if (res && res.success) {
         showToast(`Desktop wallpaper updated to ${item.name}`, 'success');
         document.querySelectorAll('.theme-card[data-category="wallpaper"]').forEach(c => {

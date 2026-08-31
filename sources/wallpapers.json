@@ -286,8 +286,8 @@
     }
   },
   {
-    "id": "wallpaper",
-    "name": "Wallpaper",
+    "id": "wallpaper-dark-mesh",
+    "name": "Dark Gradient Waves",
     "category": "wallpaper",
     "thumbnail": "assets/wallpapers/wallpaper.jpg",
     "author": "Community",
@@ -300,7 +300,7 @@
   },
   {
     "id": "wallpaperflare-com-wallpaper",
-    "name": "Wallpaper",
+    "name": "Neon Cyber Wave",
     "category": "wallpaper",
     "thumbnail": "assets/wallpapers/wallpaperflare-com-wallpaper.jpg",
     "author": "Community",
