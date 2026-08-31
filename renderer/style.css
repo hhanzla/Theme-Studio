@@ -232,8 +232,9 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 24px 12px 24px;
+  padding: 18px 24px 14px 24px;
   background: var(--bg-app);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .header-left .page-title {
@@ -288,7 +289,7 @@ html[data-initial-category="uninstall"] #btn-uninstall-mgr .footer-icon {
 
 /* Sub-tabs Bar */
 .subtabs-bar {
-  padding: 0 24px 10px 24px;
+  padding: 10px 24px;
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
