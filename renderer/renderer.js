@@ -201,7 +201,16 @@ async function loadCategory(category) {
               return file.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '');
             };
             const currentBase = getCleanBase(currentWp);
-            const matchIdx = AppState.items.findIndex(item => getCleanBase(item.url) === currentBase);
+
+            AppState.items.forEach(item => {
+              const raw = item.url || (item.source && (item.source.file || item.source.url)) || item.thumbnail || item.id || '';
+              const itemBase = getCleanBase(raw);
+              const isMatch = (currentBase && itemBase && (currentBase === itemBase || currentBase.includes(itemBase) || itemBase.includes(currentBase)));
+              item.installed = isMatch;
+              item.applied = isMatch;
+            });
+
+            const matchIdx = AppState.items.findIndex(item => item.applied);
             if (matchIdx > 0) {
               const appliedItem = AppState.items.splice(matchIdx, 1)[0];
               AppState.items.unshift(appliedItem);
@@ -323,11 +332,17 @@ function updateView() {
               };
 
               const currentBase = getCleanBase(currentWp);
-              const itemBase = getCleanBase(item.url);
+              const raw = item.url || (item.source && (item.source.file || item.source.url)) || item.thumbnail || item.id || '';
+              const itemBase = getCleanBase(raw);
 
-              if (currentBase && itemBase && currentBase === itemBase) {
+              const isMatch = (currentBase && itemBase && (currentBase === itemBase || currentBase.includes(itemBase) || itemBase.includes(currentBase)));
+              if (isMatch || item.applied) {
+                item.installed = true;
+                item.applied = true;
                 window.ThemeCard.setApplied(cardEl, true);
               } else {
+                item.installed = false;
+                item.applied = false;
                 window.ThemeCard.setApplied(cardEl, false);
               }
               return;
@@ -585,10 +600,21 @@ async function handleCardAction(item, card) {
       const res = await applyFn(wallTarget);
       if (res && res.success) {
         showToast(`Desktop wallpaper updated to ${item.name}`, 'success');
-        document.querySelectorAll('.theme-card[data-category="wallpaper"]').forEach(c => {
-          window.ThemeCard.setApplied(c, false);
+        
+        (AppState.items || []).forEach(i => {
+          const isTarget = (i.id === item.id);
+          i.installed = isTarget;
+          i.applied = isTarget;
         });
-        window.ThemeCard.setApplied(card, true);
+
+        // Re-sort applied wallpaper to the top (index 0)
+        const idx = (AppState.items || []).findIndex(i => i.id === item.id);
+        if (idx > 0) {
+          const appliedItem = AppState.items.splice(idx, 1)[0];
+          AppState.items.unshift(appliedItem);
+        }
+
+        updateView();
       } else {
         showToast(`Failed to set wallpaper: ${res ? res.error : 'Unknown error'}`, 'warning');
         if (btn) {
