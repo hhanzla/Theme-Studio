@@ -134,6 +134,17 @@ function registerGdmIpc() {
       return { success: false, error: err.message };
     }
   });
+
+  /**
+   * Sync all installed themes, icons, and wallpapers into /usr/local/share/
+   */
+  ipcMain.handle('gdm:syncAssets', async () => {
+    try {
+      return await gdm.syncAssetsToSystem();
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
 }
 
 module.exports = {

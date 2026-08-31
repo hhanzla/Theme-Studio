@@ -59,6 +59,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   gdm: {
     copyAsset: (payload) => ipcRenderer.invoke('gdm:copyAsset', payload),
+    syncAssets: () => ipcRenderer.invoke('gdm:syncAssets'),
     status: () => ipcRenderer.invoke('gdm:status'),
     installGseGdm: () => ipcRenderer.invoke('gdm:installGseGdm'),
     uninstallGseGdm: () => ipcRenderer.invoke('gdm:uninstallGseGdm'),

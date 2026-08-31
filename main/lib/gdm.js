@@ -200,8 +200,12 @@ async function installGseGdmExtension() {
     }
   }
 
-  // Execute installer script + compile schemas into /usr/share/glib-2.0/schemas
-  const installCmd = `sh -c 'cd "${repoDir}" && chmod +x install.sh && ./install.sh && cp -f src/v-45-46-47-48-49-50/schemas/*.xml /usr/share/glib-2.0/schemas/ 2>/dev/null || true && glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true && dconf update'`;
+  // Execute installer script + populate /usr/local/share/ directories + compile schemas
+  const userThemes = path.join(os.homedir(), '.themes');
+  const userIcons = path.join(os.homedir(), '.icons');
+  const appWallpapers = path.resolve(__dirname, '../../renderer/assets/wallpapers');
+
+  const installCmd = `sh -c 'cd "${repoDir}" && chmod +x install.sh && ./install.sh && mkdir -p /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/fonts /usr/local/share/pixmaps && ([ -d "${userThemes}" ] && cp -r "${userThemes}"/* /usr/local/share/themes/ 2>/dev/null || true) && ([ -d "${userIcons}" ] && cp -r "${userIcons}"/* /usr/local/share/icons/ 2>/dev/null || true) && ([ -d "${appWallpapers}" ] && cp -r "${appWallpapers}"/* /usr/local/share/backgrounds/ 2>/dev/null || true) && chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds 2>/dev/null || true && cp -f src/v-45-46-47-48-49-50/schemas/*.xml /usr/share/glib-2.0/schemas/ 2>/dev/null || true && glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true && dconf update'`;
   
   const res = await execPkexec(installCmd);
   if (!res.success) return res;
@@ -209,8 +213,28 @@ async function installGseGdmExtension() {
   const status = await checkGdmStatus();
   return {
     success: true,
-    message: 'GSE-GDM Extension installed and compiled successfully!',
+    message: 'GSE-GDM Extension and system themes/wallpapers synced successfully!',
     gseGdmInstalled: status.gseGdmInstalled
+  };
+}
+
+/**
+ * Synchronizes user-installed themes, icons, and wallpapers into /usr/local/share/ so GDM can access them
+ */
+async function syncAssetsToSystem() {
+  const userThemes = path.join(os.homedir(), '.themes');
+  const userIcons = path.join(os.homedir(), '.icons');
+  const userBg = path.join(os.homedir(), '.local', 'share', 'backgrounds');
+  const appWallpapers = path.resolve(__dirname, '../../renderer/assets/wallpapers');
+
+  const syncCmd = `sh -c 'mkdir -p /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/fonts /usr/local/share/pixmaps && ([ -d "${userThemes}" ] && cp -r "${userThemes}"/* /usr/local/share/themes/ 2>/dev/null || true) && ([ -d "${userIcons}" ] && cp -r "${userIcons}"/* /usr/local/share/icons/ 2>/dev/null || true) && ([ -d "${appWallpapers}" ] && cp -r "${appWallpapers}"/* /usr/local/share/backgrounds/ 2>/dev/null || true) && ([ -d "${userBg}" ] && cp -r "${userBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true) && chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds 2>/dev/null || true'`;
+
+  const res = await execPkexec(syncCmd);
+  if (!res.success) return res;
+
+  return {
+    success: true,
+    message: 'Successfully synced all installed themes, icons, and wallpapers to GDM (/usr/local/share)!'
   };
 }
 
@@ -332,6 +356,7 @@ module.exports = {
   installGseGdmExtension,
   uninstallGseGdmExtension,
   enableGdmCustomization,
+  syncAssetsToSystem,
   saveGdmFullSettings,
   updateGdmConfig: saveGdmFullSettings,
   setGdmShellTheme: (name) => name ? saveGdmFullSettings({ shellTheme: name }) : Promise.resolve({ success: false, error: 'Theme name required' }),

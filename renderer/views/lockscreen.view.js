@@ -151,18 +151,43 @@ const LockscreenView = {
           </div>
         </div>
 
-        <!-- Helper: Copy Custom Wallpaper into System Backgrounds -->
+        <!-- System Assets Sync for GDM (Themes, Icons & Wallpapers) -->
         <div class="settings-section">
-          <h3 class="settings-section-title">System Wallpaper Sync</h3>
+          <h3 class="settings-section-title">GDM Themes &amp; Wallpapers Sync</h3>
           <p class="settings-section-desc">
-            GDM requires wallpapers to be located in system directory (<code>/usr/share/backgrounds</code>). ${availableBackgrounds.length} system wallpapers currently detected.
+            GDM login screen runs under a separate system user and strictly reads assets from <code>/usr/local/share/</code> or <code>/usr/share/</code>.
           </p>
 
           <div class="lockscreen-card" style="margin-top: 10px;">
             <div class="lockscreen-row">
               <div class="lockscreen-row-info">
-                <strong>Copy Wallpaper for GDM Access</strong>
-                <span>Select any image file from your PC to copy into <code>/usr/share/backgrounds/</code> (Requires admin password).</span>
+                <strong>Sync All Themes, Icons &amp; Wallpapers to GDM</strong>
+                <span>1-Click copies all your installed themes (Orchis, etc.), icons (Tela, etc.), and catalog wallpapers to <code>/usr/local/share/</code> so they immediately appear in GDM's login dropdown menus.</span>
+              </div>
+              <div class="lockscreen-row-control">
+                <button class="btn btn-primary" id="btn-sync-all-gdm">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                  </svg>
+                  <span>Sync to GDM System</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Helper: Copy Custom Wallpaper into System Backgrounds -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Custom Wallpaper File Copy</h3>
+          <p class="settings-section-desc">
+            Want to use a personal photo on GDM? Select any image file from your PC to copy it into <code>/usr/local/share/backgrounds/</code>.
+          </p>
+
+          <div class="lockscreen-card" style="margin-top: 10px;">
+            <div class="lockscreen-row">
+              <div class="lockscreen-row-info">
+                <strong>Select &amp; Copy Personal Wallpaper</strong>
+                <span>Browse and copy an individual image file for GDM access (Requires admin password).</span>
               </div>
               <div class="lockscreen-row-control">
                 <button class="btn btn-secondary" id="btn-copy-custom-wallpaper">
@@ -171,7 +196,7 @@ const LockscreenView = {
                     <circle cx="9" cy="9" r="2"></circle>
                     <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
                   </svg>
-                  <span>Select &amp; Copy Wallpaper</span>
+                  <span>Select Image</span>
                 </button>
               </div>
             </div>
@@ -257,6 +282,38 @@ const LockscreenView = {
             showToast('Authentication cancelled.', 'info');
           } else {
             showToast(`Uninstall error: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error: ${err.message}`, 'warning');
+        } finally {
+          await this.loadData();
+          this.renderUI();
+        }
+      });
+    }
+
+    // 5. Sync All Themes & Wallpapers to GDM
+    const syncAllBtn = this.container.querySelector('#btn-sync-all-gdm');
+    if (syncAllBtn) {
+      syncAllBtn.addEventListener('click', async () => {
+        syncAllBtn.disabled = true;
+        syncAllBtn.innerHTML = `
+          <svg class="spin-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10"></path>
+          </svg>
+          Syncing...
+        `;
+        showToast('Syncing all themes, icons & wallpapers to /usr/local/share (requires admin password)...', 'info');
+
+        try {
+          const res = await window.electronAPI.gdm.syncAssets();
+          if (res && res.success) {
+            showToast('All themes, icons & wallpapers synced to GDM successfully!', 'success');
+          } else if (res && res.cancelled) {
+            showToast('Administrator authentication was cancelled.', 'info');
+          } else {
+            showToast(`Sync failed: ${res ? res.error : 'Unknown error'}`, 'warning');
           }
         } catch (err) {
           showToast(`Error: ${err.message}`, 'warning');
