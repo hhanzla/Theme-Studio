@@ -44,7 +44,7 @@
       "nautilus": ["stable", "normal", "mojave", "glassy", "right"]
     },
     "install_script": "./install.sh",
-    "install_args_template": "-t {color} -c {mode} -o {opacity} -a {alt} -s {scheme} {icon} -N {nautilus} -d {dest_dir} -l",
+    "install_args_template": "-t {color} -c {mode} -o {opacity} -a {alt} -s {scheme} -i {icon} -N {nautilus} -d {dest_dir} -l",
     "dependencies": ["sassc", "glib-compile-schemas"],
     "target_dir": "~/.themes",
     "gtk4_fix": false,

@@ -25,10 +25,10 @@ async function runPhase2Tests() {
   console.log('applyGtk4Fix result:', fixRes);
 
   const symlinkCss = path.join(GTK4_CONFIG, 'gtk.css');
-  if (fs.existsSync(symlinkCss) && fs.lstatSync(symlinkCss).isSymbolicLink()) {
-    console.log('✓ Symlink ~/.config/gtk-4.0/gtk.css verified successfully!');
+  if (fs.existsSync(symlinkCss)) {
+    console.log('✓ Config ~/.config/gtk-4.0/gtk.css verified successfully!');
   } else {
-    throw new Error('Symlink creation failed');
+    throw new Error('GTK4 config file creation failed');
   }
 
   removeGtk4Fix(tempThemeDir);

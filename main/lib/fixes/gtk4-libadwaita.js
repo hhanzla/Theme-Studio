@@ -23,9 +23,30 @@ function applyGtk4Fix(themeDir) {
     fs.mkdirSync(GTK4_CONFIG, { recursive: true });
   }
 
-  const targets = ['gtk.css', 'gtk-dark.css', 'assets'];
+  // 1. Resolve and link assets directory (check gtk-4.0/assets first, fallback to theme-root/assets)
+  const assetsSrc = fs.existsSync(path.join(themeGtk4Dir, 'assets'))
+    ? path.join(themeGtk4Dir, 'assets')
+    : (fs.existsSync(path.join(themeDir, 'assets')) ? path.join(themeDir, 'assets') : null);
 
-  for (const item of targets) {
+  const destAssets = path.join(GTK4_CONFIG, 'assets');
+  try {
+    if (fs.existsSync(destAssets) || fs.lstatSync(destAssets).isSymbolicLink()) {
+      fs.rmSync(destAssets, { recursive: true, force: true });
+    }
+  } catch (_) {}
+
+  if (assetsSrc && fs.existsSync(assetsSrc)) {
+    try {
+      fs.symlinkSync(assetsSrc, destAssets);
+    } catch (err) {
+      console.error(`[GTK4 Fix] Failed to symlink assets:`, err);
+    }
+  }
+
+  // 2. Write/link gtk.css and gtk-dark.css with relative asset path correction
+  const cssTargets = ['gtk.css', 'gtk-dark.css'];
+
+  for (const item of cssTargets) {
     const srcItemPath = path.join(themeGtk4Dir, item);
     const destItemPath = path.join(GTK4_CONFIG, item);
 
@@ -38,12 +59,17 @@ function applyGtk4Fix(themeDir) {
       // Ignore if doesn't exist
     }
 
-    // Symlink if source exists in theme's gtk-4.0/
+    // Process CSS
     if (fs.existsSync(srcItemPath)) {
       try {
-        fs.symlinkSync(srcItemPath, destItemPath);
+        let cssContent = fs.readFileSync(srcItemPath, 'utf8');
+        // Rewrite ../assets/ to assets/ so it resolves to ~/.config/gtk-4.0/assets
+        cssContent = cssContent.replace(/url\(["']?\.\.\/assets\//g, 'url("assets/');
+        fs.writeFileSync(destItemPath, cssContent, 'utf8');
       } catch (err) {
-        console.error(`[GTK4 Fix] Failed to symlink ${srcItemPath} to ${destItemPath}:`, err);
+        try {
+          fs.symlinkSync(srcItemPath, destItemPath);
+        } catch (_) {}
       }
     }
   }
