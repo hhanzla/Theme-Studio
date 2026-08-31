@@ -385,12 +385,12 @@ const LockscreenView = {
                 <strong>Reset Lock Screen to Default</strong>
               </div>
               <p class="settings-option-desc">
-                Reverts all GDM session dconf settings (themes, backgrounds, blur, button visibility) back to standard Ubuntu defaults.
+                Reverts all GDM login screen dconf settings (wallpaper, blur, clock, banner) back to standard Ubuntu defaults.
               </p>
             </div>
             <div class="settings-card-right">
-              <button class="btn btn-secondary" id="btn-reset-gdm-default" style="padding: 6px 12px; font-size: 11.5px;">
-                Reset GDM Settings
+              <button class="btn btn-secondary" id="btn-reset-gdm-default" style="padding: 7px 16px; font-size: 11.5px;">
+                Reset
               </button>
             </div>
           </div>
@@ -715,7 +715,7 @@ const LockscreenView = {
           showToast(`Error: ${err.message}`, 'warning');
         } finally {
           resetGdmBtn.disabled = false;
-          resetGdmBtn.textContent = 'Reset GDM Settings';
+          resetGdmBtn.textContent = 'Reset';
         }
       });
     }
