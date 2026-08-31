@@ -427,7 +427,40 @@ async function executeInstall(item, card, variant = null) {
 }
 
 async function handleCardAction(item, card) {
-  // Looks Preset Application
+  const isCurrentlyApplied = card && card.classList.contains('is-applied');
+
+  // 1. If currently applied, clicking button immediately UNAPPLIES and restores default!
+  if (isCurrentlyApplied) {
+    try {
+      if (item.category === 'looks' || (item.id && item.id.startsWith('look-')) || AppState.activeCategory === 'looks') {
+        await window.electronAPI.system.applyGtk('Yaru');
+        await window.electronAPI.system.applyShell('');
+        await window.electronAPI.system.applyIcons('Yaru');
+        await window.electronAPI.system.applyCursors('Yaru');
+        showToast(`Unapplied ${item.name} — Restored default desktop appearance`, 'info');
+      } else if (item.category === 'gtk-theme') {
+        await window.electronAPI.system.applyGtk('Yaru');
+        showToast(`Unapplied ${item.name} — Restored default Yaru GTK theme`, 'info');
+      } else if (item.category === 'shell-theme') {
+        await window.electronAPI.system.applyShell('');
+        showToast(`Unapplied ${item.name} — Restored default GNOME Shell`, 'info');
+      } else if (item.category === 'icon-theme') {
+        await window.electronAPI.system.applyIcons('Yaru');
+        showToast(`Unapplied ${item.name} — Restored default Yaru icons`, 'info');
+      } else if (item.category === 'cursor-theme') {
+        await window.electronAPI.system.applyCursors('Yaru');
+        showToast(`Unapplied ${item.name} — Restored default cursor`, 'info');
+      }
+      window.ThemeCard.setApplied(card, false);
+      if (window.refreshAppState) window.refreshAppState();
+      return;
+    } catch (err) {
+      showToast(`Failed to unapply ${item.name}: ${err.message}`, 'warning');
+      return;
+    }
+  }
+
+  // 2. Looks Preset Application
   if (item.category === 'looks' || (item.id && item.id.startsWith('look-')) || AppState.activeCategory === 'looks') {
     if (AppState.activeInstalls.has(item.id)) {
       showToast(`Applying ${item.name}...`, 'warning');
@@ -482,7 +515,7 @@ async function handleCardAction(item, card) {
     return;
   }
 
-  // Wallpaper Setting
+  // 3. Wallpaper Setting
   if (item.category === 'wallpaper') {
     const btn = card.querySelector('.action-trigger-btn');
     if (btn) {
@@ -494,7 +527,6 @@ async function handleCardAction(item, card) {
       const res = await window.electronAPI.looks.setWallpaper(item.url);
       if (res && res.success) {
         showToast(`Desktop wallpaper updated to ${item.name}`, 'success');
-        // Unmark previous applied wallpaper cards
         document.querySelectorAll('.theme-card[data-category="wallpaper"]').forEach(c => {
           window.ThemeCard.setApplied(c, false);
         });
@@ -516,36 +548,8 @@ async function handleCardAction(item, card) {
     return;
   }
 
+  // 4. Installed Item (Apply)
   if (item.installed) {
-    // If already applied, clicking the button again will Unapply / Restore defaults
-    if (isCurrentlyApplied) {
-      try {
-        if (item.category === 'looks') {
-          await window.electronAPI.system.applyGtk('Yaru');
-          await window.electronAPI.system.applyShell('');
-          await window.electronAPI.system.applyIcons('Yaru');
-          await window.electronAPI.system.applyCursors('Yaru');
-          showToast(`Unapplied ${item.name} — Restored default appearance`, 'info');
-        } else if (item.category === 'gtk-theme') {
-          await window.electronAPI.system.applyGtk('Yaru');
-          showToast(`Unapplied ${item.name} — Restored default Yaru GTK theme`, 'info');
-        } else if (item.category === 'shell-theme') {
-          await window.electronAPI.system.applyShell('');
-          showToast(`Unapplied ${item.name} — Restored default GNOME Shell`, 'info');
-        } else if (item.category === 'icon-theme') {
-          await window.electronAPI.system.applyIcons('Yaru');
-          showToast(`Unapplied ${item.name} — Restored default Yaru icons`, 'info');
-        } else if (item.category === 'cursor-theme') {
-          await window.electronAPI.system.applyCursors('Yaru');
-          showToast(`Unapplied ${item.name} — Restored default cursor`, 'info');
-        }
-        window.ThemeCard.setApplied(card, false);
-        return;
-      } catch (err) {
-        showToast(`Failed to unapply ${item.name}: ${err.message}`, 'warning');
-        return;
-      }
-    }
 
     const applyDirectly = async (chosenTarget) => {
       try {
