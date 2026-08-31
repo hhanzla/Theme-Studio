@@ -114,7 +114,9 @@ function restoreTabScroll(category) {
   const container = document.getElementById('content-container') || document.querySelector('.content-container');
   if (container) {
     const targetScroll = tabScrollMap[category] || 0;
-    container.scrollTop = targetScroll;
+    requestAnimationFrame(() => {
+      container.scrollTop = targetScroll;
+    });
   }
 }
 
@@ -123,6 +125,10 @@ async function loadCategory(category) {
   saveCurrentScroll();
   AppState.activeCategory = category;
   AppState.activeSubtab = 'browse'; // Always start on Browse when switching categories
+
+  const container = document.getElementById('content-container') || document.querySelector('.content-container');
+  if (container) container.scrollTop = 0;
+
   try { 
     sessionStorage.setItem('activeCategory', category); 
     document.documentElement.setAttribute('data-initial-category', category);
@@ -145,7 +151,7 @@ async function loadCategory(category) {
     if (subtabsBar) subtabsBar.style.display = 'none';
     cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
-    window.SettingsView.render(cardsGridEl);
+    await window.SettingsView.render(cardsGridEl);
     restoreTabScroll('settings');
     return;
   }
@@ -158,7 +164,7 @@ async function loadCategory(category) {
     cardsGridEl.style.display = 'grid';
     cardsGridEl.classList.add('extensions-grid');
     emptyStateEl.classList.add('hidden');
-    window.ExtensionsView.render(cardsGridEl);
+    await window.ExtensionsView.render(cardsGridEl);
     restoreTabScroll('extensions');
     return;
   } else {
@@ -172,7 +178,7 @@ async function loadCategory(category) {
     if (subtabsBar) subtabsBar.style.display = 'none';
     cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
-    window.TweaksView.render(cardsGridEl);
+    await window.TweaksView.render(cardsGridEl);
     restoreTabScroll('tweaks');
     return;
   }
@@ -184,7 +190,7 @@ async function loadCategory(category) {
     if (subtabsBar) subtabsBar.style.display = 'none';
     cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
-    window.LockscreenView.render(cardsGridEl);
+    await window.LockscreenView.render(cardsGridEl);
     restoreTabScroll('lockscreen');
     return;
   }
@@ -784,9 +790,13 @@ function initEvents() {
   });
 }
 
-function openUninstallManager() {
+async function openUninstallManager() {
   saveCurrentScroll();
   AppState.activeCategory = 'uninstall';
+
+  const container = document.getElementById('content-container') || document.querySelector('.content-container');
+  if (container) container.scrollTop = 0;
+
   try { 
     sessionStorage.setItem('activeCategory', 'uninstall'); 
     document.documentElement.setAttribute('data-initial-category', 'uninstall');
@@ -799,7 +809,7 @@ function openUninstallManager() {
   document.querySelector('.subtabs-bar').style.display = 'none';
   emptyStateEl.classList.add('hidden');
 
-  window.UninstallView.render(cardsGridEl);
+  await window.UninstallView.render(cardsGridEl);
   restoreTabScroll('uninstall');
 }
 
