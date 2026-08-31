@@ -1,8 +1,10 @@
-// GNOME Shell Extensions Manager View (Local & Online extensions.gnome.org)
+// renderer/views/extensions.view.js
+// Modern GNOME Shell Extensions Manager View (Local & Online)
+
 window.ExtensionsView = {
   container: null,
-  activeMode: 'browse', // 'browse' | 'installed'
-  installedFilter: 'all', // 'all' | 'enabled' | 'disabled' | 'user'
+  activeMode: 'browse',
+  installedFilter: 'all',
   installedExtensions: [],
   onlineExtensions: [],
   isLoading: false,
@@ -74,16 +76,16 @@ window.ExtensionsView = {
       : (onlineCount >= 100 ? '100+' : (onlineCount > 0 ? String(onlineCount) : '0'));
 
     subtabsBar.innerHTML = `
-      <div class="subtabs">
-        <button class="subtab-btn ${this.activeMode === 'browse' ? 'active' : ''}" data-mode="browse" id="ext-tab-browse">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+      <div class="flex items-center gap-2 py-2 border-b border-zinc-200 w-full">
+        <button class="subtab-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${this.activeMode === 'browse' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-600 hover:bg-zinc-100'}" data-mode="browse" id="ext-tab-browse">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
           <span>Browse Online</span>
-          <span class="badge count-badge" id="ext-browse-badge">${onlineCountDisplay}</span>
+          <span class="px-1.5 py-0.2 rounded text-[10px] font-bold ${this.activeMode === 'browse' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-200 text-zinc-700'}">${onlineCountDisplay}</span>
         </button>
-        <button class="subtab-btn ${this.activeMode === 'installed' ? 'active' : ''}" data-mode="installed" id="ext-tab-installed">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <button class="subtab-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${this.activeMode === 'installed' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-600 hover:bg-zinc-100'}" data-mode="installed" id="ext-tab-installed">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
           <span>Installed</span>
-          <span class="badge count-badge" id="ext-installed-badge">${installedCount}</span>
+          <span class="px-1.5 py-0.2 rounded text-[10px] font-bold ${this.activeMode === 'installed' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-200 text-zinc-700'}">${installedCount}</span>
         </button>
       </div>
     `;
@@ -103,33 +105,21 @@ window.ExtensionsView = {
     });
   },
 
-  setSearchQuery(q) {
-    this.searchQuery = (q || '').trim();
-
-    if (this.activeMode === 'browse') {
-      clearTimeout(this.searchDebounceTimer);
-      this.searchDebounceTimer = setTimeout(() => {
-        this.loadOnline(this.searchQuery);
-      }, 350);
-    } else {
-      this.renderView();
-    }
-  },
-
   renderLoading() {
     if (!this.container) return;
     this.container.innerHTML = `
-      <div class="empty-state" style="grid-column: 1 / -1; width: 100%; padding: 60px 0;">
-        <div style="width: 36px; height: 36px; border: 3px solid #e4e4e7; border-top-color: #cf4110; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px auto;"></div>
-        <h3 class="empty-title">Loading extensions.gnome.org...</h3>
-        <p class="empty-desc">Fetching latest and popular GNOME Shell extensions.</p>
+      <div class="col-span-full py-16 flex flex-col items-center justify-center text-zinc-400">
+        <svg class="animate-spin -ml-1 mr-2.5 h-6 w-6 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-xs mt-2 font-medium">Querying extensions.gnome.org repository...</span>
       </div>
     `;
   },
 
   renderView() {
     if (!this.container) return;
-
     if (this.activeMode === 'browse') {
       this.renderOnlineGrid();
     } else {
@@ -138,49 +128,42 @@ window.ExtensionsView = {
   },
 
   renderOnlineGrid() {
-    let items = this.onlineExtensions;
-
-    if (items.length === 0 && !this.isLoading) {
+    if (this.onlineExtensions.length === 0) {
       this.container.innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1; width: 100%;">
-          <div class="empty-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
+        <div class="col-span-full py-16 flex flex-col items-center justify-center text-center">
+          <div class="w-12 h-12 rounded-full bg-zinc-100 text-zinc-400 flex items-center justify-center mb-3">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
           </div>
-          <h3 class="empty-title">No Extensions Found</h3>
-          <p class="empty-desc">${this.searchQuery ? `No online extensions match "${this.searchQuery}".` : 'Could not load extensions from extensions.gnome.org.'}</p>
+          <h3 class="text-sm font-bold text-zinc-800">No Extensions Found</h3>
+          <p class="text-xs text-zinc-500 mt-1 max-w-sm">No results match your search. Try searching for "Blur", "Dash to Dock", or "AppIndicator".</p>
         </div>
       `;
       return;
     }
 
-    this.container.innerHTML = items.map(ext => this.renderOnlineCard(ext)).join('');
+    this.container.innerHTML = this.onlineExtensions.map(ext => this.renderOnlineCard(ext)).join('');
 
-    // Wire install buttons
+    // Wire install button
     this.container.querySelectorAll('.btn-install-ext').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const pk = btn.getAttribute('data-pk');
         const uuid = btn.getAttribute('data-uuid');
+        const pk = btn.getAttribute('data-pk');
         const name = btn.getAttribute('data-name');
 
-        if (this.installingUuids.has(uuid)) return;
-        this.installingUuids.add(uuid);
-
         btn.disabled = true;
-        btn.innerHTML = `<span style="display:inline-block; width:10px; height:10px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 0.6s linear infinite; margin-right:5px; vertical-align:-1px;"></span>Installing...`;
-        showToast(`Downloading and installing ${name}...`, 'info');
+        btn.innerHTML = `<svg class="animate-spin -ml-1 mr-1.5 h-3 w-3 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Installing...`;
+        showToast(`Installing ${name}...`, 'info');
 
         try {
-          const res = await window.electronAPI.extensions.installOnline({ pk, uuid });
+          const res = await window.electronAPI.extensions.install({ uuid, pk });
           if (res && res.success) {
-            showToast(`${name} installed and enabled successfully!`, 'success');
+            showToast(`${name} installed and enabled!`, 'success');
             await this.loadInstalled();
+            this.renderSubtabs();
             this.renderOnlineGrid();
           } else {
-            showToast(`Failed to install ${name}: ${res ? res.error : 'Unknown error'}`, 'warning');
+            showToast(`Installation failed: ${res ? res.error : 'Unknown error'}`, 'warning');
             btn.disabled = false;
             btn.textContent = 'Install';
           }
@@ -188,77 +171,37 @@ window.ExtensionsView = {
           showToast(`Error: ${err.message}`, 'warning');
           btn.disabled = false;
           btn.textContent = 'Install';
-        } finally {
-          this.installingUuids.delete(uuid);
         }
       });
     });
   },
 
   renderOnlineCard(ext) {
-    const isInstalled = Boolean(ext.uuid && this.installedExtensions.some(x => x.uuid && x.uuid.trim().toLowerCase() === ext.uuid.trim().toLowerCase()));
-    const downloadsFormatted = ext.downloads > 1000000 
-      ? (ext.downloads / 1000000).toFixed(1) + 'M'
-      : ext.downloads > 1000
-        ? (ext.downloads / 1000).toFixed(0) + 'K'
-        : ext.downloads;
-
-    const iconHtml = ext.icon
-      ? `<img src="${ext.icon}" alt="${ext.name}" style="width: 36px; height: 36px; border-radius: 6px; object-fit: contain; background: #f4f4f5; padding: 3px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-         <div class="ext-fallback-icon" style="display: none; width: 36px; height: 36px; border-radius: 6px; background: #f4f4f5; align-items: center; justify-content: center; color: #71717a;">
-           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-         </div>`
-      : `<div style="width: 36px; height: 36px; border-radius: 6px; background: #f4f4f5; display: flex; align-items: center; justify-content: center; color: #71717a;">
-           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
-         </div>`;
+    const isInstalled = this.installedExtensions.some(e => e.uuid === ext.uuid);
+    const downloadsText = ext.downloads ? `${Number(ext.downloads).toLocaleString()} downloads` : '';
 
     return `
-      <div class="theme-card extension-card" data-uuid="${ext.uuid}">
-        <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; min-height: 190px;">
-          <div>
-            <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px;">
-              ${iconHtml}
-              <div style="flex: 1; min-width: 0;">
-                <h3 class="card-title" style="font-size: 13.5px; line-height: 1.3; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${ext.name}">
-                  ${ext.name}
-                </h3>
-                <span style="font-size: 10.5px; color: var(--text-muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  by ${ext.creator || 'GNOME Developer'}
-                </span>
-              </div>
-            </div>
+      <div class="theme-card group relative bg-white border border-zinc-200 hover:border-zinc-300 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col p-4" data-uuid="${ext.uuid}">
+        <div class="flex items-start justify-between gap-2 mb-1.5">
+          <h4 class="text-xs font-bold text-zinc-900 leading-snug truncate flex-1">${ext.name}</h4>
+          ${ext.icon ? `<img src="https://extensions.gnome.org${ext.icon}" class="w-6 h-6 rounded shrink-0 object-contain" onerror="this.remove()" />` : ''}
+        </div>
 
-            <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px;">
-              ${ext.description || 'No description available for this GNOME Shell extension.'}
-            </p>
-          </div>
+        <span class="text-[11px] text-zinc-400 font-mono truncate mb-2">${ext.uuid}</span>
 
-          <div style="border-top: 1px solid var(--border-subtle); padding-top: 8px; margin-top: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 10px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                ${downloadsFormatted} downloads
-              </span>
-              ${ext.link ? `
-                <a href="${ext.link}" target="_blank" style="font-size: 10.5px; font-weight: 600; color: #52525b; text-decoration: none;" title="${ext.link}">
-                  Details ↗
-                </a>
-              ` : ''}
-            </div>
+        <p class="text-xs text-zinc-500 line-clamp-3 leading-relaxed mb-3 flex-1">${ext.description || 'GNOME Shell extension.'}</p>
 
-            <div class="card-footer" style="padding: 0; margin-top: 0;">
-              ${isInstalled ? `
-                <button class="card-btn is-extension-installed" disabled>
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>Installed
-                </button>
-              ` : `
-                <button class="card-btn btn-primary btn-install-ext" data-pk="${ext.pk}" data-uuid="${ext.uuid}" data-name="${ext.name}">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  Install
-                </button>
-              `}
-            </div>
-          </div>
+        <div class="flex items-center justify-between pt-2.5 border-t border-zinc-100 mt-auto">
+          <span class="text-[10.5px] text-zinc-400 font-medium">${downloadsText}</span>
+          ${isInstalled ? `
+            <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Installed
+            </span>
+          ` : `
+            <button class="btn btn-primary btn-install-ext px-3 py-1.5 text-xs font-semibold" data-pk="${ext.pk}" data-uuid="${ext.uuid}" data-name="${ext.name}">
+              Install
+            </button>
+          `}
         </div>
       </div>
     `;
@@ -279,15 +222,12 @@ window.ExtensionsView = {
 
     if (filtered.length === 0) {
       this.container.innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1; width: 100%;">
-          <div class="empty-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
+        <div class="col-span-full py-16 flex flex-col items-center justify-center text-center">
+          <div class="w-12 h-12 rounded-full bg-zinc-100 text-zinc-400 flex items-center justify-center mb-3">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
           </div>
-          <h3 class="empty-title">No Installed Extensions Found</h3>
-          <p class="empty-desc">You can browse and install new extensions from the "Browse Online" tab above.</p>
+          <h3 class="text-sm font-bold text-zinc-800">No Installed Extensions Found</h3>
+          <p class="text-xs text-zinc-500 mt-1 max-w-sm">You can browse and install new extensions from the "Browse Online" tab above.</p>
         </div>
       `;
       return;
@@ -295,7 +235,7 @@ window.ExtensionsView = {
 
     this.container.innerHTML = filtered.map(ext => this.renderInstalledCard(ext)).join('');
 
-    // Wire toggle switches
+    // Toggle switch handler
     this.container.querySelectorAll('.extension-toggle').forEach(input => {
       input.addEventListener('change', async () => {
         const uuid = input.getAttribute('data-uuid');
@@ -323,7 +263,7 @@ window.ExtensionsView = {
       });
     });
 
-    // Wire settings/prefs buttons
+    // Preferences button handler
     this.container.querySelectorAll('.btn-prefs-ext').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -336,7 +276,7 @@ window.ExtensionsView = {
       });
     });
 
-    // Wire uninstall buttons for user extensions
+    // Uninstall button handler
     this.container.querySelectorAll('.btn-uninstall-ext').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -345,10 +285,9 @@ window.ExtensionsView = {
 
         window.ConfirmDialog.show({
           title: `Uninstall ${name}`,
-          subtitle: 'Remove GNOME Shell Extension',
-          message: `Are you sure you want to completely uninstall "${name}" (${uuid}) from your user extensions directory?`,
+          message: `Are you sure you want to completely uninstall "${name}" (${uuid})?`,
           confirmText: 'Uninstall Extension',
-          cancelText: 'Cancel',
+          confirmClass: 'btn-danger',
           onConfirm: async () => {
             showToast(`Uninstalling ${name}...`, 'info');
             try {
@@ -356,6 +295,7 @@ window.ExtensionsView = {
               if (res && res.success) {
                 showToast(`${name} uninstalled successfully!`, 'success');
                 await this.loadInstalled();
+                this.renderSubtabs();
                 this.renderInstalledGrid();
               } else {
                 showToast(`Failed to uninstall: ${res ? res.error : 'Unknown error'}`, 'warning');
@@ -374,59 +314,55 @@ window.ExtensionsView = {
     const versionBadge = ext.version ? `v${ext.version}` : '';
 
     return `
-      <div class="theme-card extension-card" data-uuid="${ext.uuid}">
-        <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; min-height: 180px;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-              <div style="max-width: 75%;">
-                <h3 class="card-title" style="font-size: 13.5px; line-height: 1.3;">${ext.name}</h3>
-                <span style="font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); display: block; word-break: break-all; margin-top: 2px;">
-                  ${ext.uuid}
-                </span>
-              </div>
-              <label class="switch" style="transform: scale(0.85); transform-origin: right center;">
-                <input type="checkbox" class="extension-toggle" data-uuid="${ext.uuid}" ${ext.enabled ? 'checked' : ''}>
-                <span class="slider round"></span>
-              </label>
-            </div>
+      <div class="theme-card relative bg-white border border-zinc-200 hover:border-zinc-300 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col p-4" data-uuid="${ext.uuid}">
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <div class="flex flex-col min-w-0">
+            <h4 class="text-xs font-bold text-zinc-900 leading-snug truncate">${ext.name}</h4>
+            <span class="text-[11px] text-zinc-400 font-mono truncate mt-0.5">${ext.uuid}</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" class="extension-toggle" data-uuid="${ext.uuid}" ${ext.enabled ? 'checked' : ''} />
+            <span class="slider"></span>
+          </label>
+        </div>
 
-            <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px;">
-              ${ext.description || 'No description available for this extension.'}
-            </p>
+        <p class="text-xs text-zinc-500 line-clamp-3 leading-relaxed mb-3 flex-1">${ext.description || 'Installed GNOME extension.'}</p>
+
+        <div class="flex items-center justify-between pt-2.5 border-t border-zinc-100 mt-auto">
+          <div class="flex items-center gap-1.5">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isUser ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}">
+              ${isUser ? 'User' : 'System'}
+            </span>
+            ${versionBadge ? `<span class="text-[10.5px] font-mono text-zinc-400">${versionBadge}</span>` : ''}
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 8px; margin-top: 4px;">
-            <div style="display: flex; gap: 4px; align-items: center;">
-              <span class="badge-tag ${isUser ? 'badge-installed' : 'badge-script'}">
-                ${isUser ? 'User' : 'System'}
-              </span>
-              ${versionBadge ? `<span class="meta-chip" style="font-size: 9.5px;">${versionBadge}</span>` : ''}
-            </div>
-            
-            <div style="display: flex; align-items: center; gap: 6px;">
-              ${ext.has_prefs !== false ? `
-                <button class="btn-prefs-ext" data-uuid="${ext.uuid}" data-name="${ext.name}" style="background: transparent; border: 1px solid var(--border-subtle); cursor: pointer; color: #52525b; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 600;" title="Extension Settings">
-                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                  </svg>
-                  <span>Settings</span>
-                </button>
-              ` : ''}
-              ${ext.url ? `
-                <a href="${ext.url}" target="_blank" style="font-size: 10.5px; font-weight: 600; color: #52525b; text-decoration: none;" title="${ext.url}">
-                  Website ↗
-                </a>
-              ` : ''}
-              ${isUser ? `
-                <button class="btn-uninstall-ext" data-uuid="${ext.uuid}" data-name="${ext.name}" style="background: transparent; border: none; cursor: pointer; color: #dc2626; padding: 2px 4px; border-radius: 4px;" title="Uninstall Extension">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                </button>
-              ` : ''}
-            </div>
+          <div class="flex items-center gap-1.5">
+            ${ext.hasPrefs ? `
+              <button class="p-1.5 rounded-md hover:bg-zinc-100 text-zinc-600 hover:text-zinc-900 btn-prefs-ext transition-all" data-uuid="${ext.uuid}" data-name="${ext.name}" title="Extension Settings">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              </button>
+            ` : ''}
+
+            ${isUser ? `
+              <button class="p-1.5 rounded-md hover:bg-red-50 text-zinc-400 hover:text-red-600 btn-uninstall-ext transition-all" data-uuid="${ext.uuid}" data-name="${ext.name}" title="Uninstall Extension">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+              </button>
+            ` : ''}
           </div>
         </div>
       </div>
     `;
+  },
+
+  onSearch(query) {
+    this.searchQuery = query;
+    if (this.activeMode === 'browse') {
+      if (this.searchDebounceTimer) clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = setTimeout(() => {
+        this.loadOnline(this.searchQuery);
+      }, 350);
+    } else {
+      this.renderInstalledGrid();
+    }
   }
 };
