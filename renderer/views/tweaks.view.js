@@ -81,17 +81,10 @@ const TweaksView = {
       <div class="settings-view-container tweaks-view-wrapper">
         <!-- Section: App Menu Auto-Categorizer -->
         <div class="settings-section">
-          <div class="settings-section-header-row" style="display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <h3 class="settings-section-title">App Menu Smart Categorizer</h3>
-              <p class="settings-section-desc">
-                Select which category folders to create in your GNOME Application Grid. (${totalApps} installed apps detected)
-              </p>
-            </div>
-            <span class="badge-tag ${isOrganized ? 'badge-installed' : 'badge-script'}">
-              ${isOrganized ? '● Grid Auto-Organized' : '○ Standard Grid'}
-            </span>
-          </div>
+          <h3 class="settings-section-title">App Menu Smart Categorizer</h3>
+          <p class="settings-section-desc">
+            Select which category folders to create in your GNOME Application Grid. (${totalApps} installed apps detected)
+          </p>
 
           <!-- Selection Action Bar -->
           <div class="tweak-selection-bar">
