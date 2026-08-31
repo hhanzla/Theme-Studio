@@ -101,33 +101,17 @@ function restoreDefaultSubtabs() {
   });
 }
 
-const tabScrollMap = {};
-
-function saveCurrentScroll() {
-  const container = document.getElementById('content-container') || document.querySelector('.content-container');
-  if (container && AppState.activeCategory) {
-    tabScrollMap[AppState.activeCategory] = container.scrollTop;
-  }
-}
-
-function restoreTabScroll(category) {
-  const container = document.getElementById('content-container') || document.querySelector('.content-container');
+function resetScrollTop() {
+  const container = document.querySelector('.content-scrollable') || document.querySelector('.content-container') || document.documentElement;
   if (container) {
-    const targetScroll = tabScrollMap[category] || 0;
-    requestAnimationFrame(() => {
-      container.scrollTop = targetScroll;
-    });
+    container.scrollTop = 0;
   }
 }
 
 // Load Catalog for Active Category
 async function loadCategory(category) {
-  saveCurrentScroll();
   AppState.activeCategory = category;
   AppState.activeSubtab = 'browse'; // Always start on Browse when switching categories
-
-  const container = document.getElementById('content-container') || document.querySelector('.content-container');
-  if (container) container.scrollTop = 0;
 
   try { 
     sessionStorage.setItem('activeCategory', category); 
@@ -152,7 +136,7 @@ async function loadCategory(category) {
     cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
     await window.SettingsView.render(cardsGridEl);
-    restoreTabScroll('settings');
+    resetScrollTop();
     return;
   }
 
@@ -165,7 +149,7 @@ async function loadCategory(category) {
     cardsGridEl.classList.add('extensions-grid');
     emptyStateEl.classList.add('hidden');
     await window.ExtensionsView.render(cardsGridEl);
-    restoreTabScroll('extensions');
+    resetScrollTop();
     return;
   } else {
     cardsGridEl.classList.remove('extensions-grid');
@@ -179,7 +163,7 @@ async function loadCategory(category) {
     cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
     await window.TweaksView.render(cardsGridEl);
-    restoreTabScroll('tweaks');
+    resetScrollTop();
     return;
   }
 
@@ -191,7 +175,7 @@ async function loadCategory(category) {
     cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
     await window.LockscreenView.render(cardsGridEl);
-    restoreTabScroll('lockscreen');
+    resetScrollTop();
     return;
   }
 
@@ -313,7 +297,7 @@ function updateView() {
       window.LooksView.renderBanner(cardsGridEl);
     }
 
-    restoreTabScroll(AppState.activeCategory);
+    resetScrollTop();
 
     // Check active desktop settings to highlight currently active items (themes, icons, cursors, wallpaper)
     if (window.electronAPI && window.electronAPI.system && window.electronAPI.system.current) {
@@ -791,11 +775,7 @@ function initEvents() {
 }
 
 async function openUninstallManager() {
-  saveCurrentScroll();
   AppState.activeCategory = 'uninstall';
-
-  const container = document.getElementById('content-container') || document.querySelector('.content-container');
-  if (container) container.scrollTop = 0;
 
   try { 
     sessionStorage.setItem('activeCategory', 'uninstall'); 
@@ -810,7 +790,7 @@ async function openUninstallManager() {
   emptyStateEl.classList.add('hidden');
 
   await window.UninstallView.render(cardsGridEl);
-  restoreTabScroll('uninstall');
+  resetScrollTop();
 }
 
 window.refreshAppState = () => {
