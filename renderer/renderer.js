@@ -62,7 +62,10 @@ const toastContainerEl = document.getElementById('toast-container');
 
 function restoreDefaultSubtabs() {
   const subtabsBar = document.querySelector('.subtabs-bar');
-  if (cardsGridEl) cardsGridEl.style.display = '';
+  if (cardsGridEl) {
+    cardsGridEl.style.display = '';
+    cardsGridEl.classList.remove('extensions-grid');
+  }
   if (!subtabsBar) return;
 
   const installedCount = (AppState.items || []).filter(i => i.installed).length;
@@ -133,10 +136,13 @@ async function loadCategory(category) {
     pageSubtitleEl.textContent = 'Manage, enable, and toggle installed GNOME Shell extensions';
     const subtabsBar = document.querySelector('.subtabs-bar');
     if (subtabsBar) subtabsBar.style.display = 'none';
-    cardsGridEl.style.display = 'block';
+    cardsGridEl.style.display = 'grid';
+    cardsGridEl.classList.add('extensions-grid');
     emptyStateEl.classList.add('hidden');
     window.ExtensionsView.render(cardsGridEl);
     return;
+  } else {
+    cardsGridEl.classList.remove('extensions-grid');
   }
 
   if (category === 'tweaks') {
