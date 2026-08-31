@@ -48,6 +48,13 @@
       "sources/**/*",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "gse-gdm-extension",
+        "to": "gse-gdm-extension",
+        "filter": ["**/*"]
+      }
+    ],
     "linux": {
       "icon": "build/icon.png",
       "syncDesktopName": true,

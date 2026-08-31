@@ -167,13 +167,29 @@ async function checkGdmStatus() {
 /**
  * 1-Click Install GSE-GDM Extension directly from project repo or pull latest
  */
+function getGseGdmSourceDir() {
+  const devDir = path.resolve(__dirname, '../../gse-gdm-extension');
+  const extraDir = process.resourcesPath ? path.join(process.resourcesPath, 'gse-gdm-extension') : null;
+  const unpackedDir = process.resourcesPath ? path.join(process.resourcesPath, 'app.asar.unpacked', 'gse-gdm-extension') : null;
+  const cacheDir = path.join(os.homedir(), '.cache', 'themestudio', 'gse-gdm-extension');
+
+  const candidates = [devDir, extraDir, unpackedDir, cacheDir].filter(Boolean);
+  for (const dir of candidates) {
+    if (fs.existsSync(dir) && fs.existsSync(path.join(dir, 'install.sh'))) {
+      return dir;
+    }
+  }
+  return cacheDir;
+}
+
+/**
+ * 1-Click Install GSE-GDM Extension directly from project repo or pull latest
+ */
 async function installGseGdmExtension() {
-  const localRepoDir = path.resolve(__dirname, '../../gse-gdm-extension');
-  const cacheRepoDir = path.join(os.homedir(), '.cache', 'themestudio', 'gse-gdm-extension');
+  let repoDir = getGseGdmSourceDir();
 
-  let repoDir = fs.existsSync(localRepoDir) ? localRepoDir : cacheRepoDir;
-
-  if (!fs.existsSync(repoDir)) {
+  if (!fs.existsSync(repoDir) || !fs.existsSync(path.join(repoDir, 'install.sh'))) {
+    const cacheRepoDir = path.join(os.homedir(), '.cache', 'themestudio', 'gse-gdm-extension');
     try {
       await new Promise((res, rej) => {
         exec(`git clone --depth 1 https://github.com/pratap-panabaka/gse-gdm-extension.git "${cacheRepoDir}"`, { timeout: 45000 }, (err) => (err ? rej(err) : res()));
@@ -202,9 +218,7 @@ async function installGseGdmExtension() {
  * 1-Click Clean Uninstall of GSE-GDM Extension
  */
 async function uninstallGseGdmExtension() {
-  const localRepoDir = path.resolve(__dirname, '../../gse-gdm-extension');
-  const cacheRepoDir = path.join(os.homedir(), '.cache', 'themestudio', 'gse-gdm-extension');
-  const repoDir = fs.existsSync(localRepoDir) ? localRepoDir : cacheRepoDir;
+  const repoDir = getGseGdmSourceDir();
 
   let cmd = `sh -c 'rm -rf "/usr/local/share/gnome-shell/extensions/${GSE_GDM_UUID}" "/usr/share/gnome-shell/extensions/${GSE_GDM_UUID}" "${DCONF_GDM_FILE}" "/etc/dconf/db/gdm.d/99-gdm-extension" && rm -f /usr/share/glib-2.0/schemas/org.gnome.shell.extensions.gdm-extension.gschema.xml && glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true && dconf update'`;
   
