@@ -10,7 +10,9 @@
     "install_type": "zip-static",
     "source": {
       "type": "tar.xz",
+      "zip_url": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata.tar.xz",
       "url": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata.tar.xz",
+      "approx_bytes": 1700000,
       "variant_urls": {
         "modern-ice": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Ice.tar.xz",
         "modern-classic": "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz",

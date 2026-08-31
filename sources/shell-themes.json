@@ -40,11 +40,10 @@
       "opacity": ["normal", "solid"],
       "alt": ["normal", "alt"],
       "scheme": ["standard", "nord"],
-      "icon": ["apple", "simple", "gnome", "ubuntu", "tux", "arch", "manjaro", "fedora", "debian"],
-      "nautilus": ["stable", "normal", "mojave", "glassy", "right"]
+      "icon": ["apple", "simple", "gnome", "ubuntu", "tux", "arch", "manjaro", "fedora", "debian"]
     },
     "install_script": "./install.sh",
-    "install_args_template": "-t {color} -c {mode} -o {opacity} -a {alt} -s {scheme} -d {dest_dir}",
+    "install_args_template": "-t {color} -c {mode} -o {opacity} -a {alt} -s {scheme} --shell -i {icon} -d {dest_dir}",
     "dependencies": ["sassc", "glib-compile-schemas"],
     "target_dir": "~/.themes",
     "gtk4_fix": false,

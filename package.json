@@ -15,7 +15,7 @@
     "build": "electron-builder --linux deb",
     "build:appimage": "electron-builder --linux AppImage",
     "build:all": "electron-builder --linux deb AppImage",
-    "test": "node test/script-args-verify.js && electron test/phase1-verify.js --no-sandbox && electron test/phase2-verify.js --no-sandbox && electron test/phase3-verify.js --no-sandbox && electron test/phase4-verify.js --no-sandbox && electron test/phase5-verify.js --no-sandbox"
+    "test": "node test/script-args-verify.js && node test/test-all-variants.js && electron test/phase1-verify.js --no-sandbox && electron test/phase2-verify.js --no-sandbox && electron test/phase3-verify.js --no-sandbox && electron test/phase4-verify.js --no-sandbox && electron test/phase5-verify.js --no-sandbox"
   },
   "keywords": [
     "theme",

@@ -40,7 +40,6 @@
       "opacity": ["normal", "solid"],
       "alt": ["normal", "alt"],
       "scheme": ["standard", "nord"],
-      "icon": ["apple", "simple", "gnome", "ubuntu", "tux", "arch", "manjaro", "fedora", "debian"],
       "nautilus": ["stable", "normal", "mojave", "glassy", "right"]
     },
     "install_script": "./install.sh",
