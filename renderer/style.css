@@ -1974,3 +1974,46 @@ input:checked + .slider:before {
   width: 100%;
 }
 
+.lockscreen-view-wrapper .btn {
+  border-radius: var(--radius);
+  font-family: inherit;
+  transition: all 0.15s ease;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.lockscreen-view-wrapper .btn-primary {
+  background: #cf4110 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.lockscreen-view-wrapper .btn-primary:hover:not(:disabled) {
+  background: #b3360b !important;
+}
+
+.lockscreen-view-wrapper .btn-secondary {
+  background: #f4f4f5 !important;
+  color: #18181b !important;
+  border: 1px solid var(--border-card, #e4e4e7) !important;
+}
+
+.lockscreen-view-wrapper .btn-secondary:hover:not(:disabled) {
+  background: #e4e4e7 !important;
+  border-color: #d4d4d8 !important;
+}
+
+.lockscreen-view-wrapper .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+

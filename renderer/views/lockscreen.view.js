@@ -67,32 +67,43 @@ const LockscreenView = {
         ${!isGseInstalled ? `
           <!-- Setup Required Prompt Card -->
           <div class="settings-section">
-            <div class="settings-card" style="border-left: 3px solid #cf4110; flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px 20px;">
+            <div class="settings-card" style="border-left: 3px solid #cf4110; flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px 22px;">
               <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <div class="settings-option-title">
-                  <strong style="font-size: 14px;">GSE-GDM Extension Setup Required</strong>
+                  <strong style="font-size: 14.5px; color: #18181b;">GSE-GDM Extension Setup Required</strong>
                   <span class="badge-tag badge-script">Setup Needed</span>
                 </div>
-                <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 5px 12px; font-size: 11.5px;">
-                  Re-check Status
-                </button>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 6px 12px; font-size: 11.5px;">
+                    Re-check Status
+                  </button>
+                </div>
               </div>
 
-              <p class="settings-option-desc" style="font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
-                To customize the GDM login and lock screen appearance on GNOME 42+, the <strong>GSE-GDM Extension</strong> (<code>gdm-extension@pratap.fastmail.fm</code>) must be installed.
+              <p class="settings-option-desc" style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); margin: 0;">
+                To customize the GDM login and lock screen appearance on GNOME 42+, the <strong>GSE-GDM Extension</strong> (<code>gdm-extension@pratap.fastmail.fm</code>) must be installed on your system.
               </p>
 
-              <div style="background: #f4f4f5; padding: 10px 14px; border-radius: var(--radius); width: 100%; border: 1px solid #e4e4e7;">
-                <span style="font-size: 11px; font-weight: 700; color: #18181b; display: block; margin-bottom: 4px;">Quick Install Command (Terminal):</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; align-items: center;">
+                <button class="btn btn-primary" id="btn-clone-install-gdm" style="padding: 8px 16px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Clone &amp; Install GSE-GDM Extension
+                </button>
+
+                <a href="https://github.com/pratap-panabaka/gse-gdm-extension" target="_blank" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 7px 13px;">
+                  View on GitHub ↗
+                </a>
+              </div>
+
+              <div style="background: #f4f4f5; padding: 10px 14px; border-radius: var(--radius); width: 100%; border: 1px solid #e4e4e7; margin-top: 2px;">
+                <span style="font-size: 11px; font-weight: 700; color: #18181b; display: block; margin-bottom: 4px;">Manual Terminal Command (Alternative):</span>
                 <code style="font-size: 11.5px; color: #cf4110; user-select: all; font-family: monospace; display: block;">
                   git clone https://github.com/pratap-panabaka/gse-gdm-extension.git &amp;&amp; cd gse-gdm-extension &amp;&amp; sudo ./install.sh
                 </code>
-              </div>
-
-              <div style="display: flex; gap: 10px; margin-top: 4px;">
-                <a href="https://github.com/pratap-panabaka/gse-gdm-extension" target="_blank" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 6px 12px;">
-                  View on GitHub ↗
-                </a>
               </div>
             </div>
           </div>
@@ -102,15 +113,15 @@ const LockscreenView = {
             <div class="settings-card">
               <div class="settings-card-left">
                 <div class="settings-option-title">
-                  <strong>GSE-GDM Integration Active</strong>
-                  <span class="badge-tag badge-installed">Extension Installed</span>
+                  <strong style="font-size: 14px;">GSE-GDM Integration Active</strong>
+                  <span class="badge-tag badge-installed">Extension Ready</span>
                 </div>
                 <p class="settings-option-desc">
                   Enable theming in the GDM system user session so custom themes and icons are loaded at the login screen.
                 </p>
               </div>
               <div class="settings-card-right">
-                <button class="btn btn-primary" id="btn-enable-gdm-custom" style="padding: 7px 14px; font-size: 11.5px; background: #cf4110; color: #ffffff; border: none;">
+                <button class="btn btn-primary" id="btn-enable-gdm-custom" style="padding: 8px 16px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600;">
                   Enable GDM Theming
                 </button>
               </div>
@@ -200,6 +211,49 @@ const LockscreenView = {
   },
 
   bindEvents() {
+    // 0. Clone & Install GSE-GDM Extension (1-Click)
+    const cloneInstallBtn = this.container.querySelector('#btn-clone-install-gdm');
+    if (cloneInstallBtn) {
+      cloneInstallBtn.addEventListener('click', async () => {
+        cloneInstallBtn.disabled = true;
+        cloneInstallBtn.innerHTML = `
+          <svg class="spin-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10"></path>
+          </svg>
+          Installing GSE-GDM...
+        `;
+        showToast('Cloning & running GSE-GDM installer (requires admin password)...', 'info');
+
+        try {
+          const res = await window.electronAPI.gdm.installGseGdm();
+          if (res && res.success) {
+            showToast('GSE-GDM Extension installed successfully!', 'success');
+            await this.loadData();
+            this.renderUI();
+          } else if (res && res.cancelled) {
+            showToast('Administrator authentication was cancelled.', 'info');
+          } else {
+            showToast(`Installation failed: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error: ${err.message}`, 'warning');
+        } finally {
+          if (cloneInstallBtn) {
+            cloneInstallBtn.disabled = false;
+            cloneInstallBtn.innerHTML = `
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Clone &amp; Install GSE-GDM Extension
+            `;
+          }
+        }
+      });
+    }
+
     // 1. Re-check GDM status
     const recheckBtn = this.container.querySelector('#btn-recheck-gdm');
     if (recheckBtn) {

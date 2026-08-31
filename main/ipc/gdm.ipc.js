@@ -79,6 +79,17 @@ function registerGdmIpc() {
   });
 
   /**
+   * Clone & install GSE-GDM extension automatically via 1-click
+   */
+  ipcMain.handle('gdm:installGseGdm', async () => {
+    try {
+      return await gdm.installGseGdmExtension();
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  /**
    * Reset GDM session settings to defaults
    */
   ipcMain.handle('gdm:resetDefault', async () => {

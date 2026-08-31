@@ -123,8 +123,45 @@ async function resetGdmToDefault() {
   return execPkexec(resetCmd);
 }
 
+/**
+ * Clones and runs the installer script for GSE-GDM Extension automatically
+ */
+async function installGseGdmExtension() {
+  const cacheDir = path.join(os.homedir(), '.cache', 'themestudio');
+  if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+  const repoDir = path.join(cacheDir, 'gse-gdm-extension');
+
+  // Clone or pull repo
+  const cloneCmd = fs.existsSync(repoDir)
+    ? `git -C "${repoDir}" pull`
+    : `git clone --depth 1 https://github.com/pratap-panabaka/gse-gdm-extension.git "${repoDir}"`;
+
+  try {
+    await new Promise((res, rej) => {
+      exec(cloneCmd, { timeout: 45000 }, (err) => (err ? rej(err) : res()));
+    });
+  } catch (err) {
+    return { success: false, error: `Failed to clone GSE-GDM repository: ${err.message}` };
+  }
+
+  // Run installer via pkexec inside repoDir
+  const installCmd = `sh -c 'cd "${repoDir}" && chmod +x install.sh && ./install.sh'`;
+  const execRes = await execPkexec(installCmd);
+  if (!execRes.success) {
+    return execRes;
+  }
+
+  const updatedStatus = await checkGdmStatus();
+  return {
+    success: true,
+    message: 'GSE-GDM Extension installed successfully!',
+    gseGdmInstalled: updatedStatus.gseGdmInstalled
+  };
+}
+
 module.exports = {
   checkGdmStatus,
+  installGseGdmExtension,
   enableGdmCustomization,
   setGdmShellTheme,
   setGdmBackground,
