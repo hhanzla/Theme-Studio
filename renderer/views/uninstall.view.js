@@ -1,6 +1,4 @@
-// renderer/views/uninstall.view.js
-// Modern Uninstall Manager View with Batch Uninstall & Clean Filtering
-
+// Uninstall Manager View - Batch Uninstall & Cache Cleaner Architecture
 window.UninstallView = {
   container: null,
   activeFilter: 'all',
@@ -8,12 +6,18 @@ window.UninstallView = {
   selectedIds: new Set(),
   cacheSize: '0 B',
 
+  /**
+   * Initializes and renders the Uninstall Manager screen instantly without freeze
+   * @param {HTMLElement} containerEl
+   */
   async render(containerEl) {
     this.container = containerEl;
     this.selectedIds.clear();
     
+    // Render items immediately for instantaneous tab switching (0ms lag)
     await this.loadItems();
 
+    // Fetch cache size asynchronously in background without blocking UI
     this.fetchCacheSize().then(() => {
       const cacheBadge = document.querySelector('.cache-badge');
       if (cacheBadge) {
@@ -48,6 +52,7 @@ window.UninstallView = {
       this.installedItems = [];
     }
 
+    // Filter out selected IDs that are no longer installed
     const validIds = new Set(this.installedItems.map(i => i.id));
     for (const id of this.selectedIds) {
       if (!validIds.has(id)) {
@@ -78,47 +83,68 @@ window.UninstallView = {
     const selectedCount = this.selectedIds.size;
 
     subtabsBar.innerHTML = `
-      <div class="flex items-center justify-between w-full py-2 border-b border-zinc-200 gap-3">
-        <div class="flex items-center gap-1.5 overflow-x-auto">
-          <button class="subtab-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${this.activeFilter === 'all' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-600 hover:bg-zinc-100'}" data-cat="all">
+      <div class="subtabs-with-toolbar">
+        <div class="subtabs">
+          <button class="subtab-btn ${this.activeFilter === 'all' ? 'active' : ''}" data-cat="all">
             <span>All Installed</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold ${this.activeFilter === 'all' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-200 text-zinc-700'}">${this.installedItems.length}</span>
+            <span class="badge count-badge">${this.installedItems.length}</span>
           </button>
-          <button class="subtab-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${this.activeFilter === 'gtk-theme' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-600 hover:bg-zinc-100'}" data-cat="gtk-theme">
+          <button class="subtab-btn ${this.activeFilter === 'gtk-theme' ? 'active' : ''}" data-cat="gtk-theme">
             <span>GTK Themes</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold ${this.activeFilter === 'gtk-theme' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-200 text-zinc-700'}">${gtkCount}</span>
+            <span class="badge count-badge">${gtkCount}</span>
           </button>
-          <button class="subtab-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${this.activeFilter === 'shell-theme' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-600 hover:bg-zinc-100'}" data-cat="shell-theme">
+          <button class="subtab-btn ${this.activeFilter === 'shell-theme' ? 'active' : ''}" data-cat="shell-theme">
             <span>Shell Themes</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold ${this.activeFilter === 'shell-theme' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-200 text-zinc-700'}">${shellCount}</span>
+            <span class="badge count-badge">${shellCount}</span>
           </button>
-          <button class="subtab-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${this.activeFilter === 'icon-theme' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-600 hover:bg-zinc-100'}" data-cat="icon-theme">
+          <button class="subtab-btn ${this.activeFilter === 'icon-theme' ? 'active' : ''}" data-cat="icon-theme">
             <span>Icons</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold ${this.activeFilter === 'icon-theme' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-200 text-zinc-700'}">${iconCount}</span>
+            <span class="badge count-badge">${iconCount}</span>
           </button>
-          <button class="subtab-btn px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${this.activeFilter === 'cursor-theme' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-600 hover:bg-zinc-100'}" data-cat="cursor-theme">
+          <button class="subtab-btn ${this.activeFilter === 'cursor-theme' ? 'active' : ''}" data-cat="cursor-theme">
             <span>Cursors</span>
-            <span class="px-1.5 py-0.2 rounded text-[10px] font-bold ${this.activeFilter === 'cursor-theme' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-200 text-zinc-700'}">${cursorCount}</span>
+            <span class="badge count-badge">${cursorCount}</span>
           </button>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="uninstall-toolbar-actions">
           ${filtered.length > 0 ? `
-            <button class="btn btn-secondary px-3 py-1.5 text-xs font-medium" id="btn-select-all-toggle">
-              ${allFilteredSelected ? 'Deselect All' : 'Select All'}
+            <button class="toolbar-btn btn-select-all ${allFilteredSelected ? 'active' : ''}" id="btn-select-all-toggle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                ${allFilteredSelected 
+                  ? '<polyline points="20 6 9 17 4 12"></polyline>' 
+                  : '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>'}
+              </svg>
+              <span>${allFilteredSelected ? 'Deselect All' : 'Select All'}</span>
             </button>
           ` : ''}
 
-          ${selectedCount > 0 ? `
-            <button class="btn px-3 py-1.5 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-md shadow-sm active:scale-95 transition-all" id="btn-batch-uninstall">
-              Uninstall Selected (${selectedCount})
-            </button>
-          ` : ''}
+          <button 
+            class="toolbar-btn btn-batch-danger ${selectedCount > 0 ? 'visible' : ''}" 
+            id="btn-batch-uninstall" 
+            ${selectedCount === 0 ? 'disabled' : ''}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+            <span>Uninstall Selected (${selectedCount})</span>
+          </button>
+
+          <button class="toolbar-btn btn-clear-cache" id="btn-clear-cache" title="Clear downloaded archives and temp clones">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+            </svg>
+            <span>Clear Cache</span>
+            <span class="cache-badge">${this.cacheSize}</span>
+          </button>
         </div>
       </div>
     `;
 
-    // Filter clicks
+    // Category filter click
     subtabsBar.querySelectorAll('.subtab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         this.activeFilter = btn.getAttribute('data-cat');
@@ -141,11 +167,19 @@ window.UninstallView = {
       });
     }
 
-    // Batch Uninstall
+    // Batch Uninstall button
     const batchBtn = subtabsBar.querySelector('#btn-batch-uninstall');
     if (batchBtn && selectedCount > 0) {
       batchBtn.addEventListener('click', () => {
         this.confirmBatchRemove();
+      });
+    }
+
+    // Clear Cache button
+    const clearCacheBtn = subtabsBar.querySelector('#btn-clear-cache');
+    if (clearCacheBtn) {
+      clearCacheBtn.addEventListener('click', () => {
+        this.confirmClearCache();
       });
     }
   },
@@ -159,12 +193,15 @@ window.UninstallView = {
 
     if (filtered.length === 0) {
       this.container.innerHTML = `
-        <div class="col-span-full py-16 flex flex-col items-center justify-center text-center">
-          <div class="w-12 h-12 rounded-full bg-zinc-100 text-zinc-400 flex items-center justify-center mb-3">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        <div class="empty-state" style="grid-column: 1 / -1; width: 100%;">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
           </div>
-          <h3 class="text-sm font-bold text-zinc-800">No Installed Items Found</h3>
-          <p class="text-xs text-zinc-500 mt-1 max-w-sm">Explore the Browse tabs to install new GTK themes, icon packs, or cursor sets.</p>
+          <h3 class="empty-title">No Installed Items in this Filter</h3>
+          <p class="empty-desc">Explore the Browse tabs to install new themes, icon packs, or cursor sets.</p>
         </div>
       `;
       return;
@@ -172,7 +209,7 @@ window.UninstallView = {
 
     this.container.innerHTML = filtered.map(item => this.renderCard(item)).join('');
 
-    // Checkbox selection
+    // Checkbox selection click
     this.container.querySelectorAll('.uninstall-checkbox').forEach(chk => {
       chk.addEventListener('change', () => {
         const id = chk.getAttribute('data-id');
@@ -181,11 +218,15 @@ window.UninstallView = {
         } else {
           this.selectedIds.delete(id);
         }
+        const card = this.container.querySelector(`.theme-card[data-id="${id}"]`);
+        if (card) {
+          card.classList.toggle('is-selected', chk.checked);
+        }
         this.renderSubtabsAndToolbar();
       });
     });
 
-    // Single remove
+    // Single uninstall button click
     this.container.querySelectorAll('.btn-remove-item').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -195,7 +236,7 @@ window.UninstallView = {
       });
     });
 
-    // Single apply
+    // Single apply button click
     this.container.querySelectorAll('.btn-apply-item').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -212,39 +253,62 @@ window.UninstallView = {
       ? `${item.variant.color || ''} ${item.variant.mode ? '(' + item.variant.mode + ')' : ''}`.trim()
       : (item.installed_folders && item.installed_folders.length > 0 ? item.installed_folders.join(', ') : 'Standard');
 
+    const baseId = (item.id || '').replace(/-shell$/, '');
+    const thumbnailSrc = item.thumbnail || `assets/previews/${baseId}.png`;
     const isSelected = this.selectedIds.has(item.id);
 
     return `
-      <div class="theme-card group relative bg-white border ${isSelected ? 'border-brand ring-2 ring-brand/15' : 'border-zinc-200 hover:border-zinc-300'} rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col" data-id="${item.id}">
-        <div class="relative h-32 bg-zinc-100 overflow-hidden flex items-center justify-center">
-          <label class="absolute top-2.5 left-2.5 z-10 cursor-pointer p-1 rounded bg-white/90 backdrop-blur-sm border border-zinc-200/80 shadow-sm flex items-center justify-center">
-            <input type="checkbox" class="uninstall-checkbox accent-brand w-4 h-4 rounded cursor-pointer" data-id="${item.id}" ${isSelected ? 'checked' : ''} />
+      <div class="theme-card is-installed ${isSelected ? 'is-selected' : ''}" data-id="${item.id}">
+        <div class="card-thumbnail-container">
+          <label class="card-select-label" title="Select for batch action">
+            <input 
+              type="checkbox" 
+              class="uninstall-checkbox" 
+              data-id="${item.id}" 
+              ${isSelected ? 'checked' : ''} 
+            />
+            <span class="custom-checkbox-ui"></span>
           </label>
 
-          ${item.preview 
-            ? `<img src="${item.preview}" alt="${item.name}" class="w-full h-full object-cover" />` 
-            : `<div class="w-full h-full flex flex-col items-center justify-center bg-zinc-50 text-zinc-400 gap-1"><span class="text-xs font-semibold text-zinc-400">${item.name}</span></div>`
-          }
+          <img 
+            src="${thumbnailSrc}" 
+            alt="${item.name}" 
+            class="card-thumbnail"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="card-fallback-preview" style="display: none;">
+            <svg class="card-fallback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+              <path d="M3 9h18"></path>
+              <path d="M9 21V9"></path>
+            </svg>
+            <span class="card-fallback-name">${item.name}</span>
+          </div>
 
-          <div class="absolute top-2.5 right-2.5">
-            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Installed</span>
+          <div class="card-badges-floating">
+            <div class="badge-type-slot"></div>
+            <div class="badge-installed-slot">
+              <span class="badge-tag badge-installed">Installed</span>
+            </div>
           </div>
         </div>
 
-        <div class="p-3.5 flex flex-col flex-1">
-          <h4 class="text-xs font-bold text-zinc-900 leading-snug truncate">${item.name}</h4>
-          <span class="text-[11px] text-zinc-400 capitalize mt-0.5">${item.category.replace('-', ' ')} • ${formattedDate}</span>
+        <div class="card-body">
+          <div class="card-title-row">
+            <h3 class="card-title">${item.name}</h3>
+          </div>
+          <p class="card-author">${item.category} • <span>${formattedDate}</span></p>
 
-          <div class="flex flex-wrap gap-1 my-2.5">
-            <span class="px-1.5 py-0.5 bg-zinc-100 rounded text-[10.5px] font-medium text-zinc-600 truncate max-w-full">${variantText}</span>
-            ${item.gtk4_fix_applied ? '<span class="px-1.5 py-0.5 bg-emerald-50 border border-emerald-200 rounded text-[10.5px] font-semibold text-emerald-700">GTK4 Active</span>' : ''}
+          <div class="card-meta-tags">
+            <span class="meta-chip">${variantText}</span>
+            ${item.gtk4_fix_applied ? '<span class="meta-chip chip-gtk4">GTK4 Active</span>' : ''}
           </div>
 
-          <div class="grid grid-cols-2 gap-2 pt-2.5 border-t border-zinc-100 mt-auto">
-            <button class="btn btn-secondary btn-apply-item px-2 py-1.5 text-xs font-medium" data-id="${item.id}">
+          <div class="card-footer" style="display: flex; gap: 6px;">
+            <button class="card-btn btn-secondary btn-apply-item" data-id="${item.id}" style="flex: 1;">
               Apply
             </button>
-            <button class="btn px-2 py-1.5 text-xs font-medium bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-md transition-all btn-remove-item" data-id="${item.id}">
+            <button class="card-btn btn-danger btn-remove-item" data-id="${item.id}" style="flex: 1;">
               Uninstall
             </button>
           </div>
@@ -264,133 +328,142 @@ window.UninstallView = {
           showToast(`Applied ${chosenTarget} as active GNOME Shell theme`, 'success');
         } else if (item.category === 'icon-theme') {
           await window.electronAPI.system.applyIcons(chosenTarget);
-          showToast(`Applied ${chosenTarget} as active Icon theme`, 'success');
+          showToast(`Applied ${chosenTarget} as active icon pack`, 'success');
         } else if (item.category === 'cursor-theme') {
           await window.electronAPI.system.applyCursors(chosenTarget);
-          showToast(`Applied ${chosenTarget} as active Cursor theme`, 'success');
+          showToast(`Applied ${chosenTarget} as active cursor set`, 'success');
         }
       } catch (err) {
-        showToast(`Error applying theme: ${err.message}`, 'warning');
+        showToast(`Failed to apply ${item.name}: ${err.message}`, 'warning');
       }
     };
 
-    if (item.installed_folders && item.installed_folders.length > 1) {
-      this.promptThemeVariant(item, item.installed_folders, doApply);
-    } else {
-      const target = (item.installed_folders && item.installed_folders[0]) || item.primary_path?.split('/').pop() || item.name;
-      await doApply(target);
-    }
-  },
+    // Check if multiple variants (e.g. Standard vs Compact) exist
+    try {
+      if (window.electronAPI && window.electronAPI.system && window.electronAPI.system.getThemeVariants) {
+        const res = await window.electronAPI.system.getThemeVariants({
+          name: item.name,
+          id: item.id,
+          category: item.category
+        });
+        if (res && res.success && Array.isArray(res.variants) && res.variants.length > 1) {
+          window.ApplyVariantPicker.show({
+            title: `Apply ${item.name}`,
+            subtitle: `Select flavor (Standard or Compact) to set active`,
+            variants: res.variants,
+            onApply: (selectedId) => {
+              doApply(selectedId);
+            }
+          });
+          return;
+        }
+      }
+    } catch (_) {}
 
-  promptThemeVariant(item, folders, onSelected) {
-    const optionsHtml = folders.map(f => `
-      <label class="flex items-center gap-2 p-2.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 cursor-pointer text-xs font-medium text-zinc-800">
-        <input type="radio" name="installed_folder_choice" value="${f}" class="accent-brand" ${f === folders[0] ? 'checked' : ''} />
-        <span>${f}</span>
-      </label>
-    `).join('');
-
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="modal-dialog animate-modal-enter max-w-sm">
-        <div class="modal-header">
-          <h3 class="modal-title">Select Active Variant</h3>
-          <button class="modal-close-btn" id="modal-variant-close">×</button>
-        </div>
-        <div class="modal-body">
-          <p class="text-xs text-zinc-500 mb-2">Choose which installed variant of "${item.name}" to apply:</p>
-          <div class="flex flex-col gap-1.5">
-            ${optionsHtml}
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" id="modal-variant-cancel">Cancel</button>
-          <button class="btn btn-primary" id="modal-variant-apply">Apply Theme</button>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    const close = () => modal.remove();
-    modal.querySelector('#modal-variant-close').addEventListener('click', close);
-    modal.querySelector('#modal-variant-cancel').addEventListener('click', close);
-
-    modal.querySelector('#modal-variant-apply').addEventListener('click', () => {
-      const selectedRadio = modal.querySelector('input[name="installed_folder_choice"]:checked');
-      const target = selectedRadio ? selectedRadio.value : folders[0];
-      close();
-      onSelected(target);
-    });
+    const applyTargetName = (item.installed_folders && item.installed_folders[0]) || item.name;
+    doApply(applyTargetName);
   },
 
   confirmRemove(item) {
-    if (window.ConfirmDialog) {
-      window.ConfirmDialog.show({
-        title: `Uninstall ${item.name}?`,
-        message: `This will remove all installed folders (${(item.installed_folders || []).join(', ')}) from your system.`,
-        confirmText: 'Uninstall',
-        confirmClass: 'btn-danger',
-        onConfirm: () => this.doRemove(item)
-      });
-    } else {
-      if (confirm(`Uninstall ${item.name}?`)) {
-        this.doRemove(item);
+    window.ConfirmDialog.show({
+      title: `Uninstall ${item.name}`,
+      subtitle: 'Remove theme files and restore defaults if active',
+      message: `Are you sure you want to completely uninstall ${item.name}? This will delete the theme files from disk and reverse any GTK4 symlinks.`,
+      confirmText: 'Uninstall Theme',
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        showToast(`Uninstalling ${item.name}...`, 'info');
+        try {
+          const res = await window.electronAPI.uninstall.remove({ id: item.id });
+          if (res && res.success) {
+            showToast(`${item.name} uninstalled successfully`, 'success');
+            this.selectedIds.delete(item.id);
+            await this.loadItems();
+            this.fetchCacheSize().then(() => {
+              const cacheBadge = document.querySelector('.cache-badge');
+              if (cacheBadge) cacheBadge.textContent = this.cacheSize;
+            });
+            if (typeof window.refreshAppState === 'function') {
+              window.refreshAppState();
+            }
+          } else {
+            showToast(`Failed to uninstall: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error uninstalling: ${err.message}`, 'warning');
+        }
       }
-    }
-  },
-
-  async doRemove(item) {
-    showToast(`Uninstalling ${item.name}...`, 'info');
-    try {
-      const res = await window.electronAPI.uninstall.remove(item.id);
-      if (res && res.success) {
-        showToast(`Successfully uninstalled ${item.name}`, 'success');
-        this.selectedIds.delete(item.id);
-        await this.loadItems();
-      } else {
-        showToast(`Error uninstalling: ${res ? res.error : 'Unknown error'}`, 'warning');
-      }
-    } catch (err) {
-      showToast(`Error: ${err.message}`, 'warning');
-    }
+    });
   },
 
   confirmBatchRemove() {
     const count = this.selectedIds.size;
     if (count === 0) return;
 
-    if (window.ConfirmDialog) {
-      window.ConfirmDialog.show({
-        title: `Uninstall ${count} Items?`,
-        message: `Are you sure you want to permanently remove all ${count} selected themes/icon packs from your system?`,
-        confirmText: `Uninstall (${count})`,
-        confirmClass: 'btn-danger',
-        onConfirm: () => this.doBatchRemove()
-      });
-    } else {
-      if (confirm(`Uninstall ${count} selected items?`)) {
-        this.doBatchRemove();
+    const names = Array.from(this.selectedIds)
+      .map(id => {
+        const it = this.installedItems.find(i => i.id === id);
+        return it ? it.name : id;
+      })
+      .slice(0, 4)
+      .join(', ');
+    const moreText = count > 4 ? ` and ${count - 4} more...` : '';
+
+    window.ConfirmDialog.show({
+      title: `Batch Uninstall (${count} Items)`,
+      subtitle: 'Remove selected themes and restore default appearance',
+      message: `Are you sure you want to completely uninstall ${count} selected items (${names}${moreText})? This will delete all their files from disk and reset appearance to system defaults if active.`,
+      confirmText: `Uninstall All ${count} Items`,
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        showToast(`Uninstalling ${count} items in batch...`, 'info');
+        try {
+          const idsToUninstall = Array.from(this.selectedIds);
+          const res = await window.electronAPI.uninstall.batchRemove({ ids: idsToUninstall });
+          if (res && res.success) {
+            showToast(`Successfully uninstalled ${res.removedCount} items!`, 'success');
+            this.selectedIds.clear();
+            await this.loadItems();
+            this.fetchCacheSize().then(() => {
+              const cacheBadge = document.querySelector('.cache-badge');
+              if (cacheBadge) cacheBadge.textContent = this.cacheSize;
+            });
+            if (typeof window.refreshAppState === 'function') {
+              window.refreshAppState();
+            }
+          } else {
+            showToast(`Batch uninstall error: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error in batch uninstall: ${err.message}`, 'warning');
+        }
       }
-    }
+    });
   },
 
-  async doBatchRemove() {
-    const ids = Array.from(this.selectedIds);
-    showToast(`Uninstalling ${ids.length} items...`, 'info');
-
-    try {
-      const res = await window.electronAPI.uninstall.batchRemove(ids);
-      if (res && res.success) {
-        showToast(`Successfully uninstalled ${res.removedCount || ids.length} items!`, 'success');
-        this.selectedIds.clear();
-        await this.loadItems();
-      } else {
-        showToast(`Error in batch uninstall: ${res ? res.error : 'Unknown error'}`, 'warning');
+  confirmClearCache() {
+    window.ConfirmDialog.show({
+      title: 'Clear Download Cache',
+      subtitle: `Freed space: ${this.cacheSize}`,
+      message: `Are you sure you want to delete all cached download archives (.zip, .tar.xz) and temporary Git clones? This frees up disk space and will NOT affect your installed themes.`,
+      confirmText: 'Clear Cache',
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        showToast('Clearing download and extraction cache...', 'info');
+        try {
+          const res = await window.electronAPI.uninstall.clearCache();
+          if (res && res.success) {
+            showToast('Download cache cleared successfully!', 'success');
+            await this.fetchCacheSize();
+            const cacheBadge = document.querySelector('.cache-badge');
+            if (cacheBadge) cacheBadge.textContent = this.cacheSize;
+          } else {
+            showToast(`Failed to clear cache: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error clearing cache: ${err.message}`, 'warning');
+        }
       }
-    } catch (err) {
-      showToast(`Error: ${err.message}`, 'warning');
-    }
+    });
   }
 };

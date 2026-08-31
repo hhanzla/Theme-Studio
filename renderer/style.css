@@ -1,37 +1,35 @@
 :root {
   --bg-app: #ffffff;
-  --bg-sidebar: #fafafa;
+  --bg-sidebar: #f4f4f5;
   --bg-card: #ffffff;
-  --bg-card-hover: #ffffff;
-  --bg-surface: #f4f4f5;
+  --bg-card-hover: #fafafa;
+  --bg-surface: #e4e4e7;
   --bg-input: #ffffff;
   
   --border-subtle: #e4e4e7;
   --border-card: #e4e4e7;
-  --border-card-hover: #d4d4d8;
+  --border-card-hover: #71717a;
   --border-focus: #cf4110;
 
   --accent-primary: #cf4110;
   --accent-primary-hover: #b3360b;
   --accent-secondary: #71717a;
 
-  --text-primary: #18181b;
-  --text-secondary: #71717a;
-  --text-muted: #a1a1aa;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
   --text-inverse: #ffffff;
 
   --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius: 4px;
 
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.08);
+  --shadow-card: none;
+  --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-  --transition-fast: 0.12s ease;
-  --transition-normal: 0.18s ease;
+  --transition-fast: 0.1s ease;
+  --transition-normal: 0.15s ease;
 }
 
 * {

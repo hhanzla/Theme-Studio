@@ -1,7 +1,9 @@
-// renderer/components/confirm-dialog.js
-// Modern Confirmation Dialog Component with Backdrop Blur and Enter Animation
-
+// Confirm Dialog Component for Dependency Installation & Actions
 window.ConfirmDialog = {
+  /**
+   * Shows a confirmation dialog for missing dependencies or critical actions
+   * @param {object} options - { title, message, items: string[], confirmText, onConfirm, onCancel }
+   */
   show(options = {}) {
     this.close();
 
@@ -10,32 +12,30 @@ window.ConfirmDialog = {
     overlay.id = 'confirm-dialog-modal';
 
     const itemsHtml = Array.isArray(options.items) && options.items.length > 0
-      ? `<div class="flex flex-wrap gap-1.5 p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
-          ${options.items.map(it => `<span class="px-2 py-0.5 bg-white border border-zinc-200 rounded text-xs font-mono font-medium text-zinc-800">${it}</span>`).join('')}
+      ? `<div class="dialog-items-list">
+          ${options.items.map(it => `<div class="dialog-item-chip">${it}</div>`).join('')}
         </div>`
       : '';
 
-    const isDanger = options.confirmClass === 'btn-danger';
-
     overlay.innerHTML = `
-      <div class="modal-dialog animate-modal-enter max-w-md">
+      <div class="modal-dialog">
         <div class="modal-header">
           <div>
             <h3 class="modal-title">${options.title || 'Required Packages'}</h3>
-            <p class="modal-subtitle">${options.subtitle || 'Please confirm before proceeding'}</p>
+            <p class="modal-subtitle">${options.subtitle || 'System packages need to be installed'}</p>
           </div>
           <button class="modal-close-btn" id="confirm-close-btn">×</button>
         </div>
 
         <div class="modal-body">
-          <p class="text-xs text-zinc-600 leading-relaxed">${options.message || 'The following packages or actions will be executed:'}</p>
+          <p class="modal-text">${options.message || 'The following packages are required for this theme to build and install:'}</p>
           ${itemsHtml}
-          <p class="text-[11px] text-zinc-400 italic">You may be prompted for system authorization (pkexec) to apply changes.</p>
+          <p class="modal-subtext">You may be prompted for authorization (pkexec) to install them via apt.</p>
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-secondary" id="dialog-cancel-btn">${options.cancelText || 'Cancel'}</button>
-          <button class="btn ${isDanger ? 'bg-red-600 hover:bg-red-700 text-white' : 'btn-primary'}" id="dialog-confirm-btn">${options.confirmText || 'Confirm'}</button>
+          <button class="modal-btn btn-secondary" id="dialog-cancel-btn">${options.cancelText || 'Cancel'}</button>
+          <button class="modal-btn btn-primary" id="dialog-confirm-btn">${options.confirmText || 'Install Packages'}</button>
         </div>
       </div>
     `;

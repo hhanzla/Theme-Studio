@@ -1,6 +1,4 @@
-// renderer/views/settings.view.js
-// Modern Settings & System Paths Explorer View
-
+// Settings View Component for Theme Studio
 window.SettingsView = {
   container: null,
   cacheSize: '0 B',
@@ -9,6 +7,7 @@ window.SettingsView = {
     this.container = containerEl;
     await this.loadSettings();
 
+    // Fetch cache size asynchronously in background
     this.fetchCacheSize().then(() => {
       const badge = this.container?.querySelector('.settings-cache-badge');
       if (badge) badge.textContent = this.cacheSize;
@@ -53,157 +52,302 @@ window.SettingsView = {
     const isFlatpakSync = !!settings.flatpak_theme_sync;
 
     const pathItems = [
-      { label: 'GTK Themes (User)', tag: 'User', path: paths.userGtkThemes || '~/.themes', desc: 'Legacy user GTK 2/3 themes folder' },
-      { label: 'Themes (Local Share)', tag: 'User', path: paths.localShareThemes || '~/.local/share/themes', desc: 'Modern user XDG theme directory' },
-      { label: 'Icons & Cursors (User)', tag: 'User', path: paths.userIcons || '~/.icons', desc: 'Legacy user icon and cursor sets' },
-      { label: 'Icons (Local Share)', tag: 'User', path: paths.localShareIcons || '~/.local/share/icons', desc: 'Modern user XDG icon themes' },
-      { label: 'System Themes', tag: 'System', path: paths.systemThemes || '/usr/share/themes', desc: 'Global root system themes' },
-      { label: 'System Icons & Cursors', tag: 'System', path: paths.systemIcons || '/usr/share/icons', desc: 'Global root system icons' },
-      { label: 'GNOME Shell Extensions', tag: 'User', path: paths.userExtensions || '~/.local/share/gnome-shell/extensions', desc: 'User installed GNOME shell extensions' }
+      {
+        label: 'GTK Themes (User)',
+        tag: 'User',
+        tagClass: 'path-tag-user',
+        path: paths.userGtkThemes || '~/.themes',
+        desc: 'Legacy user GTK 2/3 themes folder'
+      },
+      {
+        label: 'Themes (Local Share)',
+        tag: 'User',
+        tagClass: 'path-tag-user',
+        path: paths.localShareThemes || '~/.local/share/themes',
+        desc: 'Modern user XDG theme directory'
+      },
+      {
+        label: 'Icons & Cursors (User)',
+        tag: 'User',
+        tagClass: 'path-tag-user',
+        path: paths.userIcons || '~/.icons',
+        desc: 'Legacy user icon and cursor sets'
+      },
+      {
+        label: 'Icons (Local Share)',
+        tag: 'User',
+        tagClass: 'path-tag-user',
+        path: paths.localShareIcons || '~/.local/share/icons',
+        desc: 'Modern user XDG icon themes'
+      },
+      {
+        label: 'System Themes',
+        tag: 'System',
+        tagClass: 'path-tag-system',
+        path: paths.systemThemes || '/usr/share/themes',
+        desc: 'Global root system themes'
+      },
+      {
+        label: 'System Icons & Cursors',
+        tag: 'System',
+        tagClass: 'path-tag-system',
+        path: paths.systemIcons || '/usr/share/icons',
+        desc: 'Global root system icons'
+      },
+      {
+        label: 'GNOME Shell Extensions',
+        tag: 'User',
+        tagClass: 'path-tag-user',
+        path: paths.extensions || '~/.local/share/gnome-shell/extensions',
+        desc: 'Installed user shell extensions'
+      },
+      {
+        label: 'Wallpapers Directory',
+        tag: 'User',
+        tagClass: 'path-tag-user',
+        path: paths.backgrounds || '~/.local/share/backgrounds',
+        desc: 'Desktop background images'
+      },
+      {
+        label: 'GTK4 / Libadwaita Config',
+        tag: 'Config',
+        tagClass: 'path-tag-config',
+        path: paths.gtk4Config || '~/.config/gtk-4.0',
+        desc: 'Modern Libadwaita styling overrides'
+      },
+      {
+        label: 'GTK3 Config',
+        tag: 'Config',
+        tagClass: 'path-tag-config',
+        path: paths.gtk3Config || '~/.config/gtk-3.0',
+        desc: 'GTK3 settings and CSS'
+      },
+      {
+        label: 'Theme Studio State Store',
+        tag: 'Config',
+        tagClass: 'path-tag-config',
+        path: paths.appData || '~/.config/themestudio',
+        desc: 'Installed records & preferences'
+      },
+      {
+        label: 'Download & Build Cache',
+        tag: 'Cache',
+        tagClass: 'path-tag-cache',
+        path: paths.downloadCache || '~/.cache/themestudio/downloads',
+        desc: 'Cloned repos & downloaded archives'
+      }
     ];
 
-    const pathRowsHtml = pathItems.map(item => `
-      <div class="flex items-center justify-between p-3 border-b border-zinc-100 last:border-b-0 hover:bg-zinc-50/50 transition-colors gap-3">
-        <div class="flex flex-col min-w-0">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold text-zinc-900">${item.label}</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${item.tag === 'System' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}">${item.tag}</span>
+    const pathsHtml = pathItems.map(p => `
+      <div class="path-card">
+        <div class="path-info">
+          <div class="path-header">
+            <span class="path-label">${p.label}</span>
+            <span class="path-tag ${p.tagClass}">${p.tag}</span>
           </div>
-          <span class="text-[11px] text-zinc-400 mt-0.5">${item.desc}</span>
+          <code class="path-value" title="${p.path}">${p.path}</code>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <code class="px-2.5 py-1 bg-zinc-100 border border-zinc-200 rounded text-[11px] font-mono text-zinc-700 select-all">${item.path}</code>
-          <button class="p-1.5 rounded-md hover:bg-zinc-200 text-zinc-500 hover:text-zinc-900 btn-copy-path transition-all" data-path="${item.path}" title="Copy path">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+        <div class="path-actions">
+          <button class="btn-open-path" data-path="${p.path}" title="Open folder in File Manager">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Open
           </button>
         </div>
       </div>
     `).join('');
 
     this.container.innerHTML = `
-      <div class="max-w-4xl flex flex-col gap-6">
-        <!-- Section: Flatpak Integration -->
-        <div class="flex flex-col gap-2">
-          <h3 class="text-sm font-bold text-zinc-900">Application Integration</h3>
-          <div class="p-4 bg-white border border-zinc-200 rounded-xl flex items-center justify-between gap-4 shadow-sm">
-            <div class="flex flex-col gap-0.5">
-              <div class="flex items-center gap-2">
-                <strong class="text-xs font-bold text-zinc-900">Sync Themes with Flatpak Apps</strong>
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${flatpakInstalled ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-zinc-100 text-zinc-500'}">
+      <div class="settings-view-container">
+        <!-- Section: Integrations -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Integrations & Compatibility</h3>
+          <p class="settings-section-desc">Manage system-level hooks and application sandboxing integration.</p>
+
+          <div class="settings-card">
+            <div class="settings-card-left">
+              <div class="settings-option-title">
+                <strong>Flatpak Theme Sync</strong>
+                <span class="badge-tag ${flatpakInstalled ? 'badge-installed' : 'badge-script'}">
                   ${flatpakInstalled ? 'Flatpak Detected' : 'Flatpak Not Found'}
                 </span>
               </div>
-              <p class="text-[11.5px] text-zinc-500">
-                Automatically grants filesystem permissions (<code>~/.themes</code> and <code>~/.icons</code>) to Flatpak apps so installed GTK and icon themes apply consistently across sandbox apps.
+              <p class="settings-option-desc">
+                Grants filesystem permissions to Flatpak sandbox (<code>~/.themes</code>, <code>~/.icons</code>, <code>~/.config/gtk-4.0</code>) so sandboxed apps automatically inherit installed themes.
               </p>
             </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="chk-flatpak-sync" ${isFlatpakSync ? 'checked' : ''} ${!flatpakInstalled ? 'disabled' : ''}>
-              <span class="slider"></span>
-            </label>
+            <div class="settings-card-right">
+              <label class="switch">
+                <input type="checkbox" id="toggle-flatpak-sync" ${isFlatpakSync ? 'checked' : ''} ${!flatpakInstalled ? 'disabled' : ''}>
+                <span class="slider round"></span>
+              </label>
+            </div>
           </div>
         </div>
 
-        <!-- Section: Storage & Cache -->
-        <div class="flex flex-col gap-2">
-          <h3 class="text-sm font-bold text-zinc-900">Storage &amp; Downloads Cache</h3>
-          <div class="p-4 bg-white border border-zinc-200 rounded-xl flex items-center justify-between gap-4 shadow-sm">
-            <div class="flex flex-col gap-0.5">
-              <strong class="text-xs font-bold text-zinc-900">Temporary Downloads Cache</strong>
-              <p class="text-[11.5px] text-zinc-500">
-                Downloaded theme archives and temporary git repositories stored in <code>~/.cache/theme-studio/</code>.
-              </p>
+        <!-- Section: Storage Paths -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">System Paths & Storage (${pathItems.length} Directories)</h3>
+          <p class="settings-section-desc">All standard theme directories, config folders, and cache paths used across GNOME and Theme Studio.</p>
+
+          <div class="settings-paths-grid">
+            ${pathsHtml}
+          </div>
+        </div>
+
+        <!-- Section: System Maintenance -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">System Maintenance</h3>
+          <p class="settings-section-desc">Quick actions to restore system defaults or clear download cache.</p>
+
+          <div class="settings-card">
+            <div class="settings-card-left">
+              <strong>Restore Desktop Defaults</strong>
+              <p class="settings-option-desc">Resets active GTK theme, icons, and cursors back to default Ubuntu Yaru theme.</p>
             </div>
-            <div class="flex items-center gap-3">
-              <span class="px-2 py-1 bg-zinc-100 border border-zinc-200 rounded text-xs font-mono text-zinc-700 settings-cache-badge">${this.cacheSize}</span>
-              <button class="btn btn-secondary px-3 py-1.5 text-xs font-medium" id="btn-clear-cache">
+            <div class="settings-card-right">
+              <button class="card-btn btn-secondary" id="btn-settings-reset-defaults">
+                Reset Defaults
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-left">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <strong>Clear Download Cache</strong>
+                <span class="cache-badge settings-cache-badge">${this.cacheSize}</span>
+              </div>
+              <p class="settings-option-desc">Clears all cached git clones and downloaded zip archives from <code>~/.cache/themestudio</code> to free disk space without affecting installed themes.</p>
+            </div>
+            <div class="settings-card-right">
+              <button class="card-btn btn-secondary" id="btn-settings-clear-cache" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                </svg>
                 Clear Cache
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Section: System Directories Explorer -->
-        <div class="flex flex-col gap-2">
-          <h3 class="text-sm font-bold text-zinc-900">Theme Directory Paths</h3>
-          <p class="text-xs text-zinc-500">
-            Locations where user and system themes, icons, cursors, and GNOME extensions are discovered on your filesystem.
-          </p>
-          <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-            ${pathRowsHtml}
+        <!-- Section: About -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">About Theme Studio</h3>
+          <div class="settings-card">
+            <div class="settings-card-left">
+              <strong>Theme Studio v1.0.0</strong>
+              <p class="settings-option-desc">Curated GNOME Theme, Icon, and Cursor Manager for modern Linux.</p>
+            </div>
+            <div class="settings-card-right">
+              <span class="meta-chip">Milestone 1</span>
+            </div>
           </div>
-        </div>
-
-        <!-- Section: About & System Info -->
-        <div class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between text-xs text-zinc-500 mb-6">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-zinc-800">Theme Studio</span>
-            <span>•</span>
-            <span>Version 1.0.0 (Linux Desktop Customizer)</span>
-          </div>
-          <span class="font-mono text-[11px] text-zinc-400">GNOME 42+ &amp; GTK4 Compatible</span>
         </div>
       </div>
     `;
 
-    this.bindEvents();
-  },
-
-  bindEvents() {
-    // Copy path buttons
-    this.container.querySelectorAll('.btn-copy-path').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const path = btn.getAttribute('data-path');
-        if (path) {
-          navigator.clipboard.writeText(path).then(() => {
-            showToast(`Copied "${path}" to clipboard!`, 'info');
-          });
+    // Wire Open Path Buttons
+    this.container.querySelectorAll('.btn-open-path').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const targetPath = btn.getAttribute('data-path');
+        if (!targetPath) return;
+        try {
+          await window.electronAPI.settings.openPath(targetPath);
+          showToast(`Opened folder in File Manager`, 'info');
+        } catch (err) {
+          showToast(`Failed to open folder: ${err.message}`, 'warning');
         }
       });
     });
 
-    // Flatpak Sync Toggle
-    const flatpakToggle = this.container.querySelector('#chk-flatpak-sync');
-    if (flatpakToggle) {
-      flatpakToggle.addEventListener('change', async (e) => {
+    // Wire Clear Cache Button with identical confirmation dialog
+    const clearCacheBtn = this.container.querySelector('#btn-settings-clear-cache');
+    if (clearCacheBtn) {
+      clearCacheBtn.addEventListener('click', () => {
+        window.ConfirmDialog.show({
+          title: 'Clear Download Cache',
+          subtitle: `Freed space: ${this.cacheSize}`,
+          message: 'Are you sure you want to delete all cached download archives (.zip, .tar.xz) and temporary Git clones? This frees up disk space and will NOT affect your installed themes.',
+          confirmText: 'Clear Cache',
+          cancelText: 'Cancel',
+          onConfirm: async () => {
+            showToast('Clearing download and extraction cache...', 'info');
+            try {
+              const res = await window.electronAPI.uninstall.clearCache();
+              if (res && res.success) {
+                showToast('Download cache cleared successfully!', 'success');
+                await this.fetchCacheSize();
+                const badge = this.container?.querySelector('.settings-cache-badge');
+                if (badge) badge.textContent = this.cacheSize;
+              } else {
+                showToast(`Failed to clear cache: ${res ? res.error : 'Unknown error'}`, 'warning');
+              }
+            } catch (err) {
+              showToast(`Error clearing cache: ${err.message}`, 'warning');
+            }
+          }
+        });
+      });
+    }
+
+    // Wire Flatpak Toggle
+    const toggleEl = this.container.querySelector('#toggle-flatpak-sync');
+    if (toggleEl) {
+      toggleEl.addEventListener('change', async (e) => {
         const enabled = e.target.checked;
+        showToast(enabled ? 'Applying Flatpak filesystem overrides...' : 'Removing Flatpak overrides...', 'info');
+
         try {
-          const res = await window.electronAPI.settings.set({ flatpak_theme_sync: enabled });
+          const res = await window.electronAPI.settings.set({
+            key: 'flatpak_theme_sync',
+            value: enabled
+          });
+
           if (res && res.success) {
-            showToast(enabled ? 'Flatpak theme synchronization enabled!' : 'Flatpak sync disabled.', 'success');
+            showToast(enabled ? 'Flatpak theme sync enabled!' : 'Flatpak theme sync disabled', 'success');
           } else {
-            showToast('Failed to update Flatpak settings.', 'warning');
+            e.target.checked = !enabled;
+            showToast(`Failed to update Flatpak override: ${res ? res.error : 'Unknown error'}`, 'warning');
           }
         } catch (err) {
+          e.target.checked = !enabled;
           showToast(`Error: ${err.message}`, 'warning');
         }
       });
     }
 
-    // Clear Cache Button
-    const clearCacheBtn = this.container.querySelector('#btn-clear-cache');
-    if (clearCacheBtn) {
-      clearCacheBtn.addEventListener('click', async () => {
-        clearCacheBtn.disabled = true;
-        clearCacheBtn.textContent = 'Clearing...';
-        try {
-          if (window.electronAPI && window.electronAPI.uninstall && window.electronAPI.uninstall.clearCache) {
-            const res = await window.electronAPI.uninstall.clearCache();
-            if (res && res.success) {
-              this.cacheSize = '0 B';
-              const badge = this.container.querySelector('.settings-cache-badge');
-              if (badge) badge.textContent = '0 B';
-              showToast('Downloads cache cleared successfully!', 'success');
-            } else {
-              showToast('Cache is already empty.', 'info');
+    // Wire Reset Defaults Button inside Settings
+    const resetBtn = this.container.querySelector('#btn-settings-reset-defaults');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        window.ConfirmDialog.show({
+          title: 'Reset to Ubuntu Default',
+          subtitle: 'Restore standard system appearance',
+          message: 'This will reset your active GTK theme, icons, and cursor back to default Ubuntu themes (Yaru).',
+          confirmText: 'Reset to Default',
+          cancelText: 'Cancel',
+          onConfirm: async () => {
+            showToast('Resetting appearance to defaults...', 'info');
+            try {
+              const res = await window.electronAPI.system.resetDefault();
+              if (res && res.success) {
+                showToast('Desktop appearance reset to Ubuntu default (Yaru)', 'success');
+                document.querySelectorAll('.theme-card').forEach(c => {
+                  if (window.ThemeCard) window.ThemeCard.setApplied(c, false);
+                });
+                if (typeof window.refreshAppState === 'function') {
+                  window.refreshAppState();
+                }
+              } else {
+                showToast(`Reset failed: ${res ? res.error : 'Unknown error'}`, 'warning');
+              }
+            } catch (err) {
+              showToast(`Error resetting: ${err.message}`, 'warning');
             }
           }
-        } catch (err) {
-          showToast(`Error: ${err.message}`, 'warning');
-        } finally {
-          clearCacheBtn.disabled = false;
-          clearCacheBtn.textContent = 'Clear Cache';
-        }
+        });
       });
     }
   }
