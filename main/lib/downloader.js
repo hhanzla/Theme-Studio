@@ -240,29 +240,25 @@ function gitClone(repoUrl, destDir, onProgress = () => {}, id = null) {
 
         if (recvMatch) {
           const pct = parseInt(recvMatch[1], 10);
-          const speed = recvMatch[2] ? ` (${recvMatch[2]})` : '';
           if (pct > 0) {
-            lastMessage = `Downloading ${pct}%${speed}`;
+            lastMessage = `Downloading (${pct}%)`;
             reportProgress(Math.round(15 + (pct * 0.60)), lastMessage);
           } else if (mibMatch) {
             const mbs = parseFloat(mibMatch[1]);
-            const spd = mibMatch[2] ? ` (${mibMatch[2]})` : '';
-            lastMessage = `Downloading ${mbs.toFixed(1)} MB${spd}`;
+            lastMessage = `Downloading ${mbs.toFixed(1)} MB`;
             reportProgress(Math.min(70, Math.round(15 + (mbs * 1.5))), lastMessage);
           } else if (kibMatch) {
             const kbs = parseFloat(kibMatch[1]);
-            const spd = kibMatch[2] ? ` (${kibMatch[2]})` : '';
-            lastMessage = `Downloading ${Math.round(kbs)} KB${spd}`;
+            lastMessage = `Downloading ${Math.round(kbs)} KB`;
             reportProgress(16, lastMessage);
           }
         } else if (deltaMatch) {
           const pct = parseInt(deltaMatch[1], 10);
-          lastMessage = `Extracting ${pct}%`;
+          lastMessage = `Extracting (${pct}%)`;
           reportProgress(Math.round(75 + (pct * 0.20)), lastMessage);
         } else if (mibMatch) {
           const mbs = parseFloat(mibMatch[1]);
-          const spd = mibMatch[2] ? ` (${mibMatch[2]})` : '';
-          lastMessage = `Downloading ${mbs.toFixed(1)} MB${spd}`;
+          lastMessage = `Downloading ${mbs.toFixed(1)} MB`;
           reportProgress(Math.min(70, Math.round(15 + (mbs * 1.5))), lastMessage);
         }
       });

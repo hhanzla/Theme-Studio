@@ -277,6 +277,16 @@ function updateView() {
               return;
             }
 
+            if (item.category === 'looks') {
+              const activeLookSetting = (s.active_look || '').toLowerCase();
+              const isApplied = activeLookSetting === (item.id || '').toLowerCase() || (
+                (s.gtk || '').toLowerCase().includes('orchis') && 
+                (s.icons || '').toLowerCase().includes('tela')
+              );
+              window.ThemeCard.setApplied(cardEl, !!isApplied);
+              return;
+            }
+
             if (!item.installed) {
               window.ThemeCard.setApplied(cardEl, false);
               return;
@@ -433,9 +443,8 @@ async function handleCardAction(item, card) {
         try {
           const res = await window.electronAPI.looks.apply({ id: item.id, variants: chosenVariants });
           AppState.activeInstalls.delete(item.id);
-
           if (res && res.success) {
-            window.ThemeCard.setInstalled(card, true);
+            window.ThemeCard.setApplied(card, true);
             showToast(`${item.name} applied successfully!`, 'success');
           } else {
             window.ThemeCard.setProgress(card, 0, 'error', res ? res.error : 'Failed to apply look');
@@ -459,7 +468,7 @@ async function handleCardAction(item, card) {
       AppState.activeInstalls.delete(item.id);
 
       if (res && res.success) {
-        window.ThemeCard.setInstalled(card, true);
+        window.ThemeCard.setApplied(card, true);
         showToast(`${item.name} applied successfully!`, 'success');
       } else {
         window.ThemeCard.setProgress(card, 0, 'error', res ? res.error : 'Failed to apply look');
@@ -480,40 +489,44 @@ async function handleCardAction(item, card) {
       btn.disabled = true;
       btn.textContent = 'Applying...';
     }
-    showToast(`Setting wallpaper: ${item.name}...`, 'info');
+
     try {
-      const res = await window.electronAPI.system.applyWallpaper(item.url);
+      const res = await window.electronAPI.looks.setWallpaper(item.url);
       if (res && res.success) {
-        // Move applied wallpaper to the top
-        const currentIdx = AppState.items.findIndex(x => x.id === item.id);
-        if (currentIdx > -1) {
-          const [movedItem] = AppState.items.splice(currentIdx, 1);
-          AppState.items.unshift(movedItem);
-        }
-        updateView();
-        showToast(`${item.name} set as desktop wallpaper!`, 'success');
+        showToast(`Desktop wallpaper updated to ${item.name}`, 'success');
+        // Unmark previous applied wallpaper cards
+        document.querySelectorAll('.theme-card[data-category="wallpaper"]').forEach(c => {
+          window.ThemeCard.setApplied(c, false);
+        });
+        window.ThemeCard.setApplied(card, true);
       } else {
+        showToast(`Failed to set wallpaper: ${res ? res.error : 'Unknown error'}`, 'warning');
         if (btn) {
           btn.disabled = false;
           btn.textContent = 'Set Wallpaper';
         }
-        showToast(`Failed to set wallpaper: ${res ? res.error : 'Error'}`, 'warning');
       }
     } catch (err) {
+      showToast(`Failed to set wallpaper: ${err.message}`, 'warning');
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'Set Wallpaper';
       }
-      showToast(`Error setting wallpaper: ${err.message}`, 'warning');
     }
     return;
   }
 
   if (item.installed) {
-    // If the card is already applied, clicking it unapplies the theme and restores system default!
-    if (card.classList.contains('is-applied')) {
+    // If already applied, clicking the button again will Unapply / Restore defaults
+    if (isCurrentlyApplied) {
       try {
-        if (item.category === 'gtk-theme') {
+        if (item.category === 'looks') {
+          await window.electronAPI.system.applyGtk('Yaru');
+          await window.electronAPI.system.applyShell('');
+          await window.electronAPI.system.applyIcons('Yaru');
+          await window.electronAPI.system.applyCursors('Yaru');
+          showToast(`Unapplied ${item.name} — Restored default appearance`, 'info');
+        } else if (item.category === 'gtk-theme') {
           await window.electronAPI.system.applyGtk('Yaru');
           showToast(`Unapplied ${item.name} — Restored default Yaru GTK theme`, 'info');
         } else if (item.category === 'shell-theme') {
