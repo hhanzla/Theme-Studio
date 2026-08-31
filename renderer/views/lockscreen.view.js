@@ -25,7 +25,9 @@ const LockscreenView = {
       if (window.electronAPI && window.electronAPI.gdm) {
         const [statusRes, installedRes] = await Promise.all([
           window.electronAPI.gdm.status(),
-          window.electronAPI.installer ? window.electronAPI.installer.list() : Promise.resolve({ items: [] })
+          (window.electronAPI.uninstall && window.electronAPI.uninstall.list) 
+            ? window.electronAPI.uninstall.list() 
+            : (window.electronAPI.installer && window.electronAPI.installer.list ? window.electronAPI.installer.list() : Promise.resolve({ items: [] }))
         ]);
         this.gdmStatus = statusRes || {};
         this.installedItems = (installedRes && installedRes.items) ? installedRes.items : [];
@@ -70,7 +72,7 @@ const LockscreenView = {
               <span class="badge-tag ${isGseInstalled ? 'badge-installed' : 'badge-script'}">
                 ${isGseInstalled ? 'Installed &amp; Active' : 'Setup Needed'}
               </span>
-              <span class="lockscreen-version-text">GNOME Shell ${status.gnomeVersion || '46'}</span>
+              <span class="lockscreen-version-text">GNOME Shell 46</span>
             </div>
             <h3 class="lockscreen-header-title">GDM Customization Studio</h3>
             <p class="lockscreen-header-desc">

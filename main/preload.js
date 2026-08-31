@@ -7,7 +7,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   installer: {
     start: (payload) => ipcRenderer.invoke('install:start', payload),
-    cancel: (payload) => ipcRenderer.invoke('install:cancel', payload)
+    cancel: (payload) => ipcRenderer.invoke('install:cancel', payload),
+    list: () => ipcRenderer.invoke('uninstall:list')
   },
   deps: {
     check: (payload) => ipcRenderer.invoke('deps:check', payload),
