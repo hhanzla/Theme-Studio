@@ -28,12 +28,8 @@ const TweaksView = {
   async loadData() {
     try {
       if (window.electronAPI && window.electronAPI.tweaks) {
-        const [foldersRes, tweaksRes] = await Promise.all([
-          window.electronAPI.tweaks.getAppFolders(),
-          window.electronAPI.tweaks.getDesktopTweaks()
-        ]);
+        const foldersRes = await window.electronAPI.tweaks.getAppFolders();
         this.appFoldersStatus = foldersRes || {};
-        this.desktopTweaks = tweaksRes || {};
 
         // If system already has organized active folders, sync selection
         if (this.appFoldersStatus && Array.isArray(this.appFoldersStatus.activeFolders) && this.appFoldersStatus.activeFolders.length > 0) {
@@ -52,7 +48,6 @@ const TweaksView = {
     if (!this.container) return;
 
     const status = this.appFoldersStatus || {};
-    const tweaks = this.desktopTweaks || {};
     const isOrganized = !!status.isOrganized;
     const totalApps = status.totalApps || 0;
     const categories = Array.isArray(status.definedCategories) ? status.definedCategories : [
@@ -131,67 +126,6 @@ const TweaksView = {
               </svg>
               <span>Restore Default Grid</span>
             </button>
-          </div>
-        </div>
-
-        <!-- Section: Desktop & Window Behavior -->
-        <div class="settings-section">
-          <h3 class="settings-section-title">Desktop & Window Behavior</h3>
-          <p class="settings-section-desc">Fine-tune Ubuntu Dock interaction and application window placement.</p>
-
-          <div class="settings-card">
-            <div class="settings-card-left">
-              <div class="settings-option-title">
-                <strong>Click to Minimize on Dock</strong>
-              </div>
-              <p class="settings-option-desc">
-                Clicking an active application icon in the Ubuntu Dock minimizes or restores its window.
-              </p>
-            </div>
-            <div class="settings-card-right">
-              <label class="switch">
-                <input type="checkbox" id="tweak-click-minimize" ${tweaks.clickToMinimize ? 'checked' : ''}>
-                <span class="slider round"></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="settings-card">
-            <div class="settings-card-left">
-              <div class="settings-option-title">
-                <strong>Center New Windows</strong>
-              </div>
-              <p class="settings-option-desc">
-                Always spawn newly opened application windows in the exact center of your display.
-              </p>
-            </div>
-            <div class="settings-card-right">
-              <label class="switch">
-                <input type="checkbox" id="tweak-center-windows" ${tweaks.centerNewWindows ? 'checked' : ''}>
-                <span class="slider round"></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="settings-card">
-            <div class="settings-card-left">
-              <div class="settings-option-title">
-                <strong>Window Control Buttons Layout</strong>
-              </div>
-              <p class="settings-option-desc">
-                Configure position of titlebar close, minimize, and maximize buttons.
-              </p>
-            </div>
-            <div class="settings-card-right">
-              <div class="tweak-btn-group">
-                <button class="tweak-choice-btn ${tweaks.buttonLayout === 'appmenu:minimize,maximize,close' || tweaks.buttonLayout === 'appmenu:close' ? 'active' : ''}" data-layout="appmenu:minimize,maximize,close">
-                  Right (Standard)
-                </button>
-                <button class="tweak-choice-btn ${tweaks.buttonLayout === 'close,minimize,maximize:appmenu' || tweaks.buttonLayout === 'close,minimize,maximize:' ? 'active' : ''}" data-layout="close,minimize,maximize:appmenu">
-                  Left (macOS)
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -287,38 +221,6 @@ const TweaksView = {
         }
       });
     }
-
-    // 6. Click to minimize toggle
-    const minToggle = this.container.querySelector('#tweak-click-minimize');
-    if (minToggle) {
-      minToggle.addEventListener('change', async (e) => {
-        const val = e.target.checked;
-        await window.electronAPI.tweaks.setDesktopTweak({ key: 'clickToMinimize', value: val });
-        showToast(val ? 'Enabled Click to Minimize on Dock' : 'Disabled Click to Minimize', 'info');
-      });
-    }
-
-    // 7. Center new windows toggle
-    const centerToggle = this.container.querySelector('#tweak-center-windows');
-    if (centerToggle) {
-      centerToggle.addEventListener('change', async (e) => {
-        const val = e.target.checked;
-        await window.electronAPI.tweaks.setDesktopTweak({ key: 'centerNewWindows', value: val });
-        showToast(val ? 'New windows will open centered' : 'Default window placement restored', 'info');
-      });
-    }
-
-    // 8. Button layout choices
-    const choiceBtns = this.container.querySelectorAll('.tweak-choice-btn');
-    choiceBtns.forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const layout = btn.getAttribute('data-layout');
-        choiceBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        await window.electronAPI.tweaks.setDesktopTweak({ key: 'buttonLayout', value: layout });
-        showToast(`Window buttons set to ${layout.startsWith('close') ? 'Left (macOS)' : 'Right'}`, 'success');
-      });
-    });
   }
 };
 
