@@ -21,23 +21,20 @@ window.VariantPicker = {
     const LABEL_MAP = {
       color: isIconTheme ? 'Folder Color Scheme' : 'Color Accent',
       mode: 'Appearance Mode',
-      flavor: 'Palette Flavor',
-      accent: 'Accent Highlight',
-      buttons: 'Window Control Buttons',
       size: isCursorTheme ? 'Cursor Pointer Size' : 'Window Density',
       tweaks: 'Theme Tweaks',
       icon: 'Top Panel Logo Icon',
       style: 'Style Variation',
-      opacity: 'Panel Opacity'
+      opacity: 'Panel Opacity',
+      alt: 'Window Buttons Style',
+      scheme: 'Color Palette Scheme',
+      nautilus: 'Nautilus File Manager Style'
     };
 
     const OPTION_DESCRIPTIONS = {
       color: isIconTheme 
-        ? "Select the folder and icon color theme (Standard Blue, Ubuntu Warm Orange, Nord Ice, Dracula, Manjaro, etc.) or 'All Variants' to install all 15 color folders."
+        ? "Select the folder and icon color theme or 'All Variants' to install all color folders."
         : 'Sets the primary accent color used for buttons, active tabs, selections, and highlights.',
-      flavor: 'Choose from Catppuccin 4 distinct soothing dark and light palettes (Mocha, Macchiato, Frappe, Latte).',
-      accent: 'Select the pastel highlight color for buttons, selections, and focus indicators.',
-      buttons: 'Choose circular macOS style window buttons or traditional standard GNOME controls.',
       mode: 'Choose Light mode for bright windows or Dark mode for sleek dark background.',
       size: isCursorTheme
         ? 'Choose cursor pointer pixel scale size.'
@@ -45,6 +42,9 @@ window.VariantPicker = {
       icon: 'Selects the logo icon displayed on the GNOME Shell top panel menu.',
       style: 'Chooses alternative visual styling variants, border curves, or theme design flavors.',
       opacity: 'Controls the background transparency level for the top panel and dropdown menus.',
+      alt: 'Select window controls style (Normal rounded or Alt sharp buttons).',
+      scheme: 'Choose between Standard macOS colors or Nord cool palette scheme.',
+      nautilus: 'Customizes Nautilus file manager sidebar appearance.',
       tweaks: 'Optional aesthetic customizations (macOS traffic lights, OLED pure black, solid panel).'
     };
 
@@ -142,41 +142,31 @@ window.VariantPicker = {
         if (displayVal === 'dracula') return isIconTheme ? 'Dracula (Purple Dark)' : 'Dracula';
         if (displayVal === 'nord') return isIconTheme ? 'Nord (Arctic Ice)' : 'Nord';
         if (displayVal === 'default') return isIconTheme ? 'Standard (Default Blue)' : 'Default (Standard)';
-        if (displayVal === 'mocha') return 'Mocha (Darkest)';
-        if (displayVal === 'macchiato') return 'Macchiato (Warm Dark)';
-        if (displayVal === 'frappe') return 'Frappe (Cool Dark)';
-        if (displayVal === 'latte') return 'Latte (Light Mode)';
-        if (displayVal === 'mauve') return 'Mauve (Purple)';
-        if (displayVal === 'flamingo') return 'Flamingo (Warm Pink)';
-        if (displayVal === 'rosewater') return 'Rosewater';
-        if (displayVal === 'sapphire') return 'Sapphire (Deep Blue)';
-        if (displayVal === 'sky') return 'Sky (Light Cyan)';
-        if (displayVal === 'peach') return 'Peach (Soft Orange)';
-        if (displayVal === 'maroon') return 'Maroon';
-        if (displayVal === 'lavender') return 'Lavender (Soft Violet)';
-        if (displayVal === 'circles') return 'macOS Traffic Lights (Circles)';
-        if (displayVal === 'bluish-accent') return 'Nord Bluish Accent';
-        if (displayVal === 'polar') return 'Nord Polar (Light Mode)';
-        if (displayVal === 'darker') return 'Nord Darker';
         if (displayVal === 'compact') return 'Compact';
         if (displayVal === 'dark') return 'Dark Mode';
         if (displayVal === 'light') return 'Light Mode';
-        if (displayVal === 'transparent-sidebar') return 'Transparent Sidebar (Glass)';
-        if (displayVal === 'pink') return 'Pink Accent';
-        if (displayVal === 'ambar-blue-dark') return 'Ambar Blue (Dark)';
-        if (displayVal === 'ambar-blue') return 'Ambar Blue';
-        if (displayVal === 'ambar') return 'Ambar (Warm Gold)';
-        if (displayVal === 'mars') return 'Mars (Neon Red)';
+        if (displayVal === 'solid') return 'Solid (Opaque)';
+        if (displayVal === 'normal') return 'Normal';
+        if (displayVal === 'stable') return 'Stable (Standard)';
+        if (displayVal === 'mojave') return 'Mojave Style';
+        if (displayVal === 'glassy') return 'Glassy (Translucent)';
+        if (displayVal === 'right') return 'Right-aligned';
         if (displayVal === 'modern') return 'Modern (Rounded)';
         if (displayVal === 'original') return 'Original (Sharp)';
         if (displayVal === 'ice') return 'Ice (White)';
         if (displayVal === 'classic') return 'Classic (Black)';
         if (displayVal === 'amber') return 'Amber (Gold)';
+        if (displayVal === 'black') return 'Black';
+        if (displayVal === 'white') return 'White';
+        if (displayVal === 'blue') return 'Blue';
+        if (displayVal === 'red') return 'Red';
         if (displayVal === 'apple') return 'Apple Logo';
+        if (displayVal === 'simple') return 'Simple Apple';
         if (displayVal === 'gnome') return 'GNOME Footprint';
         if (displayVal === 'arch') return 'Arch Linux';
         if (displayVal === 'fedora') return 'Fedora';
         if (displayVal === 'debian') return 'Debian';
+        if (displayVal === 'tux') return 'Tux Penguin';
         return displayVal.charAt(0).toUpperCase() + displayVal.slice(1);
       };
 

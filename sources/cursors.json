@@ -151,21 +151,5 @@
     },
     "target_dir": "~/.icons",
     "notes": "Modern, flat Material cursor theme with black and white pointer variations."
-  },
-  {
-    "id": "dracula-cursors",
-    "name": "Dracula Cursors",
-    "category": "cursor-theme",
-    "thumbnail": "assets/previews/dracula.png",
-    "author": "Dracula Theme",
-    "source_url": "https://github.com/dracula/gtk",
-    "license": "GPL-3.0",
-    "install_type": "zip-static",
-    "source": {
-      "type": "zip",
-      "zip_url": "https://github.com/dracula/gtk/releases/download/v4.0.0/Dracula-cursors.tar.xz"
-    },
-    "target_dir": "~/.icons",
-    "notes": "Official dark purple and cyan neon styled Dracula cursor set."
   }
 ]
