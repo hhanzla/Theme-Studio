@@ -200,14 +200,55 @@ async function installGseGdmExtension() {
     }
   }
 
-  // Execute installer script + populate /usr/local/share/ directories + compile schemas
   const userThemes = path.join(os.homedir(), '.themes');
   const userIcons = path.join(os.homedir(), '.icons');
+  const userBg = path.join(os.homedir(), '.local', 'share', 'backgrounds');
   const appWallpapers = path.resolve(__dirname, '../../renderer/assets/wallpapers');
+  const extMediaBg = '/media/hanzla-masood/DATA/Wallpapers';
 
-  const installCmd = `sh -c 'cd "${repoDir}" && chmod +x install.sh && ./install.sh && mkdir -p /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/fonts /usr/local/share/pixmaps && ([ -d "${userThemes}" ] && cp -r "${userThemes}"/* /usr/local/share/themes/ 2>/dev/null || true) && ([ -d "${userIcons}" ] && cp -r "${userIcons}"/* /usr/local/share/icons/ 2>/dev/null || true) && ([ -d "${appWallpapers}" ] && cp -r "${appWallpapers}"/* /usr/local/share/backgrounds/ 2>/dev/null || true) && chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds 2>/dev/null || true && cp -f src/v-45-46-47-48-49-50/schemas/*.xml /usr/share/glib-2.0/schemas/ 2>/dev/null || true && glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true && dconf update'`;
-  
-  const res = await execPkexec(installCmd);
+  const scriptContent = `#!/bin/bash
+set -e
+cd "${repoDir}"
+chmod +x install.sh
+./install.sh
+
+mkdir -p /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/fonts /usr/local/share/pixmaps /usr/share/backgrounds
+
+if [ -d "${userThemes}" ] && [ "$(ls -A "${userThemes}" 2>/dev/null)" ]; then
+  cp -rf "${userThemes}"/* /usr/local/share/themes/ 2>/dev/null || true
+fi
+
+if [ -d "${userIcons}" ] && [ "$(ls -A "${userIcons}" 2>/dev/null)" ]; then
+  cp -rf "${userIcons}"/* /usr/local/share/icons/ 2>/dev/null || true
+fi
+
+if [ -d "${appWallpapers}" ] && [ "$(ls -A "${appWallpapers}" 2>/dev/null)" ]; then
+  cp -rf "${appWallpapers}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
+  cp -rf "${appWallpapers}"/* /usr/share/backgrounds/ 2>/dev/null || true
+fi
+
+if [ -d "${userBg}" ] && [ "$(ls -A "${userBg}" 2>/dev/null)" ]; then
+  cp -rf "${userBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
+  cp -rf "${userBg}"/* /usr/share/backgrounds/ 2>/dev/null || true
+fi
+
+if [ -d "${extMediaBg}" ] && [ "$(ls -A "${extMediaBg}" 2>/dev/null)" ]; then
+  cp -rf "${extMediaBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
+  cp -rf "${extMediaBg}"/* /usr/share/backgrounds/ 2>/dev/null || true
+fi
+
+chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/share/backgrounds 2>/dev/null || true
+cp -f src/v-45-46-47-48-49-50/schemas/*.xml /usr/share/glib-2.0/schemas/ 2>/dev/null || true
+glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true
+dconf update
+`;
+
+  const scriptPath = path.join(os.tmpdir(), 'themestudio_gdm_install.sh');
+  fs.writeFileSync(scriptPath, scriptContent, { mode: 0o755 });
+
+  const res = await execPkexec(`/bin/bash "${scriptPath}"`);
+  try { fs.unlinkSync(scriptPath); } catch (_) {}
+
   if (!res.success) return res;
 
   const status = await checkGdmStatus();
@@ -226,10 +267,50 @@ async function syncAssetsToSystem() {
   const userIcons = path.join(os.homedir(), '.icons');
   const userBg = path.join(os.homedir(), '.local', 'share', 'backgrounds');
   const appWallpapers = path.resolve(__dirname, '../../renderer/assets/wallpapers');
+  const extMediaBg = '/media/hanzla-masood/DATA/Wallpapers';
 
-  const syncCmd = `sh -c 'mkdir -p /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/fonts /usr/local/share/pixmaps && ([ -d "${userThemes}" ] && cp -r "${userThemes}"/* /usr/local/share/themes/ 2>/dev/null || true) && ([ -d "${userIcons}" ] && cp -r "${userIcons}"/* /usr/local/share/icons/ 2>/dev/null || true) && ([ -d "${appWallpapers}" ] && cp -r "${appWallpapers}"/* /usr/local/share/backgrounds/ 2>/dev/null || true) && ([ -d "${userBg}" ] && cp -r "${userBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true) && chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds 2>/dev/null || true'`;
+  const scriptContent = `#!/bin/bash
+set -e
+mkdir -p /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/local/share/fonts /usr/local/share/pixmaps /usr/share/backgrounds
 
-  const res = await execPkexec(syncCmd);
+# 1. Sync Themes
+if [ -d "${userThemes}" ] && [ "$(ls -A "${userThemes}" 2>/dev/null)" ]; then
+  cp -rf "${userThemes}"/* /usr/local/share/themes/ 2>/dev/null || true
+fi
+
+# 2. Sync Icons
+if [ -d "${userIcons}" ] && [ "$(ls -A "${userIcons}" 2>/dev/null)" ]; then
+  cp -rf "${userIcons}"/* /usr/local/share/icons/ 2>/dev/null || true
+fi
+
+# 3. Sync App Wallpapers
+if [ -d "${appWallpapers}" ] && [ "$(ls -A "${appWallpapers}" 2>/dev/null)" ]; then
+  cp -rf "${appWallpapers}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
+  cp -rf "${appWallpapers}"/* /usr/share/backgrounds/ 2>/dev/null || true
+fi
+
+# 4. Sync User Applied Backgrounds
+if [ -d "${userBg}" ] && [ "$(ls -A "${userBg}" 2>/dev/null)" ]; then
+  cp -rf "${userBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
+  cp -rf "${userBg}"/* /usr/share/backgrounds/ 2>/dev/null || true
+fi
+
+# 5. Sync External Wallpapers if mounted
+if [ -d "${extMediaBg}" ] && [ "$(ls -A "${extMediaBg}" 2>/dev/null)" ]; then
+  cp -rf "${extMediaBg}"/* /usr/local/share/backgrounds/ 2>/dev/null || true
+  cp -rf "${extMediaBg}"/* /usr/share/backgrounds/ 2>/dev/null || true
+fi
+
+# 6. Ensure read permissions for GDM
+chmod -R a+rX /usr/local/share/themes /usr/local/share/icons /usr/local/share/backgrounds /usr/share/backgrounds 2>/dev/null || true
+`;
+
+  const scriptPath = path.join(os.tmpdir(), 'themestudio_gdm_sync.sh');
+  fs.writeFileSync(scriptPath, scriptContent, { mode: 0o755 });
+
+  const res = await execPkexec(`/bin/bash "${scriptPath}"`);
+  try { fs.unlinkSync(scriptPath); } catch (_) {}
+
   if (!res.success) return res;
 
   return {
