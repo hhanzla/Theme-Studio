@@ -200,19 +200,7 @@ window.SettingsView = {
         <!-- Section: System Maintenance -->
         <div class="settings-section">
           <h3 class="settings-section-title">System Maintenance</h3>
-          <p class="settings-section-desc">Quick actions to restore system defaults or clear download cache.</p>
-
-          <div class="settings-card">
-            <div class="settings-card-left">
-              <strong>Restore Desktop Defaults</strong>
-              <p class="settings-option-desc">Resets active GTK theme, icons, and cursors back to default Ubuntu Yaru theme.</p>
-            </div>
-            <div class="settings-card-right">
-              <button class="card-btn btn-secondary" id="btn-settings-reset-defaults">
-                Reset Defaults
-              </button>
-            </div>
-          </div>
+          <p class="settings-section-desc">Quick actions to manage storage and clear downloaded theme cache.</p>
 
           <div class="settings-card">
             <div class="settings-card-left">
@@ -316,39 +304,6 @@ window.SettingsView = {
           e.target.checked = !enabled;
           showToast(`Error: ${err.message}`, 'warning');
         }
-      });
-    }
-
-    // Wire Reset Defaults Button inside Settings
-    const resetBtn = this.container.querySelector('#btn-settings-reset-defaults');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        window.ConfirmDialog.show({
-          title: 'Reset to Ubuntu Default',
-          subtitle: 'Restore standard system appearance',
-          message: 'This will reset your active GTK theme, icons, and cursor back to default Ubuntu themes (Yaru).',
-          confirmText: 'Reset to Default',
-          cancelText: 'Cancel',
-          onConfirm: async () => {
-            showToast('Resetting appearance to defaults...', 'info');
-            try {
-              const res = await window.electronAPI.system.resetDefault();
-              if (res && res.success) {
-                showToast('Desktop appearance reset to Ubuntu default (Yaru)', 'success');
-                document.querySelectorAll('.theme-card').forEach(c => {
-                  if (window.ThemeCard) window.ThemeCard.setApplied(c, false);
-                });
-                if (typeof window.refreshAppState === 'function') {
-                  window.refreshAppState();
-                }
-              } else {
-                showToast(`Reset failed: ${res ? res.error : 'Unknown error'}`, 'warning');
-              }
-            } catch (err) {
-              showToast(`Error resetting: ${err.message}`, 'warning');
-            }
-          }
-        });
       });
     }
   }
