@@ -76,20 +76,40 @@ function downloadFileToBuffer(url) {
 }
 
 /**
- * Searches or browses extensions on extensions.gnome.org
+ * Searches or browses extensions on extensions.gnome.org (Multi-page batch for 100+ extensions)
  */
 async function searchOnlineExtensions({ query = '', page = 1, sort = 'popularity' } = {}) {
   try {
     const shellVer = await getGnomeShellVersion();
-    let url = `https://extensions.gnome.org/extension-query/?page=${page}&n_per_page=18&shell_version=${shellVer}`;
-    if (query && query.trim()) {
-      url += `&search=${encodeURIComponent(query.trim())}`;
-    } else {
-      url += `&sort=${encodeURIComponent(sort || 'popularity')}`;
-    }
 
-    const data = await httpsGetJson(url);
-    const rawList = data.extensions || [];
+    // When browsing without a search query, fetch multiple pages in parallel to load 100+ extensions
+    const pageNumbers = query && query.trim() ? [1, 2, 3] : Array.from({ length: 11 }, (_, i) => i + 1);
+
+    const pageResults = await Promise.all(
+      pageNumbers.map(p => {
+        let url = `https://extensions.gnome.org/extension-query/?page=${p}&n_per_page=25&shell_version=${shellVer}`;
+        if (query && query.trim()) {
+          url += `&search=${encodeURIComponent(query.trim())}`;
+        } else {
+          url += `&sort=${encodeURIComponent(sort || 'popularity')}`;
+        }
+        return httpsGetJson(url).catch(() => ({ extensions: [] }));
+      })
+    );
+
+    const seenUuids = new Set();
+    const rawList = [];
+
+    for (const res of pageResults) {
+      if (Array.isArray(res.extensions)) {
+        for (const ext of res.extensions) {
+          if (ext && ext.uuid && !seenUuids.has(ext.uuid)) {
+            seenUuids.add(ext.uuid);
+            rawList.push(ext);
+          }
+        }
+      }
+    }
 
     const items = rawList.map(ext => {
       let iconUrl = '';
@@ -120,7 +140,7 @@ async function searchOnlineExtensions({ query = '', page = 1, sort = 'popularity
     return {
       success: true,
       extensions: items,
-      total: data.total || items.length,
+      total: items.length,
       shell_version: shellVer
     };
   } catch (err) {

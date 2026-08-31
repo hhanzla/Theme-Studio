@@ -69,13 +69,14 @@ window.ExtensionsView = {
 
     const installedCount = this.installedExtensions.length;
     const onlineCount = this.onlineExtensions.length;
+    const onlineCountDisplay = onlineCount >= 100 ? '100+' : (onlineCount > 0 ? String(onlineCount) : '100+');
 
     subtabsBar.innerHTML = `
       <div class="subtabs">
         <button class="subtab-btn ${this.activeMode === 'browse' ? 'active' : ''}" data-mode="browse" id="ext-tab-browse">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
           <span>Browse Online</span>
-          <span class="badge count-badge" id="ext-browse-badge">${onlineCount}</span>
+          <span class="badge count-badge" id="ext-browse-badge">${onlineCountDisplay}</span>
         </button>
         <button class="subtab-btn ${this.activeMode === 'installed' ? 'active' : ''}" data-mode="installed" id="ext-tab-installed">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -2px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
