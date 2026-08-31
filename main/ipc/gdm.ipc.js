@@ -57,6 +57,17 @@ function registerGdmIpc() {
   });
 
   /**
+   * Update full GDM extension configuration options
+   */
+  ipcMain.handle('gdm:updateConfig', async (_event, payload = {}) => {
+    try {
+      return await gdm.updateGdmConfig(payload);
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  /**
    * Set GDM Shell Theme in gdm user dconf
    */
   ipcMain.handle('gdm:setShellTheme', async (_event, payload = {}) => {
@@ -84,6 +95,17 @@ function registerGdmIpc() {
   ipcMain.handle('gdm:installGseGdm', async () => {
     try {
       return await gdm.installGseGdmExtension();
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  /**
+   * Uninstall GSE-GDM extension cleanly
+   */
+  ipcMain.handle('gdm:uninstallGseGdm', async () => {
+    try {
+      return await gdm.uninstallGseGdmExtension();
     } catch (err) {
       return { success: false, error: err.message };
     }

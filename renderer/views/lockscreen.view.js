@@ -1,5 +1,5 @@
 // renderer/views/lockscreen.view.js
-// Handles GDM Login / Lock Screen customization view, system copying, and extension enablement
+// Complete GDM Login / Lock Screen customization view: install/uninstall, blur, colors, themes, icons, background, button toggle
 
 const LockscreenView = {
   container: null,
@@ -43,8 +43,11 @@ const LockscreenView = {
     if (!this.container) return;
 
     const isGseInstalled = !!(this.gdmStatus && this.gdmStatus.gseGdmInstalled);
+    const availableBackgrounds = (this.gdmStatus && this.gdmStatus.availableBackgrounds) || [];
+    const availableThemes = (this.gdmStatus && this.gdmStatus.availableThemes) || [];
+    const availableIcons = (this.gdmStatus && this.gdmStatus.availableIcons) || [];
+    const hideButton = !!(this.gdmStatus && this.gdmStatus.hideButton);
 
-    // Filter installed items that are gdm-eligible
     const shellThemes = this.installedItems.filter(i => (i.category === 'shell-theme' || i.category === 'gtk-theme') && i.gdm_eligible !== false);
     const iconsAndCursors = this.installedItems.filter(i => (i.category === 'icon' || i.category === 'icon-theme' || i.category === 'cursor' || i.category === 'cursors'));
 
@@ -57,9 +60,9 @@ const LockscreenView = {
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
           <div>
-            <strong>GDM Login & Lock Screen Customizer</strong>
+            <strong>GDM Login &amp; Lock Screen Manager</strong>
             <p style="margin: 2px 0 0; font-size: 11.5px; opacity: 0.9;">
-              Changes here apply to the system login/lock screen and require your administrator (sudo) password.
+              Customize GNOME login screen appearance, background blur, themes, icons, and logo. Changes require admin (sudo) authorization.
             </p>
           </div>
         </div>
@@ -73,15 +76,13 @@ const LockscreenView = {
                   <strong style="font-size: 14.5px; color: #18181b;">GSE-GDM Extension Setup Required</strong>
                   <span class="badge-tag badge-script">Setup Needed</span>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                  <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 6px 12px; font-size: 11.5px;">
-                    Re-check Status
-                  </button>
-                </div>
+                <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 6px 12px; font-size: 11.5px;">
+                  Re-check Status
+                </button>
               </div>
 
               <p class="settings-option-desc" style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); margin: 0;">
-                To customize the GDM login and lock screen appearance on GNOME 42+, the <strong>GSE-GDM Extension</strong> (<code>gdm-extension@pratap.fastmail.fm</code>) must be installed on your system.
+                To customize the GDM login and lock screen appearance on GNOME 42+, the <strong>GSE-GDM Extension</strong> (<code>gdm-extension@pratap.fastmail.fm</code>) is required. You can install it in 1 click below:
               </p>
 
               <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; align-items: center;">
@@ -91,38 +92,112 @@ const LockscreenView = {
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                   </svg>
-                  Clone &amp; Install GSE-GDM Extension
+                  1-Click Clone &amp; Install GSE-GDM Extension
                 </button>
 
                 <a href="https://github.com/pratap-panabaka/gse-gdm-extension" target="_blank" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 7px 13px;">
                   View on GitHub ↗
                 </a>
               </div>
-
-              <div style="background: #f4f4f5; padding: 10px 14px; border-radius: var(--radius); width: 100%; border: 1px solid #e4e4e7; margin-top: 2px;">
-                <span style="font-size: 11px; font-weight: 700; color: #18181b; display: block; margin-bottom: 4px;">Manual Terminal Command (Alternative):</span>
-                <code style="font-size: 11.5px; color: #cf4110; user-select: all; font-family: monospace; display: block;">
-                  git clone https://github.com/pratap-panabaka/gse-gdm-extension.git &amp;&amp; cd gse-gdm-extension &amp;&amp; sudo ./install.sh
-                </code>
-              </div>
             </div>
           </div>
         ` : `
-          <!-- Extension Active Card -->
+          <!-- Integration Active & Life-cycle Card -->
           <div class="settings-section">
-            <div class="settings-card">
+            <div class="settings-card" style="padding: 16px 20px;">
               <div class="settings-card-left">
                 <div class="settings-option-title">
-                  <strong style="font-size: 14px;">GSE-GDM Integration Active</strong>
-                  <span class="badge-tag badge-installed">Extension Ready</span>
+                  <strong style="font-size: 14px;">GSE-GDM Extension Integration</strong>
+                  <span class="badge-tag badge-installed">Installed &amp; Active</span>
                 </div>
                 <p class="settings-option-desc">
-                  Enable theming in the GDM system user session so custom themes and icons are loaded at the login screen.
+                  GSE-GDM extension is installed at <code>/usr/local/share/gnome-shell/extensions/${window.electronAPI.gdm ? 'gdm-extension@pratap.fastmail.fm' : ''}</code>.
                 </p>
               </div>
-              <div class="settings-card-right">
-                <button class="btn btn-primary" id="btn-enable-gdm-custom" style="padding: 8px 16px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600;">
+              <div class="settings-card-right" style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" id="btn-enable-gdm-custom" style="padding: 7px 14px; font-size: 11.5px; background: #cf4110; color: #ffffff; border: none; font-weight: 600;">
                   Enable GDM Theming
+                </button>
+                <button class="btn btn-secondary" id="btn-uninstall-gse-gdm" style="padding: 7px 12px; font-size: 11.5px; color: #ef4444;" title="Uninstall GSE-GDM extension">
+                  Uninstall Extension
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Login Screen Visual Customizer -->
+          <div class="settings-section">
+            <h3 class="settings-section-title">Login Screen Visual Customization</h3>
+            <p class="settings-section-desc">
+              Configure background image, blur intensity, gradient colors, and lock screen settings directly in GDM dconf.
+            </p>
+
+            <div class="settings-card" style="flex-direction: column; align-items: stretch; gap: 16px; padding: 18px 20px;">
+              <!-- Background Image -->
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <div>
+                  <strong style="font-size: 13px; color: #18181b;">Background Image</strong>
+                  <span style="font-size: 11.5px; color: var(--text-muted); display: block;">Select wallpaper from <code>/usr/share/backgrounds</code></span>
+                </div>
+                <select id="gdm-bg-select" class="form-select" style="padding: 6px 12px; border: 1px solid var(--border-card); border-radius: var(--radius); font-size: 12px; min-width: 200px;">
+                  <option value="">Default GNOME Background</option>
+                  ${availableBackgrounds.map(bg => `<option value="${bg}">${bg}</option>`).join('')}
+                </select>
+              </div>
+
+              <div style="height: 1px; background: var(--border-subtle, #f4f4f5);"></div>
+
+              <!-- Blur Radius & Brightness -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <strong style="font-size: 12.5px; color: #18181b;">Blur Radius</strong>
+                    <span id="lbl-blur-radius" style="font-size: 11.5px; font-weight: 600; color: #cf4110;">0px</span>
+                  </div>
+                  <input type="range" id="gdm-blur-radius" min="0" max="100" value="0" style="width: 100%; accent-color: #cf4110;">
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <strong style="font-size: 12.5px; color: #18181b;">Blur Brightness</strong>
+                    <span id="lbl-blur-brightness" style="font-size: 11.5px; font-weight: 600; color: #cf4110;">0.65</span>
+                  </div>
+                  <input type="range" id="gdm-blur-brightness" min="0" max="1" step="0.05" value="0.65" style="width: 100%; accent-color: #cf4110;">
+                </div>
+              </div>
+
+              <div style="height: 1px; background: var(--border-subtle, #f4f4f5);"></div>
+
+              <!-- Background Size & Button Visibility -->
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <div>
+                  <strong style="font-size: 13px; color: #18181b;">Background Size</strong>
+                  <span style="font-size: 11.5px; color: var(--text-muted); display: block;">Image scaling mode on login screen</span>
+                </div>
+                <select id="gdm-bg-size" class="form-select" style="padding: 6px 12px; border: 1px solid var(--border-card); border-radius: var(--radius); font-size: 12px; min-width: 140px;">
+                  <option value="cover" selected>Cover</option>
+                  <option value="contain">Contain</option>
+                  <option value="auto">Auto</option>
+                </select>
+              </div>
+
+              <div style="height: 1px; background: var(--border-subtle, #f4f4f5);"></div>
+
+              <!-- Hide Button on Login Screen -->
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <div>
+                  <strong style="font-size: 13px; color: #18181b;">Hide Settings Button on Login Screen</strong>
+                  <span style="font-size: 11.5px; color: var(--text-muted); display: block;">Hides the GSE-GDM gear button from the GDM top bar</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="chk-hide-gdm-btn" ${hideButton ? 'checked' : ''}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
+                <button class="btn btn-primary" id="btn-save-gdm-visuals" style="padding: 8px 18px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600;">
+                  Apply Visual Settings
                 </button>
               </div>
             </div>
@@ -159,7 +234,7 @@ const LockscreenView = {
 
         <!-- Section: Icons & Cursors -->
         <div class="settings-section">
-          <h3 class="settings-section-title">System Icons & Cursors for GDM</h3>
+          <h3 class="settings-section-title">System Icons &amp; Cursors for GDM</h3>
           <p class="settings-section-desc">
             Copies custom icon and cursor packs into <code>/usr/share/icons</code> for system-wide and login screen display.
           </p>
@@ -194,7 +269,7 @@ const LockscreenView = {
                 <strong>Reset Lock Screen to Default</strong>
               </div>
               <p class="settings-option-desc">
-                Reverts GDM session dconf settings (User Themes, background) back to standard Ubuntu defaults.
+                Reverts all GDM session dconf settings (themes, backgrounds, blur, button visibility) back to standard Ubuntu defaults.
               </p>
             </div>
             <div class="settings-card-right">
@@ -247,14 +322,41 @@ const LockscreenView = {
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Clone &amp; Install GSE-GDM Extension
+              1-Click Clone &amp; Install GSE-GDM Extension
             `;
           }
         }
       });
     }
 
-    // 1. Re-check GDM status
+    // 1. Uninstall GSE-GDM
+    const uninstallBtn = this.container.querySelector('#btn-uninstall-gse-gdm');
+    if (uninstallBtn) {
+      uninstallBtn.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to uninstall the GSE-GDM extension from your system?')) return;
+        uninstallBtn.disabled = true;
+        showToast('Uninstalling GSE-GDM extension (requires admin password)...', 'info');
+
+        try {
+          const res = await window.electronAPI.gdm.uninstallGseGdm();
+          if (res && res.success) {
+            showToast('GSE-GDM extension uninstalled successfully!', 'success');
+            await this.loadData();
+            this.renderUI();
+          } else if (res && res.cancelled) {
+            showToast('Authentication cancelled.', 'info');
+          } else {
+            showToast(`Uninstall error: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error: ${err.message}`, 'warning');
+        } finally {
+          if (uninstallBtn) uninstallBtn.disabled = false;
+        }
+      });
+    }
+
+    // 2. Re-check GDM status
     const recheckBtn = this.container.querySelector('#btn-recheck-gdm');
     if (recheckBtn) {
       recheckBtn.addEventListener('click', async () => {
@@ -266,7 +368,7 @@ const LockscreenView = {
       });
     }
 
-    // 2. Enable GDM Customization
+    // 3. Enable GDM Customization
     const enableBtn = this.container.querySelector('#btn-enable-gdm-custom');
     if (enableBtn) {
       enableBtn.addEventListener('click', async () => {
@@ -292,7 +394,62 @@ const LockscreenView = {
       });
     }
 
-    // 3. Apply Shell Theme to Lock Screen
+    // 4. Sliders live feedback
+    const blurRadiusInput = this.container.querySelector('#gdm-blur-radius');
+    const lblBlurRadius = this.container.querySelector('#lbl-blur-radius');
+    if (blurRadiusInput && lblBlurRadius) {
+      blurRadiusInput.addEventListener('input', () => {
+        lblBlurRadius.textContent = `${blurRadiusInput.value}px`;
+      });
+    }
+
+    const blurBrightnessInput = this.container.querySelector('#gdm-blur-brightness');
+    const lblBlurBrightness = this.container.querySelector('#lbl-blur-brightness');
+    if (blurBrightnessInput && lblBlurBrightness) {
+      blurBrightnessInput.addEventListener('input', () => {
+        lblBlurBrightness.textContent = blurBrightnessInput.value;
+      });
+    }
+
+    // 5. Apply Visual Settings
+    const saveVisualsBtn = this.container.querySelector('#btn-save-gdm-visuals');
+    if (saveVisualsBtn) {
+      saveVisualsBtn.addEventListener('click', async () => {
+        saveVisualsBtn.disabled = true;
+        saveVisualsBtn.textContent = 'Applying...';
+        showToast('Applying visual settings to GDM (requires admin password)...', 'info');
+
+        const bgSelect = this.container.querySelector('#gdm-bg-select');
+        const bgSizeSelect = this.container.querySelector('#gdm-bg-size');
+        const chkHideBtn = this.container.querySelector('#chk-hide-gdm-btn');
+
+        const config = {
+          backgroundImage: bgSelect ? bgSelect.value : undefined,
+          backgroundSize: bgSizeSelect ? bgSizeSelect.value : undefined,
+          blurRadius: blurRadiusInput ? parseInt(blurRadiusInput.value, 10) : undefined,
+          blurBrightness: blurBrightnessInput ? parseFloat(blurBrightnessInput.value) : undefined,
+          hideButton: chkHideBtn ? chkHideBtn.checked : undefined
+        };
+
+        try {
+          const res = await window.electronAPI.gdm.updateConfig(config);
+          if (res && res.success) {
+            showToast('Login Screen visual settings applied successfully!', 'success');
+          } else if (res && res.cancelled) {
+            showToast('Authentication cancelled.', 'info');
+          } else {
+            showToast(`Update error: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error: ${err.message}`, 'warning');
+        } finally {
+          saveVisualsBtn.disabled = false;
+          saveVisualsBtn.textContent = 'Apply Visual Settings';
+        }
+      });
+    }
+
+    // 6. Apply Shell Theme to Lock Screen
     this.container.querySelectorAll('.btn-apply-gdm-theme').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
@@ -302,21 +459,19 @@ const LockscreenView = {
         showToast(`Applying ${themeName} to Lock Screen (requires admin password)...`, 'info');
 
         try {
-          // Step 1: Copy theme folder to /usr/share/themes
           const copyRes = await window.electronAPI.gdm.copyAsset({ id, category: 'shell-theme' });
           if (copyRes && copyRes.cancelled) {
             showToast('Authentication cancelled.', 'info');
             return;
           }
 
-          // Step 2: Set shell theme in GDM dconf
           const setRes = await window.electronAPI.gdm.setShellTheme({ themeName });
           if (setRes && setRes.success) {
             showToast(`${themeName} applied to GDM Login Screen!`, 'success');
           } else if (setRes && setRes.cancelled) {
             showToast('Authentication cancelled.', 'info');
           } else {
-            showToast(`Theme copied to /usr/share/themes. Setting GDM dconf: ${setRes ? setRes.error : ''}`, 'info');
+            showToast(`Theme copied to /usr/share/themes. Setting GDM: ${setRes ? setRes.error : ''}`, 'info');
           }
         } catch (err) {
           showToast(`Error: ${err.message}`, 'warning');
@@ -327,7 +482,7 @@ const LockscreenView = {
       });
     });
 
-    // 4. Copy Icon Theme to System
+    // 7. Copy Icon Theme to System
     this.container.querySelectorAll('.btn-copy-gdm-icon').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
@@ -353,7 +508,7 @@ const LockscreenView = {
       });
     });
 
-    // 5. Reset GDM Settings
+    // 8. Reset GDM Settings
     const resetGdmBtn = this.container.querySelector('#btn-reset-gdm-default');
     if (resetGdmBtn) {
       resetGdmBtn.addEventListener('click', async () => {

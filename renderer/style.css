@@ -2017,3 +2017,22 @@ input:checked + .slider:before {
   animation: spin 1s linear infinite;
 }
 
+.lockscreen-view-wrapper select.form-select {
+  background: #ffffff;
+  color: #18181b;
+  border: 1px solid var(--border-card, #e4e4e7);
+  border-radius: var(--radius);
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.lockscreen-view-wrapper select.form-select:focus {
+  border-color: #cf4110;
+}
+
+.lockscreen-view-wrapper input[type="range"] {
+  accent-color: #cf4110;
+  cursor: pointer;
+}
+

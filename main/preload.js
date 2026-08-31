@@ -58,7 +58,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     copyAsset: (payload) => ipcRenderer.invoke('gdm:copyAsset', payload),
     status: () => ipcRenderer.invoke('gdm:status'),
     installGseGdm: () => ipcRenderer.invoke('gdm:installGseGdm'),
+    uninstallGseGdm: () => ipcRenderer.invoke('gdm:uninstallGseGdm'),
     enableExtension: () => ipcRenderer.invoke('gdm:enableExtension'),
+    updateConfig: (payload) => ipcRenderer.invoke('gdm:updateConfig', payload),
     setShellTheme: (payload) => ipcRenderer.invoke('gdm:setShellTheme', payload),
     setBackground: (payload) => ipcRenderer.invoke('gdm:setBackground', payload),
     resetDefault: () => ipcRenderer.invoke('gdm:resetDefault')
