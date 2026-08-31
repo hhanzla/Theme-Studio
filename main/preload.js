@@ -50,7 +50,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   tweaks: {
     getAppFolders: () => ipcRenderer.invoke('tweaks:get-app-folders'),
-    organizeAppFolders: () => ipcRenderer.invoke('tweaks:organize-app-folders'),
+    organizeAppFolders: (payload) => ipcRenderer.invoke('tweaks:organize-app-folders', payload),
     resetAppFolders: () => ipcRenderer.invoke('tweaks:reset-app-folders'),
     getDesktopTweaks: () => ipcRenderer.invoke('tweaks:get-desktop-tweaks'),
     setDesktopTweak: (payload) => ipcRenderer.invoke('tweaks:set-desktop-tweak', payload)

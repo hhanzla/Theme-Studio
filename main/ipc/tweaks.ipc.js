@@ -10,9 +10,9 @@ function registerTweaksIpc() {
     }
   });
 
-  ipcMain.handle('tweaks:organize-app-folders', async () => {
+  ipcMain.handle('tweaks:organize-app-folders', async (_event, payload = {}) => {
     try {
-      return await tweaks.organizeAppFolders();
+      return await tweaks.organizeAppFolders(payload.selectedFolders);
     } catch (err) {
       return { success: false, error: err.message };
     }

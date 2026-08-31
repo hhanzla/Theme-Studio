@@ -133,14 +133,13 @@ function scanDesktopApplications() {
 }
 
 /**
- * Check the status of GNOME app folders
+ * Check the status of GNOME app folders and count apps per category
  */
 async function getAppFoldersStatus() {
   const res = await execGsettings(['get', 'org.gnome.desktop.app-folders', 'folder-children']);
   let children = [];
   if (res.success && res.value) {
     try {
-      // Parse array like "['Utilities', 'YaST']"
       const cleaned = res.value.replace(/^@as\s*/, '').replace(/'/g, '"');
       children = JSON.parse(cleaned);
     } catch (_) {
@@ -148,30 +147,52 @@ async function getAppFoldersStatus() {
     }
   }
 
+  const allApps = scanDesktopApplications();
   const isOrganized = children.length >= 4 && (children.includes('Internet') || children.includes('Development') || children.includes('Media'));
-  const totalApps = scanDesktopApplications().length;
+
+  // Calculate app count per category
+  const categoriesWithCounts = CATEGORY_DEFINITIONS.map(c => {
+    let count = 0;
+    for (const app of allApps) {
+      if (c.categories.some(cat => app.categories.includes(cat))) {
+        count++;
+      } else {
+        const lowerName = (app.desktopFile + ' ' + app.name).toLowerCase();
+        if (c.keywords.some(kw => lowerName.includes(kw))) {
+          count++;
+        }
+      }
+    }
+    return {
+      id: c.id,
+      name: c.name,
+      icon: c.icon,
+      count
+    };
+  });
 
   return {
     success: true,
     isOrganized,
     activeFolders: children,
-    totalApps,
-    definedCategories: CATEGORY_DEFINITIONS.map(c => ({
-      id: c.id,
-      name: c.name,
-      icon: c.icon
-    }))
+    totalApps: allApps.length,
+    definedCategories: categoriesWithCounts
   };
 }
 
 /**
- * Automatically categorize and organize App Grid icons into curated GNOME app folders
+ * Automatically categorize and organize App Grid icons into selected GNOME app folders
+ * @param {string[]} selectedFolderIds - Optional list of folder IDs to apply
  */
-async function organizeAppFolders() {
+async function organizeAppFolders(selectedFolderIds = null) {
   const allApps = scanDesktopApplications();
   const folderAssignments = {};
 
-  for (const def of CATEGORY_DEFINITIONS) {
+  const targets = Array.isArray(selectedFolderIds) && selectedFolderIds.length > 0
+    ? CATEGORY_DEFINITIONS.filter(c => selectedFolderIds.includes(c.id))
+    : CATEGORY_DEFINITIONS;
+
+  for (const def of targets) {
     folderAssignments[def.id] = {
       name: def.name,
       categories: def.categories,
@@ -184,7 +205,7 @@ async function organizeAppFolders() {
     let assigned = false;
 
     // 1. Try matching explicit XDG Categories
-    for (const def of CATEGORY_DEFINITIONS) {
+    for (const def of targets) {
       if (def.categories.some(cat => app.categories.includes(cat))) {
         folderAssignments[def.id].apps.push(app.desktopFile);
         assigned = true;
@@ -195,7 +216,7 @@ async function organizeAppFolders() {
     // 2. Fallback: match keywords in desktop filename or app name
     if (!assigned) {
       const lowerName = (app.desktopFile + ' ' + app.name).toLowerCase();
-      for (const def of CATEGORY_DEFINITIONS) {
+      for (const def of targets) {
         if (def.keywords.some(kw => lowerName.includes(kw))) {
           folderAssignments[def.id].apps.push(app.desktopFile);
           assigned = true;
@@ -205,29 +226,25 @@ async function organizeAppFolders() {
     }
   }
 
-  // Keep only folders with at least 1 app or standard system folders
   const activeFolders = [];
 
-  for (const def of CATEGORY_DEFINITIONS) {
+  for (const def of targets) {
     const group = folderAssignments[def.id];
-    // Always include if has apps or is standard
-    if (group.apps.length > 0 || ['Utilities', 'System', 'Internet'].includes(def.id)) {
-      activeFolders.push(def.id);
-      const schemaPath = `org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/${def.id}/`;
+    activeFolders.push(def.id);
+    const schemaPath = `org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/${def.id}/`;
 
-      // Set folder name
-      await execGsettings(['set', schemaPath, 'name', def.name]);
-      await execGsettings(['set', schemaPath, 'translate', 'false']);
+    // Set folder name
+    await execGsettings(['set', schemaPath, 'name', def.name]);
+    await execGsettings(['set', schemaPath, 'translate', 'false']);
 
-      // Set categories
-      const catArrayStr = JSON.stringify(def.categories).replace(/"/g, "'");
-      await execGsettings(['set', schemaPath, 'categories', catArrayStr]);
+    // Set categories
+    const catArrayStr = JSON.stringify(def.categories).replace(/"/g, "'");
+    await execGsettings(['set', schemaPath, 'categories', catArrayStr]);
 
-      // Set apps
-      if (group.apps.length > 0) {
-        const appsArrayStr = JSON.stringify(group.apps).replace(/"/g, "'");
-        await execGsettings(['set', schemaPath, 'apps', appsArrayStr]);
-      }
+    // Set apps
+    if (group.apps.length > 0) {
+      const appsArrayStr = JSON.stringify(group.apps).replace(/"/g, "'");
+      await execGsettings(['set', schemaPath, 'apps', appsArrayStr]);
     }
   }
 
@@ -237,7 +254,7 @@ async function organizeAppFolders() {
 
   return {
     success: true,
-    message: `Successfully organized applications into ${activeFolders.length} smart folders!`,
+    message: `Successfully organized applications into ${activeFolders.length} selected folders!`,
     activeFolders,
     totalCategorizedApps: allApps.length
   };

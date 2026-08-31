@@ -6,12 +6,13 @@ const TweaksView = {
   appFoldersStatus: null,
   desktopTweaks: null,
   isOrganizing: false,
+  selectedFolderIds: new Set(['Internet', 'Development', 'Media', 'Graphics', 'Office', 'System', 'Utilities', 'Games']),
 
   async render(containerEl) {
     if (containerEl) this.container = containerEl;
     if (this.container) {
       this.container.innerHTML = `
-        <div class="tweaks-view-container" style="display: flex; align-items: center; justify-content: center; padding: 40px; color: var(--text-secondary);">
+        <div class="settings-view-container" style="display: flex; align-items: center; justify-content: center; padding: 40px; color: var(--text-secondary);">
           <span>Loading desktop tweaks...</span>
         </div>
       `;
@@ -33,6 +34,14 @@ const TweaksView = {
         ]);
         this.appFoldersStatus = foldersRes || {};
         this.desktopTweaks = tweaksRes || {};
+
+        // If system already has organized active folders, sync selection
+        if (this.appFoldersStatus && Array.isArray(this.appFoldersStatus.activeFolders) && this.appFoldersStatus.activeFolders.length > 0) {
+          const currentActive = this.appFoldersStatus.activeFolders;
+          if (currentActive.some(f => ['Internet', 'Development', 'Media', 'Graphics', 'Office', 'System'].includes(f))) {
+            this.selectedFolderIds = new Set(currentActive);
+          }
+        }
       }
     } catch (err) {
       console.error('[TweaksView] Failed to load tweaks data:', err);
@@ -45,122 +54,135 @@ const TweaksView = {
     const status = this.appFoldersStatus || {};
     const tweaks = this.desktopTweaks || {};
     const isOrganized = !!status.isOrganized;
-    const activeFolders = Array.isArray(status.activeFolders) ? status.activeFolders : [];
     const totalApps = status.totalApps || 0;
-
-    const categoriesList = [
-      { id: 'Internet', name: 'Internet & Web', icon: '🌐', desc: 'Browsers, Chat, Cloud & Mail' },
-      { id: 'Development', name: 'Development', icon: '💻', desc: 'IDEs, Terminals & Code Tools' },
-      { id: 'Media', name: 'Audio & Video', icon: '🎬', desc: 'Players, Streaming & Sound' },
-      { id: 'Graphics', name: 'Graphics & Photos', icon: '🎨', desc: 'Image Viewers & Editors' },
-      { id: 'Office', name: 'Office & Documents', icon: '📄', desc: 'Documents, Readers & PDFs' },
-      { id: 'System', name: 'System & Tools', icon: '⚙️', desc: 'Monitor, Disk, Package Managers' },
-      { id: 'Utilities', name: 'Utilities', icon: '🛠️', desc: 'Clock, Calculator, Text Tools' },
-      { id: 'Games', name: 'Games', icon: '🎮', desc: 'Game Launchers & Emulators' }
+    const categories = Array.isArray(status.definedCategories) ? status.definedCategories : [
+      { id: 'Internet', name: 'Internet & Web', icon: '🌐', count: 0 },
+      { id: 'Development', name: 'Development', icon: '💻', count: 0 },
+      { id: 'Media', name: 'Audio & Video', icon: '🎬', count: 0 },
+      { id: 'Graphics', name: 'Graphics & Photos', icon: '🎨', count: 0 },
+      { id: 'Office', name: 'Office & Documents', icon: '📄', count: 0 },
+      { id: 'System', name: 'System & Tools', icon: '⚙️', count: 0 },
+      { id: 'Utilities', name: 'Utilities', icon: '🛠️', count: 0 },
+      { id: 'Games', name: 'Games', icon: '🎮', count: 0 }
     ];
 
-    const categoryChipsHtml = categoriesList.map(cat => {
-      const isFolderActive = activeFolders.includes(cat.id);
+    const folderCardsHtml = categories.map(cat => {
+      const isSelected = this.selectedFolderIds.has(cat.id);
       return `
-        <div class="tweak-category-chip ${isFolderActive ? 'active' : ''}">
-          <span class="chip-icon">${cat.icon}</span>
-          <div class="chip-content">
-            <span class="chip-title">${cat.name}</span>
-            <span class="chip-desc">${cat.desc}</span>
+        <div class="tweak-folder-card ${isSelected ? 'selected' : ''}" data-folder-id="${cat.id}">
+          <div class="tweak-folder-checkbox">
+            <input type="checkbox" class="folder-check-input" ${isSelected ? 'checked' : ''} tabindex="-1">
           </div>
-          ${isFolderActive ? '<span class="chip-badge">Active</span>' : ''}
+          <div class="tweak-folder-icon">${cat.icon}</div>
+          <div class="tweak-folder-info">
+            <span class="tweak-folder-name">${cat.name}</span>
+            <span class="tweak-folder-count">${cat.count} ${cat.count === 1 ? 'app' : 'apps'} detected</span>
+          </div>
         </div>
       `;
     }).join('');
 
     this.container.innerHTML = `
-      <div class="tweaks-view-container">
-        <div class="tweaks-content-layout">
-          <!-- Featured: App Menu Auto Folders Card -->
-          <div class="tweak-hero-card">
-            <div class="tweak-hero-header">
-              <div class="tweak-hero-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="7" height="7" x="3" y="3" rx="1"></rect>
-                  <rect width="7" height="7" x="14" y="3" rx="1"></rect>
-                  <rect width="7" height="7" x="14" y="14" rx="1"></rect>
-                  <rect width="7" height="7" x="3" y="14" rx="1"></rect>
-                </svg>
-              </div>
-              <div class="tweak-hero-info">
-                <div class="tweak-hero-title-row">
-                  <h2 class="tweak-hero-title">Smart App Menu Auto-Categorizer</h2>
-                  <span class="status-pill ${isOrganized ? 'status-active' : 'status-default'}">
-                    ${isOrganized ? '● Auto-Organized' : '○ Standard Grid'}
-                  </span>
-                </div>
-                <p class="tweak-hero-desc">
-                  Automatically scans all <strong>${totalApps} installed desktop apps</strong> and groups them cleanly into curated category folders (Internet, Development, Media, Graphics, Office, System, Utilities) in your GNOME App Grid.
-                </p>
-              </div>
+      <div class="settings-view-container tweaks-view-wrapper">
+        <!-- Section: App Menu Auto-Categorizer -->
+        <div class="settings-section">
+          <div class="settings-section-header-row" style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h3 class="settings-section-title">App Menu Smart Categorizer</h3>
+              <p class="settings-section-desc">
+                Select which category folders to create in your GNOME Application Grid. (${totalApps} installed apps detected)
+              </p>
             </div>
+            <span class="badge-tag ${isOrganized ? 'badge-installed' : 'badge-script'}">
+              ${isOrganized ? '● Grid Auto-Organized' : '○ Standard Grid'}
+            </span>
+          </div>
 
-            <!-- Visual Preview of Folders -->
-            <div class="tweak-categories-grid">
-              ${categoryChipsHtml}
+          <!-- Selection Action Bar -->
+          <div class="tweak-selection-bar">
+            <div class="tweak-selection-count">
+              <span><strong>${this.selectedFolderIds.size}</strong> of ${categories.length} folders selected</span>
             </div>
-
-            <!-- Action Controls -->
-            <div class="tweak-hero-actions">
-              <button class="btn btn-primary btn-lg" id="btn-organize-folders" ${this.isOrganizing ? 'disabled' : ''}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-                </svg>
-                <span>${this.isOrganizing ? 'Organizing Apps...' : 'Auto-Organize App Grid into Folders'}</span>
-              </button>
-
-              <button class="btn btn-secondary" id="btn-reset-folders" ${this.isOrganizing ? 'disabled' : ''}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                  <path d="M3 3v5h5"></path>
-                </svg>
-                <span>Restore Default Grid</span>
-              </button>
+            <div class="tweak-selection-buttons">
+              <button class="btn-text-action" id="btn-select-all">Select All</button>
+              <span class="btn-divider">•</span>
+              <button class="btn-text-action" id="btn-deselect-all">Deselect All</button>
             </div>
           </div>
 
-          <!-- Section: Quick Desktop Tweaks -->
-          <div class="tweaks-section-card">
-            <h3 class="tweaks-section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-              </svg>
-              <span>Interface & Window Behavior</span>
-            </h3>
+          <!-- Selectable Folders Grid -->
+          <div class="tweak-folders-grid">
+            ${folderCardsHtml}
+          </div>
 
-            <div class="tweak-row">
-              <div class="tweak-row-text">
-                <span class="tweak-row-label">Click to Minimize on Dock</span>
-                <span class="tweak-row-sub">Clicking an active application icon on Ubuntu Dock minimizes its window</span>
+          <!-- Apply / Restore Action Row -->
+          <div class="tweak-actions-row">
+            <button class="btn btn-primary" id="btn-organize-folders" ${this.isOrganizing || this.selectedFolderIds.size === 0 ? 'disabled' : ''}>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              </svg>
+              <span>${this.isOrganizing ? 'Applying...' : `Organize App Grid (${this.selectedFolderIds.size} Folders)`}</span>
+            </button>
+
+            <button class="btn btn-secondary" id="btn-reset-folders" ${this.isOrganizing ? 'disabled' : ''}>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+              </svg>
+              <span>Restore Default Grid</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section: Desktop & Window Behavior -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Desktop & Window Behavior</h3>
+          <p class="settings-section-desc">Fine-tune Ubuntu Dock interaction and application window placement.</p>
+
+          <div class="settings-card">
+            <div class="settings-card-left">
+              <div class="settings-option-title">
+                <strong>Click to Minimize on Dock</strong>
               </div>
+              <p class="settings-option-desc">
+                Clicking an active application icon in the Ubuntu Dock minimizes or restores its window.
+              </p>
+            </div>
+            <div class="settings-card-right">
               <label class="switch">
                 <input type="checkbox" id="tweak-click-minimize" ${tweaks.clickToMinimize ? 'checked' : ''}>
-                <span class="slider"></span>
+                <span class="slider round"></span>
               </label>
             </div>
+          </div>
 
-            <div class="tweak-row">
-              <div class="tweak-row-text">
-                <span class="tweak-row-label">Center New Windows</span>
-                <span class="tweak-row-sub">Always spawn newly opened application windows in the center of the display</span>
+          <div class="settings-card">
+            <div class="settings-card-left">
+              <div class="settings-option-title">
+                <strong>Center New Windows</strong>
               </div>
+              <p class="settings-option-desc">
+                Always spawn newly opened application windows in the exact center of your display.
+              </p>
+            </div>
+            <div class="settings-card-right">
               <label class="switch">
                 <input type="checkbox" id="tweak-center-windows" ${tweaks.centerNewWindows ? 'checked' : ''}>
-                <span class="slider"></span>
+                <span class="slider round"></span>
               </label>
             </div>
+          </div>
 
-            <div class="tweak-row">
-              <div class="tweak-row-text">
-                <span class="tweak-row-label">Window Control Buttons Layout</span>
-                <span class="tweak-row-sub">Position of close, minimize, and maximize buttons on window titlebars</span>
+          <div class="settings-card">
+            <div class="settings-card-left">
+              <div class="settings-option-title">
+                <strong>Window Control Buttons Layout</strong>
               </div>
+              <p class="settings-option-desc">
+                Configure position of titlebar close, minimize, and maximize buttons.
+              </p>
+            </div>
+            <div class="settings-card-right">
               <div class="tweak-btn-group">
                 <button class="tweak-choice-btn ${tweaks.buttonLayout === 'appmenu:minimize,maximize,close' || tweaks.buttonLayout === 'appmenu:close' ? 'active' : ''}" data-layout="appmenu:minimize,maximize,close">
                   Right (Standard)
@@ -179,15 +201,56 @@ const TweaksView = {
   },
 
   bindEvents() {
-    // 1. Organize Folders Button
+    // 1. Selectable Folder Cards Click
+    const folderCards = this.container.querySelectorAll('.tweak-folder-card');
+    folderCards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        const folderId = card.getAttribute('data-folder-id');
+        if (!folderId) return;
+
+        if (this.selectedFolderIds.has(folderId)) {
+          this.selectedFolderIds.delete(folderId);
+        } else {
+          this.selectedFolderIds.add(folderId);
+        }
+        this.renderUI();
+      });
+    });
+
+    // 2. Select All
+    const selectAllBtn = this.container.querySelector('#btn-select-all');
+    if (selectAllBtn) {
+      selectAllBtn.addEventListener('click', () => {
+        const categories = this.appFoldersStatus?.definedCategories || [];
+        categories.forEach(c => this.selectedFolderIds.add(c.id));
+        this.renderUI();
+      });
+    }
+
+    // 3. Deselect All
+    const deselectAllBtn = this.container.querySelector('#btn-deselect-all');
+    if (deselectAllBtn) {
+      deselectAllBtn.addEventListener('click', () => {
+        this.selectedFolderIds.clear();
+        this.renderUI();
+      });
+    }
+
+    // 4. Organize Folders Button
     const organizeBtn = this.container.querySelector('#btn-organize-folders');
     if (organizeBtn) {
       organizeBtn.addEventListener('click', async () => {
+        if (this.selectedFolderIds.size === 0) {
+          showToast('Please select at least 1 category folder', 'warning');
+          return;
+        }
         this.isOrganizing = true;
         this.renderUI();
         try {
-          showToast('Scanning applications and organizing App Grid...', 'info');
-          const res = await window.electronAPI.tweaks.organizeAppFolders();
+          showToast(`Organizing apps into ${this.selectedFolderIds.size} folders...`, 'info');
+          const res = await window.electronAPI.tweaks.organizeAppFolders({
+            selectedFolders: Array.from(this.selectedFolderIds)
+          });
           if (res && res.success) {
             showToast(res.message || 'Applications organized into category folders!', 'success');
           } else {
@@ -203,7 +266,7 @@ const TweaksView = {
       });
     }
 
-    // 2. Reset Folders Button
+    // 5. Reset Folders Button
     const resetBtn = this.container.querySelector('#btn-reset-folders');
     if (resetBtn) {
       resetBtn.addEventListener('click', async () => {
@@ -225,7 +288,7 @@ const TweaksView = {
       });
     }
 
-    // 3. Click to minimize toggle
+    // 6. Click to minimize toggle
     const minToggle = this.container.querySelector('#tweak-click-minimize');
     if (minToggle) {
       minToggle.addEventListener('change', async (e) => {
@@ -235,7 +298,7 @@ const TweaksView = {
       });
     }
 
-    // 4. Center new windows toggle
+    // 7. Center new windows toggle
     const centerToggle = this.container.querySelector('#tweak-center-windows');
     if (centerToggle) {
       centerToggle.addEventListener('change', async (e) => {
@@ -245,7 +308,7 @@ const TweaksView = {
       });
     }
 
-    // 5. Button layout choices
+    // 8. Button layout choices
     const choiceBtns = this.container.querySelectorAll('.tweak-choice-btn');
     choiceBtns.forEach(btn => {
       btn.addEventListener('click', async () => {
