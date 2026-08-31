@@ -402,17 +402,32 @@ async function installScript(item, options = {}, onProgress = () => {}) {
         const flagVal = (vVal && vVal !== 'none' && vVal !== 'default') ? `--tweaks ${vVal}` : '';
         argsTemplate = argsTemplate.replace(/\{tweaks\}/g, flagVal);
       } else if (vKey === 'icon') {
-        const flagVal = (vVal && vVal !== 'none' && vVal !== 'default') ? `-i ${vVal}` : '';
-        argsTemplate = argsTemplate.replace(/\{icon\}/g, flagVal);
+        const hasFlag = argsTemplate.includes('-i {icon}');
+        const flagVal = (vVal && vVal !== 'none' && vVal !== 'default') 
+          ? (hasFlag ? vVal : `-i ${vVal}`) 
+          : '';
+        if (hasFlag && !flagVal) {
+          argsTemplate = argsTemplate.replace(/-i\s+\{icon\}/g, '');
+        } else {
+          argsTemplate = argsTemplate.replace(/\{icon\}/g, flagVal);
+        }
       } else if (vKey === 'color' && vVal === 'all' && argsTemplate.includes('{color}')) {
         argsTemplate = argsTemplate.replace(/\{color\}/g, '-a');
+      } else if (vKey === 'color' && (vVal === 'nord' || vVal === 'dracula') && item.id && item.id.includes('orchis')) {
+        // Orchis treats nord/dracula as --tweaks, not -t
+        argsTemplate = argsTemplate.replace(/\{color\}/g, 'default');
+        if (argsTemplate.includes('{tweaks}')) {
+          argsTemplate = argsTemplate.replace(/\{tweaks\}/g, `--tweaks ${vVal}`);
+        } else if (!argsTemplate.includes('--tweaks')) {
+          argsTemplate += ` --tweaks ${vVal}`;
+        }
       } else {
         argsTemplate = argsTemplate.replace(new RegExp(`\\{${vKey}\\}`, 'g'), vVal);
       }
     }
 
     // Clean up any remaining unselected optional flags
-    argsTemplate = argsTemplate.replace(/\{tweaks\}/g, '').replace(/\{icon\}/g, '');
+    argsTemplate = argsTemplate.replace(/-i\s+\{icon\}/g, '').replace(/\{icon\}/g, '').replace(/\{tweaks\}/g, '');
 
     // Fallback for any unselected required keys defined on item.variants
     if (item.variants) {
