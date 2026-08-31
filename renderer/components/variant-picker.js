@@ -21,6 +21,9 @@ window.VariantPicker = {
     const LABEL_MAP = {
       color: isIconTheme ? 'Folder Color Scheme' : 'Color Accent',
       mode: 'Appearance Mode',
+      flavor: 'Palette Flavor',
+      accent: 'Accent Highlight',
+      buttons: 'Window Control Buttons',
       size: isCursorTheme ? 'Cursor Pointer Size' : 'Window Density',
       tweaks: 'Theme Tweaks',
       icon: 'Top Panel Logo Icon',
@@ -32,6 +35,9 @@ window.VariantPicker = {
       color: isIconTheme 
         ? "Select the folder and icon color theme (Standard Blue, Ubuntu Warm Orange, Nord Ice, Dracula, Manjaro, etc.) or 'All Variants' to install all 15 color folders."
         : 'Sets the primary accent color used for buttons, active tabs, selections, and highlights.',
+      flavor: 'Choose from Catppuccin 4 distinct soothing dark and light palettes (Mocha, Macchiato, Frappe, Latte).',
+      accent: 'Select the pastel highlight color for buttons, selections, and focus indicators.',
+      buttons: 'Choose circular macOS style window buttons or traditional standard GNOME controls.',
       mode: 'Choose Light mode for bright windows or Dark mode for sleek dark background.',
       size: isCursorTheme
         ? 'Choose cursor pointer pixel scale size.'
@@ -99,27 +105,26 @@ window.VariantPicker = {
           };
 
           return `
-            <label class="tweak-checkbox-item">
-              <input type="checkbox" class="tweak-checkbox-input" value="${opt}" />
-              <span class="tweak-checkbox-label">${detail.title}</span>
-              <span class="tweak-info-badge" onclick="event.preventDefault();" title="${detail.desc}">
-                ⓘ
-                <span class="tweak-tooltip">${detail.desc}</span>
-              </span>
+            <label class="tweak-checkbox-card">
+              <input type="checkbox" class="tweak-checkbox-input" value="${opt}">
+              <div class="tweak-checkbox-content">
+                <span class="tweak-checkbox-title">${detail.title}</span>
+                <span class="tweak-checkbox-desc">${detail.desc}</span>
+              </div>
             </label>
           `;
         }).join('');
 
         formGroupsHtml += `
-          <div class="form-group">
-            <div class="form-label" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
-              <span>${label} <small style="color: var(--text-muted); font-weight: normal; font-size: 10.5px; margin-left: 4px;">(Multi-select)</small></span>
+          <div class="form-group tweaks-section">
+            <div class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+              <span>${label}</span>
               <span class="tweak-info-badge" onclick="event.preventDefault();" title="${groupDesc}">
                 ⓘ
                 <span class="tweak-tooltip">${groupDesc}</span>
               </span>
             </div>
-            <div class="tweaks-grid-container">
+            <div class="tweaks-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-top: 4px;">
               ${tweakCheckboxesHtml}
             </div>
           </div>
@@ -137,6 +142,22 @@ window.VariantPicker = {
         if (displayVal === 'dracula') return isIconTheme ? 'Dracula (Purple Dark)' : 'Dracula';
         if (displayVal === 'nord') return isIconTheme ? 'Nord (Arctic Ice)' : 'Nord';
         if (displayVal === 'default') return isIconTheme ? 'Standard (Default Blue)' : 'Default (Standard)';
+        if (displayVal === 'mocha') return 'Mocha (Darkest)';
+        if (displayVal === 'macchiato') return 'Macchiato (Warm Dark)';
+        if (displayVal === 'frappe') return 'Frappe (Cool Dark)';
+        if (displayVal === 'latte') return 'Latte (Light Mode)';
+        if (displayVal === 'mauve') return 'Mauve (Purple)';
+        if (displayVal === 'flamingo') return 'Flamingo (Warm Pink)';
+        if (displayVal === 'rosewater') return 'Rosewater';
+        if (displayVal === 'sapphire') return 'Sapphire (Deep Blue)';
+        if (displayVal === 'sky') return 'Sky (Light Cyan)';
+        if (displayVal === 'peach') return 'Peach (Soft Orange)';
+        if (displayVal === 'maroon') return 'Maroon';
+        if (displayVal === 'lavender') return 'Lavender (Soft Violet)';
+        if (displayVal === 'circles') return 'macOS Traffic Lights (Circles)';
+        if (displayVal === 'bluish-accent') return 'Nord Bluish Accent';
+        if (displayVal === 'polar') return 'Nord Polar (Light Mode)';
+        if (displayVal === 'darker') return 'Nord Darker';
         if (displayVal === 'compact') return 'Compact';
         if (displayVal === 'dark') return 'Dark Mode';
         if (displayVal === 'light') return 'Light Mode';

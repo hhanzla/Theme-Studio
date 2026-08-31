@@ -8,17 +8,60 @@
     "source_url": "https://github.com/vinceliuice/Orchis-theme",
     "license": "GPL-3.0",
     "install_type": "script",
-    "source": { "type": "git", "repo": "https://github.com/vinceliuice/Orchis-theme.git" },
+    "source": {
+      "type": "git",
+      "repo": "https://github.com/vinceliuice/Orchis-theme.git"
+    },
     "variants": {
-      "color": ["default", "purple", "pink", "red", "orange", "yellow", "green", "teal", "grey", "all"],
-      "mode": ["dark", "light", "standard"],
-      "size": ["standard", "compact"],
-      "tweaks": ["none", "solid", "compact", "black", "primary", "macos", "submenu", "nord", "dracula", "dock"],
-      "icon": ["default", "apple", "gnome", "ubuntu", "arch", "fedora", "debian", "manjaro"]
+      "color": [
+        "default",
+        "purple",
+        "pink",
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "teal",
+        "grey",
+        "all"
+      ],
+      "mode": [
+        "dark",
+        "light",
+        "standard"
+      ],
+      "size": [
+        "standard",
+        "compact"
+      ],
+      "tweaks": [
+        "none",
+        "solid",
+        "compact",
+        "black",
+        "primary",
+        "macos",
+        "submenu",
+        "nord",
+        "dracula",
+        "dock"
+      ],
+      "icon": [
+        "default",
+        "apple",
+        "gnome",
+        "ubuntu",
+        "arch",
+        "fedora",
+        "debian",
+        "manjaro"
+      ]
     },
     "install_script": "./install.sh",
     "install_args_template": "-t {color} -c {mode} -s {size} {tweaks} -i {icon} -l",
-    "dependencies": ["sassc"],
+    "dependencies": [
+      "sassc"
+    ],
     "target_dir": "~/.themes",
     "gtk4_fix": false,
     "gdm_eligible": true,
@@ -33,18 +76,57 @@
     "source_url": "https://github.com/vinceliuice/WhiteSur-gtk-theme",
     "license": "MIT",
     "install_type": "script",
-    "source": { "type": "git", "repo": "https://github.com/vinceliuice/WhiteSur-gtk-theme.git" },
+    "source": {
+      "type": "git",
+      "repo": "https://github.com/vinceliuice/WhiteSur-gtk-theme.git"
+    },
     "variants": {
-      "color": ["default", "blue", "purple", "pink", "red", "orange", "yellow", "green", "grey", "all"],
-      "mode": ["dark", "light"],
-      "opacity": ["normal", "solid"],
-      "alt": ["normal", "alt"],
-      "scheme": ["standard", "nord"],
-      "icon": ["apple", "simple", "gnome", "ubuntu", "tux", "arch", "manjaro", "fedora", "debian"]
+      "color": [
+        "default",
+        "blue",
+        "purple",
+        "pink",
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "grey",
+        "all"
+      ],
+      "mode": [
+        "dark",
+        "light"
+      ],
+      "opacity": [
+        "normal",
+        "solid"
+      ],
+      "alt": [
+        "normal",
+        "alt"
+      ],
+      "scheme": [
+        "standard",
+        "nord"
+      ],
+      "icon": [
+        "apple",
+        "simple",
+        "gnome",
+        "ubuntu",
+        "tux",
+        "arch",
+        "manjaro",
+        "fedora",
+        "debian"
+      ]
     },
     "install_script": "./install.sh",
     "install_args_template": "-t {color} -c {mode} -o {opacity} -a {alt} -s {scheme} --shell -i {icon} -d {dest_dir}",
-    "dependencies": ["sassc", "glib-compile-schemas"],
+    "dependencies": [
+      "sassc",
+      "glib-compile-schemas"
+    ],
     "target_dir": "~/.themes",
     "gtk4_fix": false,
     "gdm_eligible": true,
@@ -146,5 +228,147 @@
     "gtk4_fix": false,
     "gdm_eligible": true,
     "notes": "Minimalist theme for GNOME Shell top panel with dark, light, and transparent sidebar options."
+  },
+  {
+    "id": "nordic-shell",
+    "name": "Nordic Shell",
+    "category": "shell-theme",
+    "thumbnail": "assets/previews/nordic.png",
+    "author": "EliverLara",
+    "source_url": "https://github.com/EliverLara/Nordic",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-v40.tar.xz",
+      "approx_bytes": 600000,
+      "variant_urls": {
+        "standard-circles": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-v40.tar.xz",
+        "standard-standard": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-standard-buttons-v40.tar.xz",
+        "darker-circles": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-darker-v40.tar.xz",
+        "darker-standard": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-darker-standard-buttons-v40.tar.xz",
+        "bluish-accent-circles": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-bluish-accent-v40.tar.xz",
+        "bluish-accent-standard": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-bluish-accent-standard-buttons-v40.tar.xz",
+        "polar-circles": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-Polar-v40.tar.xz",
+        "polar-standard": "https://github.com/EliverLara/Nordic/releases/download/v2.2.0/Nordic-Polar-standard-buttons-v40.tar.xz"
+      }
+    },
+    "variants": {
+      "style": [
+        "standard",
+        "darker",
+        "bluish-accent",
+        "polar"
+      ],
+      "buttons": [
+        "circles",
+        "standard"
+      ]
+    },
+    "target_dir": "~/.themes",
+    "gtk4_fix": false,
+    "gdm_eligible": true,
+    "notes": "Nordic is a dark Gtk3.20+ and Gtk4 theme created using the awesome Nord color palette with dark, darker, bluish accent, and polar light flavors."
+  },
+  {
+    "id": "catppuccin-shell",
+    "name": "Catppuccin Shell",
+    "category": "shell-theme",
+    "thumbnail": "assets/previews/catppuccin.png",
+    "author": "Catppuccin Org",
+    "source_url": "https://github.com/catppuccin/gtk",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-mauve-standard%2Bdefault.zip",
+      "approx_bytes": 300000,
+      "variant_urls": {
+        "mocha-mauve": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-mauve-standard%2Bdefault.zip",
+        "mocha-blue": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-blue-standard%2Bdefault.zip",
+        "mocha-flamingo": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-flamingo-standard%2Bdefault.zip",
+        "mocha-green": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-green-standard%2Bdefault.zip",
+        "mocha-lavender": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-lavender-standard%2Bdefault.zip",
+        "mocha-maroon": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-maroon-standard%2Bdefault.zip",
+        "mocha-peach": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-peach-standard%2Bdefault.zip",
+        "mocha-pink": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-pink-standard%2Bdefault.zip",
+        "mocha-red": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-red-standard%2Bdefault.zip",
+        "mocha-rosewater": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-rosewater-standard%2Bdefault.zip",
+        "mocha-sapphire": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-sapphire-standard%2Bdefault.zip",
+        "mocha-sky": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-sky-standard%2Bdefault.zip",
+        "mocha-teal": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-teal-standard%2Bdefault.zip",
+        "mocha-yellow": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-mocha-yellow-standard%2Bdefault.zip",
+        "macchiato-mauve": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-mauve-standard%2Bdefault.zip",
+        "macchiato-blue": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-blue-standard%2Bdefault.zip",
+        "macchiato-flamingo": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-flamingo-standard%2Bdefault.zip",
+        "macchiato-green": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-green-standard%2Bdefault.zip",
+        "macchiato-lavender": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-lavender-standard%2Bdefault.zip",
+        "macchiato-maroon": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-maroon-standard%2Bdefault.zip",
+        "macchiato-peach": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-peach-standard%2Bdefault.zip",
+        "macchiato-pink": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-pink-standard%2Bdefault.zip",
+        "macchiato-red": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-red-standard%2Bdefault.zip",
+        "macchiato-rosewater": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-rosewater-standard%2Bdefault.zip",
+        "macchiato-sapphire": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-sapphire-standard%2Bdefault.zip",
+        "macchiato-sky": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-sky-standard%2Bdefault.zip",
+        "macchiato-teal": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-teal-standard%2Bdefault.zip",
+        "macchiato-yellow": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-macchiato-yellow-standard%2Bdefault.zip",
+        "frappe-mauve": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-mauve-standard%2Bdefault.zip",
+        "frappe-blue": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-blue-standard%2Bdefault.zip",
+        "frappe-flamingo": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-flamingo-standard%2Bdefault.zip",
+        "frappe-green": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-green-standard%2Bdefault.zip",
+        "frappe-lavender": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-lavender-standard%2Bdefault.zip",
+        "frappe-maroon": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-maroon-standard%2Bdefault.zip",
+        "frappe-peach": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-peach-standard%2Bdefault.zip",
+        "frappe-pink": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-pink-standard%2Bdefault.zip",
+        "frappe-red": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-red-standard%2Bdefault.zip",
+        "frappe-rosewater": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-rosewater-standard%2Bdefault.zip",
+        "frappe-sapphire": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-sapphire-standard%2Bdefault.zip",
+        "frappe-sky": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-sky-standard%2Bdefault.zip",
+        "frappe-teal": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-teal-standard%2Bdefault.zip",
+        "frappe-yellow": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-frappe-yellow-standard%2Bdefault.zip",
+        "latte-mauve": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-mauve-standard%2Bdefault.zip",
+        "latte-blue": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-blue-standard%2Bdefault.zip",
+        "latte-flamingo": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-flamingo-standard%2Bdefault.zip",
+        "latte-green": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-green-standard%2Bdefault.zip",
+        "latte-lavender": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-lavender-standard%2Bdefault.zip",
+        "latte-maroon": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-maroon-standard%2Bdefault.zip",
+        "latte-peach": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-peach-standard%2Bdefault.zip",
+        "latte-pink": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-pink-standard%2Bdefault.zip",
+        "latte-red": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-red-standard%2Bdefault.zip",
+        "latte-rosewater": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-rosewater-standard%2Bdefault.zip",
+        "latte-sapphire": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-sapphire-standard%2Bdefault.zip",
+        "latte-sky": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-sky-standard%2Bdefault.zip",
+        "latte-teal": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-teal-standard%2Bdefault.zip",
+        "latte-yellow": "https://github.com/catppuccin/gtk/releases/download/v1.0.3/catppuccin-latte-yellow-standard%2Bdefault.zip"
+      }
+    },
+    "variants": {
+      "flavor": [
+        "mocha",
+        "macchiato",
+        "frappe",
+        "latte"
+      ],
+      "accent": [
+        "mauve",
+        "blue",
+        "flamingo",
+        "green",
+        "lavender",
+        "maroon",
+        "peach",
+        "pink",
+        "red",
+        "rosewater",
+        "sapphire",
+        "sky",
+        "teal",
+        "yellow"
+      ]
+    },
+    "target_dir": "~/.themes",
+    "gtk4_fix": false,
+    "gdm_eligible": true,
+    "notes": "Soothing pastel theme for GTK 3/4 and GNOME Shell available in 4 flavors (Mocha dark, Macchiato warm dark, Frappe cool dark, Latte light) across 14 lovely accents."
   }
 ]
