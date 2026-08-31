@@ -39,8 +39,8 @@ window.LooksView = {
       grid-column: 1 / -1;
       background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.08) 100%);
       border: 1px solid rgba(99,102,241,0.2);
-      border-radius: 12px;
-      padding: 16px 20px;
+      border-radius: var(--radius);
+      padding: 14px 18px;
       margin-bottom: 4px;
       display: flex;
       align-items: center;
