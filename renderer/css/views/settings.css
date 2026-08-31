@@ -1,29 +1,35 @@
 /* renderer/css/views/settings.css */
-/* Settings View Styling */
+/* Settings View - Full Width Responsive Grid */
+
+.cards-grid > .settings-view-container {
+  grid-column: 1 / -1;
+  width: 100%;
+}
 
 .settings-view-container {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 860px;
   width: 100%;
+  max-width: 100%;
 }
 
 .settings-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
 .settings-section-title {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
 .settings-section-desc {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.4;
   margin-bottom: 4px;
@@ -38,12 +44,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  width: 100%;
 }
 
 .settings-card-left {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex: 1;
 }
 
@@ -51,15 +58,27 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.settings-option-title strong {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .settings-option-desc {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.4;
+}
+
+.settings-option-desc code {
+  font-family: var(--font-mono);
+  background: #f4f4f5;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #18181b;
 }
 
 .settings-card-right {
@@ -69,43 +88,59 @@
   flex-shrink: 0;
 }
 
-/* System Path Items List */
-.path-items-list {
-  display: flex;
-  flex-direction: column;
+/* System Path Grid Layout */
+.settings-paths-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.path-card {
+  background: #ffffff;
   border: 1px solid var(--border-card);
   border-radius: var(--radius);
-  background: #ffffff;
-  overflow: hidden;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.path-item-row {
+.path-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.path-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.path-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--border-subtle);
-  gap: 12px;
+  gap: 8px;
 }
 
-.path-item-row:last-child {
-  border-bottom: none;
-}
-
-.path-item-label {
-  font-size: 12px;
+.path-label {
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  white-space: nowrap;
 }
 
 .path-tag {
   font-size: 9.5px;
-  padding: 1px 5px;
+  padding: 1px 6px;
   border-radius: 3px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .path-tag-user {
@@ -118,12 +153,101 @@
   color: #92400e;
 }
 
-.path-item-value {
+.path-tag-config {
+  background: #fdf2f8;
+  color: #9d174d;
+}
+
+.path-tag-cache {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.path-value {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-secondary);
-  background: #fafafa;
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.path-actions {
+  flex-shrink: 0;
+}
+
+.btn-open-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-secondary);
+  background: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.btn-open-path:hover {
+  background: #f4f4f5;
+  color: var(--text-primary);
+  border-color: #cbd5e1;
+}
+
+/* Switch styling for Settings */
+.settings-view-container .switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+}
+
+.settings-view-container .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-view-container .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e4e4e7;
+  transition: 0.18s ease;
+}
+
+.settings-view-container .slider.round {
+  border-radius: 20px;
+}
+
+.settings-view-container .slider.round:before {
+  border-radius: 50%;
+}
+
+.settings-view-container .slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.18s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.settings-view-container input:checked + .slider {
+  background-color: #cf4110;
+}
+
+.settings-view-container input:checked + .slider:before {
+  transform: translateX(18px);
 }
