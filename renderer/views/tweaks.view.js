@@ -139,7 +139,7 @@ const TweaksView = {
                 <span class="tweak-row-label">Click to Minimize on Dock</span>
                 <span class="tweak-row-sub">Clicking an active application icon on Ubuntu Dock minimizes its window</span>
               </div>
-              <label class="toggle-switch">
+              <label class="switch">
                 <input type="checkbox" id="tweak-click-minimize" ${tweaks.clickToMinimize ? 'checked' : ''}>
                 <span class="slider"></span>
               </label>
@@ -150,7 +150,7 @@ const TweaksView = {
                 <span class="tweak-row-label">Center New Windows</span>
                 <span class="tweak-row-sub">Always spawn newly opened application windows in the center of the display</span>
               </div>
-              <label class="toggle-switch">
+              <label class="switch">
                 <input type="checkbox" id="tweak-center-windows" ${tweaks.centerNewWindows ? 'checked' : ''}>
                 <span class="slider"></span>
               </label>
