@@ -1,4 +1,4 @@
-/* renderer/views/lockscreen.css */
+/* renderer/css/views/lockscreen.css */
 /* Dedicated isolated styles for GDM Lock Screen Management Studio */
 
 .lockscreen-view-wrapper {
@@ -304,8 +304,4 @@
 .lockscreen-view-wrapper .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.lockscreen-view-wrapper .spin-icon {
-  animation: spin 1s linear infinite;
 }

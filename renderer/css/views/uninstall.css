@@ -1,0 +1,50 @@
+/* renderer/css/views/uninstall.css */
+/* Uninstall Manager View Styling */
+
+.uninstall-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 860px;
+  width: 100%;
+}
+
+.uninstall-header-card {
+  background: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.uninstall-items-table {
+  width: 100%;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  background: #ffffff;
+  overflow: hidden;
+  border-collapse: collapse;
+}
+
+.uninstall-items-table th {
+  background: #fafafa;
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.uninstall-items-table td {
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.uninstall-items-table tr:last-child td {
+  border-bottom: none;
+}

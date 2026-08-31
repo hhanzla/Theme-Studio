@@ -1,0 +1,47 @@
+/* renderer/css/variables.css */
+:root {
+  --bg-app: #ffffff;
+  --bg-sidebar: #fafafa;
+  --bg-card: #ffffff;
+  --bg-card-hover: #ffffff;
+  --bg-subtle: #f4f4f5;
+
+  --border-app: #e4e4e7;
+  --border-subtle: #f4f4f5;
+  --border-card: #e4e4e7;
+
+  --text-primary: #18181b;
+  --text-secondary: #71717a;
+  --text-muted: #a1a1aa;
+
+  --accent-primary: #cf4110;
+  --accent-hover: #b3360b;
+  --accent-subtle: #fff7ed;
+  --accent-border: #fed7aa;
+
+  --status-installed: #16a34a;
+  --status-installed-bg: #f0fdf4;
+  --status-installed-border: #bbf7d0;
+
+  --status-applying: #ca8a04;
+  --status-applying-bg: #fefce8;
+  --status-applying-border: #fef08a;
+
+  --status-error: #dc2626;
+  --status-error-bg: #fef2f2;
+  --status-error-border: #fecaca;
+
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --transition-fast: 0.12s ease;
+  --transition-normal: 0.18s ease;
+
+  --topbar-height: 52px;
+  --sidebar-width: 220px;
+}
