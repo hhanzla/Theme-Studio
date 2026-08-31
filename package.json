@@ -46,6 +46,7 @@
       "main/**/*",
       "renderer/**/*",
       "sources/**/*",
+      "assets/**/*",
       "package.json"
     ],
     "extraResources": [

@@ -1,1 +1,327 @@
-[]
+[
+  {
+    "id": "artowave-material-grey",
+    "name": "ArtoWave Material Grey",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/artowave-material-grey.png",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/artowave-material-grey.png"
+    }
+  },
+  {
+    "id": "artowave-material-multic",
+    "name": "ArtoWave Material MultiC",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/artowave-material-multic.png",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/artowave-material-multic.png"
+    }
+  },
+  {
+    "id": "gdwp-955-hd-no-logo",
+    "name": "GDWP 955 HD No Logo",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/gdwp-955-hd-no-logo.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/gdwp-955-hd-no-logo.jpg"
+    }
+  },
+  {
+    "id": "abstract-artwork-logo-linux-wallpaper-d3",
+    "name": "Abstract Artwork Logo Linux Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/abstract-artwork-logo-linux-wallpaper-d3.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/abstract-artwork-logo-linux-wallpaper-d3.jpg"
+    }
+  },
+  {
+    "id": "digital-digital-art-artwork-illustration",
+    "name": "Digital Digital Art Artwork Illustration Abstract Hd Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/digital-digital-art-artwork-illustration.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/digital-digital-art-artwork-illustration.jpg"
+    }
+  },
+  {
+    "id": "lake-mountain-fog-mist-scenery-ai-4k-wal",
+    "name": "Lake Mountain Fog Mist Scenery Ai 4k Wallpaper Uhdpaper.com 709",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/lake-mountain-fog-mist-scenery-ai-4k-wal.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/lake-mountain-fog-mist-scenery-ai-4k-wal.jpg"
+    }
+  },
+  {
+    "id": "landscape-anime-digital-art-fantasy-art-",
+    "name": "Landscape Anime Digital Art Fantasy Art Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/landscape-anime-digital-art-fantasy-art-.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/landscape-anime-digital-art-fantasy-art-.jpg"
+    }
+  },
+  {
+    "id": "mac-os-x-os-x-big-sur-hd-wallpaper-863ba",
+    "name": "Mac Os X Os X Big Sur Hd Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/mac-os-x-os-x-big-sur-hd-wallpaper-863ba.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/mac-os-x-os-x-big-sur-hd-wallpaper-863ba.jpg"
+    }
+  },
+  {
+    "id": "macos-mojave-night-wallpaper-33048d6dbcf",
+    "name": "Macos Mojave Night Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/macos-mojave-night-wallpaper-33048d6dbcf.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/macos-mojave-night-wallpaper-33048d6dbcf.jpg"
+    }
+  },
+  {
+    "id": "microsoft-surface-3840x2160-26736",
+    "name": "Microsoft Surface",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/microsoft-surface-3840x2160-26736.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/microsoft-surface-3840x2160-26736.jpg"
+    }
+  },
+  {
+    "id": "neon-4k-hd-best-for-desktop-wallpaper-b8",
+    "name": "Neon 4k Hd Best For Desktop Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/neon-4k-hd-best-for-desktop-wallpaper-b8.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/neon-4k-hd-best-for-desktop-wallpaper-b8.jpg"
+    }
+  },
+  {
+    "id": "nhsoftwallpaper01",
+    "name": "NhSoftWallpaper01",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/nhsoftwallpaper01.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/nhsoftwallpaper01.jpg"
+    }
+  },
+  {
+    "id": "nhsoftwallpaper02-jpg",
+    "name": "NhSoftWallpaper02",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/nhsoftwallpaper02-jpg.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/nhsoftwallpaper02-jpg.jpg"
+    }
+  },
+  {
+    "id": "pexels-kaique-rocha-105250",
+    "name": "Pexels Kaique Rocha",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/pexels-kaique-rocha-105250.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/pexels-kaique-rocha-105250.jpg"
+    }
+  },
+  {
+    "id": "pexels-kelly-2918152",
+    "name": "Pexels Kelly",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/pexels-kelly-2918152.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/pexels-kelly-2918152.jpg"
+    }
+  },
+  {
+    "id": "pexels-oleksandra-zelena-17049234",
+    "name": "Pexels Oleksandra Zelena",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/pexels-oleksandra-zelena-17049234.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/pexels-oleksandra-zelena-17049234.jpg"
+    }
+  },
+  {
+    "id": "pexels-pixabay-210349",
+    "name": "Pexels Pixabay",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/pexels-pixabay-210349.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/pexels-pixabay-210349.jpg"
+    }
+  },
+  {
+    "id": "pexels-ryan-baker-129574",
+    "name": "Pexels Ryan Baker",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/pexels-ryan-baker-129574.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/pexels-ryan-baker-129574.jpg"
+    }
+  },
+  {
+    "id": "rajiv-gandhi-sea-link-suspension-bridge-",
+    "name": "Rajiv Gandhi Sea Link Suspension Bridge Bandra Worli Sea Link Bridge",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/rajiv-gandhi-sea-link-suspension-bridge-.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/rajiv-gandhi-sea-link-suspension-bridge-.jpg"
+    }
+  },
+  {
+    "id": "trees-green-trees-with-water-kerala-gods",
+    "name": "Trees Green Trees With Water Kerala Gods Own Country",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/trees-green-trees-with-water-kerala-gods.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/trees-green-trees-with-water-kerala-gods.jpg"
+    }
+  },
+  {
+    "id": "ubuntu-4k",
+    "name": "Ubuntu 4k",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/ubuntu-4k.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/ubuntu-4k.jpg"
+    }
+  },
+  {
+    "id": "ubuntu-lucid-wallpaper-50e4967776637252c",
+    "name": "Ubuntu Lucid Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/ubuntu-lucid-wallpaper-50e4967776637252c.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/ubuntu-lucid-wallpaper-50e4967776637252c.jpg"
+    }
+  },
+  {
+    "id": "wallpaper",
+    "name": "Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/wallpaper.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/wallpaper.jpg"
+    }
+  },
+  {
+    "id": "wallpaperflare-com-wallpaper",
+    "name": "Wallpaper",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/wallpaperflare-com-wallpaper.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/wallpaperflare-com-wallpaper.jpg"
+    }
+  },
+  {
+    "id": "wallpapersden-com-snowy-mountain-hd-phot",
+    "name": "Snowy Mountain Hd Photography 2022",
+    "category": "wallpaper",
+    "thumbnail": "assets/wallpapers/wallpapersden-com-snowy-mountain-hd-phot.jpg",
+    "author": "Community",
+    "license": "Free / CC0",
+    "install_type": "static",
+    "source": {
+      "type": "local",
+      "file": "assets/wallpapers/wallpapersden-com-snowy-mountain-hd-phot.jpg"
+    }
+  }
+]

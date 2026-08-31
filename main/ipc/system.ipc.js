@@ -186,9 +186,12 @@ function registerSystemIpc() {
         }
         wallpaperPath = targetPath;
       } else if (!wallpaperPath.startsWith('/') && !wallpaperPath.startsWith('file://')) {
-        const absPath = path.resolve(__dirname, '../../renderer', wallpaperPath);
-        if (fs.existsSync(absPath)) {
-          wallpaperPath = absPath;
+        const rootPath = path.resolve(__dirname, '../../', wallpaperPath);
+        const rendererPath = path.resolve(__dirname, '../../renderer', wallpaperPath);
+        if (fs.existsSync(rootPath)) {
+          wallpaperPath = rootPath;
+        } else if (fs.existsSync(rendererPath)) {
+          wallpaperPath = rendererPath;
         }
       }
 
