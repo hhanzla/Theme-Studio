@@ -75,14 +75,6 @@ const TweaksView = {
 
     this.container.innerHTML = `
       <div class="tweaks-view-container">
-        <!-- View Header -->
-        <div class="view-header">
-          <div class="view-title-group">
-            <h1 class="view-title">Desktop Tweaks</h1>
-            <p class="view-subtitle">Customize GNOME App Menu layout, dock behavior, and window management</p>
-          </div>
-        </div>
-
         <div class="tweaks-content-layout">
           <!-- Featured: App Menu Auto Folders Card -->
           <div class="tweak-hero-card">

@@ -62,6 +62,7 @@ const toastContainerEl = document.getElementById('toast-container');
 
 function restoreDefaultSubtabs() {
   const subtabsBar = document.querySelector('.subtabs-bar');
+  if (cardsGridEl) cardsGridEl.style.display = '';
   if (!subtabsBar) return;
 
   const installedCount = (AppState.items || []).filter(i => i.installed).length;
@@ -121,6 +122,7 @@ async function loadCategory(category) {
     pageSubtitleEl.textContent = 'Flatpak sandbox theme sync, asset storage directories, and system preferences';
     const subtabsBar = document.querySelector('.subtabs-bar');
     if (subtabsBar) subtabsBar.style.display = 'none';
+    cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
     window.SettingsView.render(cardsGridEl);
     return;
@@ -129,6 +131,9 @@ async function loadCategory(category) {
   if (category === 'extensions') {
     pageTitleEl.textContent = 'GNOME Extensions';
     pageSubtitleEl.textContent = 'Manage, enable, and toggle installed GNOME Shell extensions';
+    const subtabsBar = document.querySelector('.subtabs-bar');
+    if (subtabsBar) subtabsBar.style.display = 'none';
+    cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
     window.ExtensionsView.render(cardsGridEl);
     return;
@@ -139,6 +144,7 @@ async function loadCategory(category) {
     pageSubtitleEl.textContent = 'Customize GNOME App Menu layout, dock behavior, and window management';
     const subtabsBar = document.querySelector('.subtabs-bar');
     if (subtabsBar) subtabsBar.style.display = 'none';
+    cardsGridEl.style.display = 'block';
     emptyStateEl.classList.add('hidden');
     window.TweaksView.render(cardsGridEl);
     return;
