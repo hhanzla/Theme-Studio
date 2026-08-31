@@ -403,14 +403,20 @@ async function installScript(item, options = {}, onProgress = () => {}) {
         const flagVal = (vVal && vVal !== 'none' && vVal !== 'default') ? `--tweaks ${vVal}` : '';
         argsTemplate = argsTemplate.replace(/\{tweaks\}/g, flagVal);
       } else if (vKey === 'icon') {
-        const hasFlag = argsTemplate.includes('-i {icon}');
-        const flagVal = (vVal && vVal !== 'none' && vVal !== 'default') 
-          ? (hasFlag ? vVal : `-i ${vVal}`) 
-          : '';
-        if (hasFlag && !flagVal) {
-          argsTemplate = argsTemplate.replace(/-i\s+\{icon\}/g, '');
+        if (item.id && item.id.includes('whitesur')) {
+          if (vVal && vVal !== 'none' && vVal !== 'default' && (item.category === 'shell-theme' || item.id.includes('shell'))) {
+            argsTemplate += ` --shell -i ${vVal}`;
+          }
         } else {
-          argsTemplate = argsTemplate.replace(/\{icon\}/g, flagVal);
+          const hasFlag = argsTemplate.includes('-i {icon}');
+          const flagVal = (vVal && vVal !== 'none' && vVal !== 'default') 
+            ? (hasFlag ? vVal : `-i ${vVal}`) 
+            : '';
+          if (hasFlag && !flagVal) {
+            argsTemplate = argsTemplate.replace(/-i\s+\{icon\}/g, '');
+          } else {
+            argsTemplate = argsTemplate.replace(/\{icon\}/g, flagVal);
+          }
         }
       } else if (vKey === 'color' && vVal === 'all' && argsTemplate.includes('{color}')) {
         argsTemplate = argsTemplate.replace(/\{color\}/g, '-a');
