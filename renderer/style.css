@@ -1986,6 +1986,15 @@ input:checked + .toggle-slider:before {
   width: 100%;
 }
 
+.lockscreen-disabled-area {
+  opacity: 0.52;
+  pointer-events: none;
+  filter: grayscale(0.2);
+  user-select: none;
+  cursor: not-allowed;
+  transition: opacity 0.2s ease;
+}
+
 .lockscreen-form-card {
   display: flex !important;
   flex-direction: column !important;
