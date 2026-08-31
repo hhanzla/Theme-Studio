@@ -1,7 +1,7 @@
 // renderer/views/tweaks.view.js
 // Handles desktop tweaks, App Grid auto-folders organization, UI controls, and Compact Desktop Mode
 
-const TweaksView = {
+window.TweaksView = {
   container: null,
   appFoldersStatus: null,
   desktopTweaks: null,
