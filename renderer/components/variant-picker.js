@@ -136,7 +136,7 @@ window.VariantPicker = {
         if (displayVal === 'manjaro') return isIconTheme ? 'Manjaro (Teal Green)' : 'Manjaro';
         if (displayVal === 'dracula') return isIconTheme ? 'Dracula (Purple Dark)' : 'Dracula';
         if (displayVal === 'nord') return isIconTheme ? 'Nord (Arctic Ice)' : 'Nord';
-        if (displayVal === 'default') return 'Default (Standard)';
+        if (displayVal === 'default') return isIconTheme ? 'Standard (Default Blue)' : 'Default (Standard)';
         if (displayVal === 'compact') return 'Compact';
         if (displayVal === 'dark') return 'Dark Mode';
         if (displayVal === 'light') return 'Light Mode';
@@ -194,7 +194,7 @@ window.VariantPicker = {
       `;
     });
 
-    const isLargeModal = Boolean(item.id && (item.id.includes('orchis') || item.id.includes('whitesur')));
+    const isLargeModal = variantKeys.length >= 3;
 
     overlay.innerHTML = `
       <div class="modal-dialog ${isLargeModal ? 'modal-large' : ''}">
