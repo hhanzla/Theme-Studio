@@ -39,6 +39,120 @@
     "notes": "Crisp, modern, and material-designed open-source cursor set with rounded and sharp variations across classic, ice, and amber palettes."
   },
   {
+    "id": "apple-cursor",
+    "name": "macOS Cursors",
+    "category": "cursor-theme",
+    "thumbnail": "assets/previews/apple-cursor.png",
+    "author": "ful1e5",
+    "source_url": "https://github.com/ful1e5/apple_cursor",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "tar.xz",
+      "zip_url": "https://github.com/ful1e5/apple_cursor/releases/download/v2.0.1/macOS.tar.xz",
+      "url": "https://github.com/ful1e5/apple_cursor/releases/download/v2.0.1/macOS.tar.xz",
+      "approx_bytes": 5500000,
+      "variant_urls": {
+        "black": "https://github.com/ful1e5/apple_cursor/releases/download/v2.0.1/macOS.tar.xz",
+        "white": "https://github.com/ful1e5/apple_cursor/releases/download/v2.0.1/macOS-White.tar.xz"
+      }
+    },
+    "variants": {
+      "color": [
+        "black",
+        "white"
+      ]
+    },
+    "target_dir": "~/.icons",
+    "notes": "Official Apple macOS Cupertino inspired high-DPI cursor set with crisp pointers and animated wheels."
+  },
+  {
+    "id": "whitesur-cursors",
+    "name": "WhiteSur Cursors",
+    "category": "cursor-theme",
+    "thumbnail": "assets/previews/whitesur-cursors.png",
+    "author": "vinceliuice",
+    "source_url": "https://github.com/vinceliuice/WhiteSur-cursors",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/vinceliuice/WhiteSur-cursors/archive/refs/heads/master.zip",
+      "url": "https://github.com/vinceliuice/WhiteSur-cursors/archive/refs/heads/master.zip",
+      "approx_bytes": 1200000
+    },
+    "target_dir": "~/.icons",
+    "notes": "MacOS BigSur aesthetic cursor theme designed for Linux with smooth gradients and rounded edges."
+  },
+  {
+    "id": "graphite-cursors",
+    "name": "Graphite Cursors",
+    "category": "cursor-theme",
+    "thumbnail": "assets/previews/graphite-cursors.png",
+    "author": "vinceliuice",
+    "source_url": "https://github.com/vinceliuice/Graphite-cursors",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/vinceliuice/Graphite-cursors/archive/refs/heads/main.zip",
+      "url": "https://github.com/vinceliuice/Graphite-cursors/archive/refs/heads/main.zip",
+      "approx_bytes": 3000000
+    },
+    "target_dir": "~/.icons",
+    "notes": "Nordic minimalist and modern cursor set featuring dark, light, and nord ice palettes."
+  },
+  {
+    "id": "google-dot-cursors",
+    "name": "Google Dot Cursors",
+    "category": "cursor-theme",
+    "thumbnail": "assets/previews/google-dot-cursors.png",
+    "author": "ful1e5",
+    "source_url": "https://github.com/ful1e5/Google_Cursor",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "tar.gz",
+      "zip_url": "https://github.com/ful1e5/Google_Cursor/releases/download/v2.0.0/GoogleDot-Black.tar.gz",
+      "url": "https://github.com/ful1e5/Google_Cursor/releases/download/v2.0.0/GoogleDot-Black.tar.gz",
+      "approx_bytes": 4800000,
+      "variant_urls": {
+        "black": "https://github.com/ful1e5/Google_Cursor/releases/download/v2.0.0/GoogleDot-Black.tar.gz",
+        "white": "https://github.com/ful1e5/Google_Cursor/releases/download/v2.0.0/GoogleDot-White.tar.gz",
+        "blue": "https://github.com/ful1e5/Google_Cursor/releases/download/v2.0.0/GoogleDot-Blue.tar.gz",
+        "red": "https://github.com/ful1e5/Google_Cursor/releases/download/v2.0.0/GoogleDot-Red.tar.gz"
+      }
+    },
+    "variants": {
+      "color": [
+        "black",
+        "white",
+        "blue",
+        "red"
+      ]
+    },
+    "target_dir": "~/.icons",
+    "notes": "Google Pixel and Material Design inspired dot cursor pack with vibrant color accents."
+  },
+  {
+    "id": "vimix-cursors",
+    "name": "Vimix Cursors",
+    "category": "cursor-theme",
+    "thumbnail": "assets/previews/vimix-cursors.png",
+    "author": "vinceliuice",
+    "source_url": "https://github.com/vinceliuice/Vimix-cursors",
+    "license": "GPL-3.0",
+    "install_type": "zip-static",
+    "source": {
+      "type": "zip",
+      "zip_url": "https://github.com/vinceliuice/Vimix-cursors/archive/refs/heads/master.zip",
+      "url": "https://github.com/vinceliuice/Vimix-cursors/archive/refs/heads/master.zip",
+      "approx_bytes": 1400000
+    },
+    "target_dir": "~/.icons",
+    "notes": "Modern, flat Material cursor theme with black and white pointer variations."
+  },
+  {
     "id": "dracula-cursors",
     "name": "Dracula Cursors",
     "category": "cursor-theme",
