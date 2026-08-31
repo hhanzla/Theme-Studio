@@ -17,6 +17,11 @@ const LOCAL_THEMES = path.join(HOME, '.local', 'share', 'themes');
 const LOCAL_ICONS = path.join(HOME, '.local', 'share', 'icons');
 const SYSTEM_THEMES = '/usr/share/themes';
 const SYSTEM_ICONS = '/usr/share/icons';
+const SYS_THEMES = '/usr/share/themes';
+const SYS_ICONS = '/usr/share/icons';
+const SYS_BACKGROUNDS = '/usr/share/backgrounds';
+const SYS_FONTS = '/usr/share/fonts';
+const SYS_PIXMAPS = '/usr/share/pixmaps';
 const GTK4_CONFIG = path.join(HOME, '.config', 'gtk-4.0');
 const GTK3_CONFIG = path.join(HOME, '.config', 'gtk-3.0');
 const EXTENSIONS_DIR = path.join(HOME, '.local', 'share', 'gnome-shell', 'extensions');
@@ -47,6 +52,11 @@ module.exports = {
   LOCAL_ICONS,
   SYSTEM_THEMES,
   SYSTEM_ICONS,
+  SYS_THEMES,
+  SYS_ICONS,
+  SYS_BACKGROUNDS,
+  SYS_FONTS,
+  SYS_PIXMAPS,
   GTK4_CONFIG,
   GTK3_CONFIG,
   EXTENSIONS_DIR,
