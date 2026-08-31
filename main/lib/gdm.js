@@ -115,11 +115,20 @@ async function setGdmBackground(bgPath) {
   return execPkexec(cmd);
 }
 
+/**
+ * Resets GDM user session appearance dconf settings to system defaults
+ */
+async function resetGdmToDefault() {
+  const resetCmd = `sh -c 'sudo -u gdm dbus-run-session gsettings reset org.gnome.shell.extensions.user-theme name && sudo -u gdm dbus-run-session gsettings reset org.gnome.desktop.background picture-uri && sudo -u gdm dbus-run-session gsettings reset org.gnome.desktop.background picture-uri-dark'`;
+  return execPkexec(resetCmd);
+}
+
 module.exports = {
   checkGdmStatus,
   enableGdmCustomization,
   setGdmShellTheme,
   setGdmBackground,
+  resetGdmToDefault,
   execPkexec,
   GSE_GDM_UUID,
   USER_THEMES_UUID

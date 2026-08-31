@@ -59,7 +59,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     status: () => ipcRenderer.invoke('gdm:status'),
     enableExtension: () => ipcRenderer.invoke('gdm:enableExtension'),
     setShellTheme: (payload) => ipcRenderer.invoke('gdm:setShellTheme', payload),
-    setBackground: (payload) => ipcRenderer.invoke('gdm:setBackground', payload)
+    setBackground: (payload) => ipcRenderer.invoke('gdm:setBackground', payload),
+    resetDefault: () => ipcRenderer.invoke('gdm:resetDefault')
   },
   on: (channel, callback) => {
     const validChannels = ['install:progress', 'install:done', 'install:error'];

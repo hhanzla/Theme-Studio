@@ -77,6 +77,17 @@ function registerGdmIpc() {
       return { success: false, error: err.message };
     }
   });
+
+  /**
+   * Reset GDM session settings to defaults
+   */
+  ipcMain.handle('gdm:resetDefault', async () => {
+    try {
+      return await gdm.resetGdmToDefault();
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
 }
 
 module.exports = {

@@ -173,6 +173,26 @@ const LockscreenView = {
             `).join('')}
           </div>
         </div>
+
+        <!-- Section: Safety & Reset Recovery -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Safety &amp; Recovery</h3>
+          <div class="settings-card" style="border-left: 3px solid #71717a;">
+            <div class="settings-card-left">
+              <div class="settings-option-title">
+                <strong>Reset Lock Screen to Default</strong>
+              </div>
+              <p class="settings-option-desc">
+                Reverts GDM session dconf settings (User Themes, background) back to standard Ubuntu defaults.
+              </p>
+            </div>
+            <div class="settings-card-right">
+              <button class="btn btn-secondary" id="btn-reset-gdm-default" style="padding: 6px 12px; font-size: 11.5px;">
+                Reset GDM Settings
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     `;
 
@@ -278,6 +298,32 @@ const LockscreenView = {
         }
       });
     });
+
+    // 5. Reset GDM Settings
+    const resetGdmBtn = this.container.querySelector('#btn-reset-gdm-default');
+    if (resetGdmBtn) {
+      resetGdmBtn.addEventListener('click', async () => {
+        resetGdmBtn.disabled = true;
+        resetGdmBtn.textContent = 'Resetting...';
+        showToast('Resetting GDM session settings to defaults...', 'info');
+
+        try {
+          const res = await window.electronAPI.gdm.resetDefault();
+          if (res && res.success) {
+            showToast('GDM Lock Screen settings reset to default!', 'success');
+          } else if (res && res.cancelled) {
+            showToast('Authentication cancelled.', 'info');
+          } else {
+            showToast(`Reset error: ${res ? res.error : 'Unknown error'}`, 'warning');
+          }
+        } catch (err) {
+          showToast(`Error: ${err.message}`, 'warning');
+        } finally {
+          resetGdmBtn.disabled = false;
+          resetGdmBtn.textContent = 'Reset GDM Settings';
+        }
+      });
+    }
   }
 };
 
