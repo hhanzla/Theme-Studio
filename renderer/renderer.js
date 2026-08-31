@@ -36,6 +36,10 @@ const CATEGORY_META = {
   'extensions': {
     title: 'GNOME Extensions',
     subtitle: 'Enhance your GNOME desktop workflow with extensions'
+  },
+  'tweaks': {
+    title: 'Desktop Tweaks',
+    subtitle: 'Customize GNOME App Menu layout, dock behavior, and window management'
   }
 };
 
@@ -127,6 +131,16 @@ async function loadCategory(category) {
     pageSubtitleEl.textContent = 'Manage, enable, and toggle installed GNOME Shell extensions';
     emptyStateEl.classList.add('hidden');
     window.ExtensionsView.render(cardsGridEl);
+    return;
+  }
+
+  if (category === 'tweaks') {
+    pageTitleEl.textContent = 'Desktop Tweaks';
+    pageSubtitleEl.textContent = 'Customize GNOME App Menu layout, dock behavior, and window management';
+    const subtabsBar = document.querySelector('.subtabs-bar');
+    if (subtabsBar) subtabsBar.style.display = 'none';
+    emptyStateEl.classList.add('hidden');
+    window.TweaksView.init(cardsGridEl);
     return;
   }
 

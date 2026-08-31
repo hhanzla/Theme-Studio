@@ -6,6 +6,7 @@ const { registerDepsIpc } = require('./ipc/deps.ipc');
 const { registerUninstallIpc } = require('./ipc/uninstall.ipc');
 const { registerSystemIpc } = require('./ipc/system.ipc');
 const { registerSettingsIpc } = require('./ipc/settings.ipc');
+const { registerTweaksIpc } = require('./ipc/tweaks.ipc');
 
 let mainWindow = null;
 
@@ -65,6 +66,7 @@ app.whenReady().then(() => {
   registerUninstallIpc();
   registerSystemIpc();
   registerSettingsIpc();
+  registerTweaksIpc();
 
   createWindow();
 

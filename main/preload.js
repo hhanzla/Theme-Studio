@@ -48,6 +48,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   looks: {
     apply: (payload) => ipcRenderer.invoke('look:apply', payload)
   },
+  tweaks: {
+    getAppFolders: () => ipcRenderer.invoke('tweaks:get-app-folders'),
+    organizeAppFolders: () => ipcRenderer.invoke('tweaks:organize-app-folders'),
+    resetAppFolders: () => ipcRenderer.invoke('tweaks:reset-app-folders'),
+    getDesktopTweaks: () => ipcRenderer.invoke('tweaks:get-desktop-tweaks'),
+    setDesktopTweak: (payload) => ipcRenderer.invoke('tweaks:set-desktop-tweak', payload)
+  },
   on: (channel, callback) => {
     const validChannels = ['install:progress', 'install:done', 'install:error'];
     if (validChannels.includes(channel)) {
