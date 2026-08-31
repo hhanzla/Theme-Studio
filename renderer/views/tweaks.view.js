@@ -46,6 +46,7 @@ const TweaksView = {
 
   renderUI() {
     if (!this.container) return;
+    if (window.AppState && window.AppState.activeCategory !== 'tweaks') return;
 
     const status = this.appFoldersStatus || {};
     const isOrganized = !!status.isOrganized;

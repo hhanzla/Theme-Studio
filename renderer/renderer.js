@@ -7,6 +7,7 @@ const AppState = {
   items: [],
   activeInstalls: new Set()
 };
+window.AppState = AppState;
 
 const CATEGORY_META = {
   'looks': {
@@ -215,6 +216,10 @@ async function loadCategory(category) {
   } catch (err) {
     console.error('IPC invocation error:', err);
     AppState.items = [];
+  }
+
+  if (AppState.activeCategory !== category) {
+    return; // Guard: User switched to another tab while catalog was loading
   }
 
   restoreDefaultSubtabs();

@@ -48,6 +48,7 @@ window.SettingsView = {
 
   renderUI(settings, flatpakInstalled, paths = {}) {
     if (!this.container) return;
+    if (window.AppState && window.AppState.activeCategory !== 'settings') return;
 
     const isFlatpakSync = !!settings.flatpak_theme_sync;
 

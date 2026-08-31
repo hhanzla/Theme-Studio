@@ -41,6 +41,7 @@ const LockscreenView = {
 
   renderUI() {
     if (!this.container) return;
+    if (window.AppState && window.AppState.activeCategory !== 'lockscreen') return;
 
     const isGseInstalled = !!(this.gdmStatus && this.gdmStatus.gseGdmInstalled);
     const availableBackgrounds = (this.gdmStatus && this.gdmStatus.availableBackgrounds) || [];

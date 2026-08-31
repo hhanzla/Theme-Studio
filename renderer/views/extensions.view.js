@@ -13,9 +13,11 @@ window.ExtensionsView = {
   async render(containerEl) {
     this.container = containerEl;
     await this.loadInstalled();
+    if (window.AppState && window.AppState.activeCategory !== 'extensions') return;
     if (this.activeMode === 'browse' && this.onlineExtensions.length === 0) {
       await this.loadOnline();
     } else {
+      if (window.AppState && window.AppState.activeCategory !== 'extensions') return;
       this.renderSubtabs();
       this.renderView();
     }
@@ -36,6 +38,7 @@ window.ExtensionsView = {
   },
 
   async loadOnline(query = '') {
+    if (window.AppState && window.AppState.activeCategory !== 'extensions') return;
     this.isLoading = true;
     this.renderSubtabs();
     this.renderLoading();
@@ -46,22 +49,28 @@ window.ExtensionsView = {
         this.onlineExtensions = res.extensions || [];
       } else {
         this.onlineExtensions = [];
-        if (res && res.error) {
+        if (res && res.error && (!window.AppState || window.AppState.activeCategory === 'extensions')) {
           showToast(`Error searching extensions: ${res.error}`, 'warning');
         }
       }
     } catch (err) {
       console.error('[ExtensionsView] Failed to query extensions.gnome.org:', err);
       this.onlineExtensions = [];
-      showToast(`Failed to connect to extensions.gnome.org: ${err.message}`, 'warning');
+      if (!window.AppState || window.AppState.activeCategory === 'extensions') {
+        showToast(`Failed to connect to extensions.gnome.org: ${err.message}`, 'warning');
+      }
     } finally {
       this.isLoading = false;
+      if (window.AppState && window.AppState.activeCategory !== 'extensions') {
+        return; // Guard: Do not render if user switched away to another tab
+      }
       this.renderSubtabs();
       this.renderView();
     }
   },
 
   renderSubtabs() {
+    if (window.AppState && window.AppState.activeCategory !== 'extensions') return;
     const subtabsBar = document.querySelector('.subtabs-bar');
     if (!subtabsBar) return;
 
@@ -118,6 +127,7 @@ window.ExtensionsView = {
 
   renderLoading() {
     if (!this.container) return;
+    if (window.AppState && window.AppState.activeCategory !== 'extensions') return;
     this.container.innerHTML = `
       <div class="empty-state" style="grid-column: 1 / -1; width: 100%; padding: 60px 0;">
         <div style="width: 36px; height: 36px; border: 3px solid #e4e4e7; border-top-color: #cf4110; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px auto;"></div>
@@ -129,6 +139,7 @@ window.ExtensionsView = {
 
   renderView() {
     if (!this.container) return;
+    if (window.AppState && window.AppState.activeCategory !== 'extensions') return;
 
     if (this.activeMode === 'browse') {
       this.renderOnlineGrid();
