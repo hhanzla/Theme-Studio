@@ -1,5 +1,5 @@
 // main/lib/gdm.js
-// Complete GDM Lock Screen management: installation, uninstallation, dconf keys, blur, colors, themes, icons, logos
+// Complete GDM Lock Screen Management: In-depth DConf, Schema Compilation, Visuals, Themes, Fonts, Clock & Banner Message
 
 const { exec } = require('child_process');
 const fs = require('fs');
@@ -9,12 +9,10 @@ const paths = require('./paths');
 
 const GSE_GDM_UUID = 'gdm-extension@pratap.fastmail.fm';
 const USER_THEMES_UUID = 'user-theme@gnome-shell-extensions.gcampax.github.com';
-const GDM_SCHEMA = 'org.gnome.shell.extensions.gdm-extension';
+const DCONF_GDM_FILE = '/etc/dconf/db/gdm.d/01-themestudio';
 
 /**
- * Execute command via pkexec with clean error and cancellation handling
- * @param {string} cmd
- * @returns {Promise<{ success: boolean, stdout?: string, stderr?: string, cancelled?: boolean, error?: string }>}
+ * Execute command via pkexec with clean cancellation handling
  */
 function execPkexec(cmd) {
   return new Promise((resolve) => {
@@ -34,7 +32,7 @@ function execPkexec(cmd) {
 }
 
 /**
- * Checks whether GSE-GDM extension is installed in system or user paths
+ * Reads all system assets & current GDM dconf settings
  */
 async function checkGdmStatus() {
   const gseSystemPath = '/usr/local/share/gnome-shell/extensions/' + GSE_GDM_UUID;
@@ -44,233 +42,274 @@ async function checkGdmStatus() {
   const isInstalled = fs.existsSync(gseSystemPath) || fs.existsSync(gseAltSystemPath) || fs.existsSync(gseUserPath);
   const installPath = isInstalled ? (fs.existsSync(gseSystemPath) ? gseSystemPath : (fs.existsSync(gseAltSystemPath) ? gseAltSystemPath : gseUserPath)) : null;
 
-  // Read available system assets
-  let availableThemes = [];
-  let availableIcons = [];
+  // 1. Scan available Backgrounds
   let availableBackgrounds = [];
+  const bgDirs = ['/usr/share/backgrounds', '/usr/local/share/backgrounds'];
+  for (const dir of bgDirs) {
+    if (fs.existsSync(dir)) {
+      try {
+        const files = fs.readdirSync(dir).filter(f => f.match(/\.(jpg|jpeg|png|webp|svg)$/i));
+        files.forEach(f => {
+          const full = path.join(dir, f);
+          if (!availableBackgrounds.includes(full)) availableBackgrounds.push(full);
+        });
+      } catch (_) {}
+    }
+  }
+
+  // 2. Scan Shell Themes
+  let availableThemes = [];
+  const themeDirs = ['/usr/share/themes', '/usr/local/share/themes'];
+  for (const dir of themeDirs) {
+    if (fs.existsSync(dir)) {
+      try {
+        const folders = fs.readdirSync(dir).filter(f => !f.startsWith('.'));
+        folders.forEach(f => {
+          if (!availableThemes.includes(f)) availableThemes.push(f);
+        });
+      } catch (_) {}
+    }
+  }
+
+  // 3. Scan Icon Themes
+  let availableIcons = [];
+  const iconDirs = ['/usr/share/icons', '/usr/local/share/icons'];
+  for (const dir of iconDirs) {
+    if (fs.existsSync(dir)) {
+      try {
+        const folders = fs.readdirSync(dir).filter(f => !f.startsWith('.'));
+        folders.forEach(f => {
+          if (!availableIcons.includes(f)) availableIcons.push(f);
+        });
+      } catch (_) {}
+    }
+  }
+
+  // 4. Scan Logos
   let availableLogos = [];
-
-  try {
-    if (fs.existsSync(paths.SYS_THEMES)) {
-      availableThemes = fs.readdirSync(paths.SYS_THEMES).filter(f => !f.startsWith('.'));
+  const pixDirs = ['/usr/share/pixmaps', '/usr/local/share/pixmaps'];
+  for (const dir of pixDirs) {
+    if (fs.existsSync(dir)) {
+      try {
+        const files = fs.readdirSync(dir).filter(f => f.toLowerCase().includes('logo') && f.match(/\.(png|svg|jpg)$/i));
+        files.forEach(f => {
+          const full = path.join(dir, f);
+          if (!availableLogos.includes(full)) availableLogos.push(full);
+        });
+      } catch (_) {}
     }
-  } catch (_) {}
+  }
 
-  try {
-    if (fs.existsSync(paths.SYS_ICONS)) {
-      availableIcons = fs.readdirSync(paths.SYS_ICONS).filter(f => !f.startsWith('.'));
-    }
-  } catch (_) {}
+  // 5. Read current settings from /etc/dconf/db/gdm.d/01-themestudio
+  const settings = {
+    backgroundImage: '',
+    blurRadius: 0,
+    blurBrightness: 0.65,
+    backgroundSize: 'cover',
+    primaryColor: '#cf4110',
+    secondaryColor: '#18181b',
+    gradientDirection: 'none',
+    shellTheme: '',
+    iconTheme: '',
+    logo: '',
+    bannerMessageEnable: false,
+    bannerMessageText: '',
+    clockShowDate: true,
+    clockShowSeconds: false,
+    clockShowWeekday: true,
+    showBatteryPercentage: true,
+    tapToClick: true,
+    hideButton: false
+  };
 
-  try {
-    if (fs.existsSync(paths.SYS_BACKGROUNDS)) {
-      availableBackgrounds = fs.readdirSync(paths.SYS_BACKGROUNDS).filter(f => !f.startsWith('.'));
-    }
-  } catch (_) {}
+  if (fs.existsSync(DCONF_GDM_FILE)) {
+    try {
+      const content = fs.readFileSync(DCONF_GDM_FILE, 'utf8');
+      const getVal = (key) => {
+        const match = content.match(new RegExp(`^${key}\\s*=\\s*(.*)$`, 'm'));
+        return match ? match[1].trim().replace(/^['"]|['"]$/g, '') : null;
+      };
 
-  try {
-    if (fs.existsSync(paths.SYS_PIXMAPS)) {
-      availableLogos = fs.readdirSync(paths.SYS_PIXMAPS).filter(f => f.toLowerCase().includes('logo'));
-    }
-  } catch (_) {}
-
-  // Read button hide setting from /etc/dconf/db/gdm.d/99-gdm-extension
-  let hideButton = false;
-  try {
-    const dconfFile = '/etc/dconf/db/gdm.d/99-gdm-extension';
-    if (fs.existsSync(dconfFile)) {
-      const content = fs.readFileSync(dconfFile, 'utf8');
-      if (/hide-gdm-extension-button\s*=\s*true/i.test(content)) {
-        hideButton = true;
-      }
-    }
-  } catch (_) {}
+      if (getVal('background-image-path-1')) settings.backgroundImage = getVal('background-image-path-1');
+      if (getVal('blur-radius-1')) settings.blurRadius = parseInt(getVal('blur-radius-1'), 10) || 0;
+      if (getVal('blur-brightness-1')) settings.blurBrightness = parseFloat(getVal('blur-brightness-1')) || 0.65;
+      if (getVal('background-size-1')) settings.backgroundSize = getVal('background-size-1');
+      if (getVal('primary-color-1')) settings.primaryColor = getVal('primary-color-1');
+      if (getVal('secondary-color-1')) settings.secondaryColor = getVal('secondary-color-1');
+      if (getVal('gradient-direction-1')) settings.gradientDirection = getVal('gradient-direction-1');
+      if (getVal('shell-theme')) settings.shellTheme = getVal('shell-theme');
+      if (getVal('icon-theme')) settings.iconTheme = getVal('icon-theme');
+      if (getVal('logo')) settings.logo = getVal('logo');
+      if (getVal('banner-message-enable')) settings.bannerMessageEnable = getVal('banner-message-enable') === 'true';
+      if (getVal('banner-message-text')) settings.bannerMessageText = getVal('banner-message-text');
+      if (getVal('clock-show-date')) settings.clockShowDate = getVal('clock-show-date') === 'true';
+      if (getVal('clock-show-seconds')) settings.clockShowSeconds = getVal('clock-show-seconds') === 'true';
+      if (getVal('clock-show-weekday')) settings.clockShowWeekday = getVal('clock-show-weekday') === 'true';
+      if (getVal('show-battery-percentage')) settings.showBatteryPercentage = getVal('show-battery-percentage') === 'true';
+      if (getVal('tap-to-click')) settings.tapToClick = getVal('tap-to-click') === 'true';
+      if (getVal('hide-gdm-extension-button')) settings.hideButton = getVal('hide-gdm-extension-button') === 'true';
+    } catch (_) {}
+  }
 
   return {
     success: true,
     gseGdmInstalled: isInstalled,
     gseGdmPath: installPath,
     uuid: GSE_GDM_UUID,
+    availableBackgrounds,
     availableThemes,
     availableIcons,
-    availableBackgrounds,
     availableLogos,
-    hideButton
+    settings
   };
 }
 
 /**
- * Clones and runs the installer script for GSE-GDM Extension automatically
+ * 1-Click Install GSE-GDM Extension directly from project repo or pull latest
  */
 async function installGseGdmExtension() {
-  const cacheDir = path.join(os.homedir(), '.cache', 'themestudio');
-  if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-  const repoDir = path.join(cacheDir, 'gse-gdm-extension');
+  const localRepoDir = path.resolve(__dirname, '../../gse-gdm-extension');
+  const cacheRepoDir = path.join(os.homedir(), '.cache', 'themestudio', 'gse-gdm-extension');
 
-  // Clone or pull repo
-  const cloneCmd = fs.existsSync(repoDir)
-    ? `git -C "${repoDir}" pull`
-    : `git clone --depth 1 https://github.com/pratap-panabaka/gse-gdm-extension.git "${repoDir}"`;
+  let repoDir = fs.existsSync(localRepoDir) ? localRepoDir : cacheRepoDir;
 
-  try {
-    await new Promise((res, rej) => {
-      exec(cloneCmd, { timeout: 45000 }, (err) => (err ? rej(err) : res()));
-    });
-  } catch (err) {
-    return { success: false, error: `Failed to clone GSE-GDM repository: ${err.message}` };
+  if (!fs.existsSync(repoDir)) {
+    try {
+      await new Promise((res, rej) => {
+        exec(`git clone --depth 1 https://github.com/pratap-panabaka/gse-gdm-extension.git "${cacheRepoDir}"`, { timeout: 45000 }, (err) => (err ? rej(err) : res()));
+      });
+      repoDir = cacheRepoDir;
+    } catch (err) {
+      return { success: false, error: `Failed to clone repository: ${err.message}` };
+    }
   }
 
-  // Run installer via pkexec inside repoDir
-  const installCmd = `sh -c 'cd "${repoDir}" && chmod +x install.sh && ./install.sh'`;
-  const execRes = await execPkexec(installCmd);
-  if (!execRes.success) {
-    return execRes;
-  }
+  // Execute installer script + compile schemas into /usr/share/glib-2.0/schemas
+  const installCmd = `sh -c 'cd "${repoDir}" && chmod +x install.sh && ./install.sh && cp -f src/v-45-46-47-48-49-50/schemas/*.xml /usr/share/glib-2.0/schemas/ 2>/dev/null || true && glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true && dconf update'`;
+  
+  const res = await execPkexec(installCmd);
+  if (!res.success) return res;
 
-  const updatedStatus = await checkGdmStatus();
+  const status = await checkGdmStatus();
   return {
     success: true,
-    message: 'GSE-GDM Extension installed successfully!',
-    gseGdmInstalled: updatedStatus.gseGdmInstalled
+    message: 'GSE-GDM Extension installed and compiled successfully!',
+    gseGdmInstalled: status.gseGdmInstalled
   };
 }
 
 /**
- * Uninstalls GSE-GDM Extension cleanly
+ * 1-Click Clean Uninstall of GSE-GDM Extension
  */
 async function uninstallGseGdmExtension() {
-  const cacheDir = path.join(os.homedir(), '.cache', 'themestudio');
-  const repoDir = path.join(cacheDir, 'gse-gdm-extension');
+  const localRepoDir = path.resolve(__dirname, '../../gse-gdm-extension');
+  const cacheRepoDir = path.join(os.homedir(), '.cache', 'themestudio', 'gse-gdm-extension');
+  const repoDir = fs.existsSync(localRepoDir) ? localRepoDir : cacheRepoDir;
 
-  let uninstallCmd = '';
+  let cmd = `sh -c 'rm -rf "/usr/local/share/gnome-shell/extensions/${GSE_GDM_UUID}" "/usr/share/gnome-shell/extensions/${GSE_GDM_UUID}" "${DCONF_GDM_FILE}" "/etc/dconf/db/gdm.d/99-gdm-extension" && rm -f /usr/share/glib-2.0/schemas/org.gnome.shell.extensions.gdm-extension.gschema.xml && glib-compile-schemas /usr/share/glib-2.0/schemas/ 2>/dev/null || true && dconf update'`;
+  
   if (fs.existsSync(path.join(repoDir, 'uninstall.sh'))) {
-    uninstallCmd = `sh -c 'cd "${repoDir}" && chmod +x uninstall.sh && ./uninstall.sh'`;
-  } else {
-    uninstallCmd = `sh -c 'rm -rf "/usr/local/share/gnome-shell/extensions/${GSE_GDM_UUID}" "/usr/share/gnome-shell/extensions/${GSE_GDM_UUID}" "/etc/dconf/db/gdm.d/99-gdm-extension" && dconf update'`;
+    cmd = `sh -c 'cd "${repoDir}" && chmod +x uninstall.sh && ./uninstall.sh && rm -f "${DCONF_GDM_FILE}" && dconf update'`;
   }
 
-  return execPkexec(uninstallCmd);
+  return execPkexec(cmd);
 }
 
 /**
- * Enables login screen customization for the GDM session user
+ * Enable login screen customization for GDM session user
  */
 async function enableGdmCustomization() {
   const status = await checkGdmStatus();
   if (!status.gseGdmInstalled) {
-    return {
-      success: false,
-      needInstall: true,
-      error: 'GSE-GDM extension is not installed on this system.'
-    };
+    return { success: false, needInstall: true, error: 'GSE-GDM extension is not installed.' };
   }
 
-  // 1. Enable GSE-GDM & User-Themes in GDM session
-  const enableCmd = `sh -c 'sudo -u gdm dbus-run-session gnome-extensions enable ${GSE_GDM_UUID} && sudo -u gdm dbus-run-session gnome-extensions enable ${USER_THEMES_UUID}'`;
-  const res = await execPkexec(enableCmd);
+  const enableCmd = `sh -c 'sudo -u gdm dbus-run-session gnome-extensions enable ${GSE_GDM_UUID} 2>/dev/null || sudo -u gdm3 dbus-run-session gnome-extensions enable ${GSE_GDM_UUID} 2>/dev/null || true; sudo -u gdm dbus-run-session gnome-extensions enable ${USER_THEMES_UUID} 2>/dev/null || sudo -u gdm3 dbus-run-session gnome-extensions enable ${USER_THEMES_UUID} 2>/dev/null || true'`;
+  return execPkexec(enableCmd);
+}
 
-  if (!res.success) {
-    return res;
-  }
+/**
+ * Saves complete GDM settings into /etc/dconf/db/gdm.d/01-themestudio and updates dconf
+ * @param {object} cfg - Settings payload
+ */
+async function saveGdmFullSettings(cfg = {}) {
+  const bgPath = cfg.backgroundImage || '';
+  const blurRad = typeof cfg.blurRadius === 'number' ? cfg.blurRadius : 0;
+  const blurBright = typeof cfg.blurBrightness === 'number' ? cfg.blurBrightness : 0.65;
+  const bgSize = cfg.backgroundSize || 'cover';
+  const pColor = cfg.primaryColor || '#cf4110';
+  const sColor = cfg.secondaryColor || '#18181b';
+  const gradDir = cfg.gradientDirection || (bgPath ? 'none' : 'horizontal');
+  const themeName = cfg.shellTheme || '';
+  const iconName = cfg.iconTheme || '';
+  const logoPath = cfg.logo || '';
+  const bannerEnable = !!cfg.bannerMessageEnable;
+  const bannerText = cfg.bannerMessageText || '';
+  const showDate = cfg.clockShowDate !== false;
+  const showSec = !!cfg.clockShowSeconds;
+  const showWk = cfg.clockShowWeekday !== false;
+  const showBat = cfg.showBatteryPercentage !== false;
+  const tapClick = cfg.tapToClick !== false;
+  const hideBtn = !!cfg.hideButton;
+
+  // Build the complete multi-section dconf keyfile
+  const keyfileLines = [
+    `# Theme Studio GDM Configuration`,
+    `[org/gnome/shell/extensions/gdm-extension]`,
+    `background-image-path-1='${bgPath || 'none'}'`,
+    `blur-radius-1=${blurRad}`,
+    `blur-brightness-1=${blurBright}`,
+    `background-size-1='${bgSize}'`,
+    `primary-color-1='${pColor}'`,
+    `secondary-color-1='${sColor}'`,
+    `gradient-direction-1='${gradDir}'`,
+    `shell-theme='${themeName}'`,
+    `hide-gdm-extension-button=${hideBtn}`,
+    ``,
+    `[org/gnome/login-screen]`,
+    `banner-message-enable=${bannerEnable}`,
+    `banner-message-text='${bannerText}'`,
+    `logo='${logoPath}'`,
+    ``,
+    `[org/gnome/desktop/interface]`,
+    `clock-show-date=${showDate}`,
+    `clock-show-seconds=${showSec}`,
+    `clock-show-weekday=${showWk}`,
+    `show-battery-percentage=${showBat}`,
+    iconName ? `icon-theme='${iconName}'` : ``,
+    ``,
+    `[org/gnome/desktop/peripherals/touchpad]`,
+    `tap-to-click=${tapClick}`,
+    ``,
+    `[org/gnome/shell/extensions/user-theme]`,
+    `name='${themeName}'`,
+    ``,
+    `[org/gnome/desktop/background]`,
+    bgPath ? `picture-uri='file://${bgPath}'` : ``,
+    bgPath ? `picture-uri-dark='file://${bgPath}'` : ``
+  ].filter(l => l !== null);
+
+  const fileContent = keyfileLines.join('\n');
+  const tempPath = path.join(os.tmpdir(), `themestudio_gdm_${Date.now()}.conf`);
+  fs.writeFileSync(tempPath, fileContent, 'utf8');
+
+  // Copy keyfile to /etc/dconf/db/gdm.d/01-themestudio and compile schemas & dconf update
+  const applyCmd = `sh -c 'mkdir -p /etc/dconf/db/gdm.d && cp -f "${tempPath}" "${DCONF_GDM_FILE}" && rm -f "${tempPath}" && dconf update'`;
+  
+  const res = await execPkexec(applyCmd);
+  if (!res.success) return res;
 
   return {
     success: true,
-    message: 'GDM Login Screen customization successfully enabled!'
+    message: 'GDM Login Screen settings applied successfully!'
   };
-}
-
-/**
- * Updates full GSE-GDM configuration options in GDM dconf
- * @param {object} config - Settings object
- */
-async function updateGdmConfig(config = {}) {
-  const commands = [];
-
-  // 1. Background image
-  if (config.backgroundImage) {
-    const bgPath = config.backgroundImage.startsWith('/') ? config.backgroundImage : path.join('/usr/share/backgrounds', config.backgroundImage);
-    commands.push(`sudo -u gdm dbus-run-session gsettings set ${GDM_SCHEMA} background-image-path-1 "'${bgPath}'"`);
-    commands.push(`sudo -u gdm dbus-run-session gsettings set org.gnome.desktop.background picture-uri "'file://${bgPath}'"`);
-    commands.push(`sudo -u gdm dbus-run-session gsettings set org.gnome.desktop.background picture-uri-dark "'file://${bgPath}'"`);
-  }
-
-  // 2. Background size
-  if (config.backgroundSize) {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set ${GDM_SCHEMA} background-size-1 "'${config.backgroundSize}'"`);
-  }
-
-  // 3. Blur radius & brightness
-  if (typeof config.blurRadius === 'number') {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set ${GDM_SCHEMA} blur-radius-1 ${config.blurRadius}`);
-  }
-  if (typeof config.blurBrightness === 'number') {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set ${GDM_SCHEMA} blur-brightness-1 ${config.blurBrightness}`);
-  }
-
-  // 4. Gradient colors & direction
-  if (config.primaryColor) {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set ${GDM_SCHEMA} primary-color-1 "'${config.primaryColor}'"`);
-  }
-  if (config.secondaryColor) {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set ${GDM_SCHEMA} secondary-color-1 "'${config.secondaryColor}'"`);
-  }
-  if (config.gradientDirection) {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set ${GDM_SCHEMA} gradient-direction-1 "'${config.gradientDirection}'"`);
-  }
-
-  // 5. Shell theme
-  if (config.shellTheme) {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set ${GDM_SCHEMA} shell-theme "'${config.shellTheme}'"`);
-    commands.push(`sudo -u gdm dbus-run-session gsettings set org.gnome.shell.extensions.user-theme name "'${config.shellTheme}'"`);
-  }
-
-  // 6. Icon theme
-  if (config.iconTheme) {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set org.gnome.desktop.interface icon-theme "'${config.iconTheme}'"`);
-  }
-
-  // 7. Font name
-  if (config.fontName) {
-    commands.push(`sudo -u gdm dbus-run-session gsettings set org.gnome.desktop.interface font-name "'${config.fontName}'"`);
-  }
-
-  // 8. Hide / Show extension button on login screen (/etc/dconf/db/gdm.d/99-gdm-extension)
-  if (typeof config.hideButton === 'boolean') {
-    const dconfDir = '/etc/dconf/db/gdm.d';
-    const dconfFile = path.join(dconfDir, '99-gdm-extension');
-    const content = `[org/gnome/shell/extensions/gdm-extension]\nhide-gdm-extension-button=${config.hideButton}\n`;
-    commands.push(`mkdir -p ${dconfDir} && printf "%s" "${content.replace(/\n/g, '\\n')}" > ${dconfFile} && dconf update`);
-  }
-
-  if (commands.length === 0) {
-    return { success: true, message: 'No settings modified' };
-  }
-
-  const batchCmd = `sh -c '${commands.join(' && ')}'`;
-  return execPkexec(batchCmd);
-}
-
-/**
- * Sets the GDM Shell Theme under the `gdm` user session
- */
-async function setGdmShellTheme(themeName) {
-  if (!themeName) return { success: false, error: 'Theme name required' };
-  return updateGdmConfig({ shellTheme: themeName });
-}
-
-/**
- * Sets GDM Login Screen background image
- */
-async function setGdmBackground(bgPath) {
-  if (!bgPath) return { success: false, error: 'Background path required' };
-  return updateGdmConfig({ backgroundImage: bgPath });
 }
 
 /**
  * Resets GDM user session appearance dconf settings to system defaults
  */
 async function resetGdmToDefault() {
-  const resetCmd = `sh -c 'sudo -u gdm dbus-run-session gsettings reset org.gnome.shell.extensions.user-theme name && sudo -u gdm dbus-run-session gsettings reset org.gnome.desktop.background picture-uri && sudo -u gdm dbus-run-session gsettings reset org.gnome.desktop.background picture-uri-dark && sudo -u gdm dbus-run-session gsettings reset org.gnome.desktop.interface icon-theme && sudo -u gdm dbus-run-session gsettings reset-recursively ${GDM_SCHEMA} && rm -f /etc/dconf/db/gdm.d/99-gdm-extension && dconf update'`;
+  const resetCmd = `sh -c 'rm -f "${DCONF_GDM_FILE}" "/etc/dconf/db/gdm.d/99-gdm-extension" && dconf update && sudo -u gdm dbus-run-session gsettings reset org.gnome.shell.extensions.user-theme name 2>/dev/null || true'`;
   return execPkexec(resetCmd);
 }
 
@@ -279,12 +318,13 @@ module.exports = {
   installGseGdmExtension,
   uninstallGseGdmExtension,
   enableGdmCustomization,
-  updateGdmConfig,
-  setGdmShellTheme,
-  setGdmBackground,
+  saveGdmFullSettings,
+  updateGdmConfig: saveGdmFullSettings,
+  setGdmShellTheme: (name) => name ? saveGdmFullSettings({ shellTheme: name }) : Promise.resolve({ success: false, error: 'Theme name required' }),
+  setGdmBackground: (bg) => bg ? saveGdmFullSettings({ backgroundImage: bg }) : Promise.resolve({ success: false, error: 'Background path required' }),
   resetGdmToDefault,
   execPkexec,
   GSE_GDM_UUID,
   USER_THEMES_UUID,
-  GDM_SCHEMA
+  DCONF_GDM_FILE
 };

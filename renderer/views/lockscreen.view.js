@@ -1,5 +1,5 @@
 // renderer/views/lockscreen.view.js
-// Complete GDM Login / Lock Screen customization view: install/uninstall, blur, colors, themes, icons, background, button toggle
+// Complete GDM Login / Lock Screen Management Studio with refined minimalist UI
 
 const LockscreenView = {
   container: null,
@@ -46,165 +46,253 @@ const LockscreenView = {
     const availableBackgrounds = (this.gdmStatus && this.gdmStatus.availableBackgrounds) || [];
     const availableThemes = (this.gdmStatus && this.gdmStatus.availableThemes) || [];
     const availableIcons = (this.gdmStatus && this.gdmStatus.availableIcons) || [];
-    const hideButton = !!(this.gdmStatus && this.gdmStatus.hideButton);
+    const availableLogos = (this.gdmStatus && this.gdmStatus.availableLogos) || [];
+    const current = (this.gdmStatus && this.gdmStatus.settings) || {};
 
     const shellThemes = this.installedItems.filter(i => (i.category === 'shell-theme' || i.category === 'gtk-theme') && i.gdm_eligible !== false);
     const iconsAndCursors = this.installedItems.filter(i => (i.category === 'icon' || i.category === 'icon-theme' || i.category === 'cursor' || i.category === 'cursors'));
 
     this.container.innerHTML = `
       <div class="settings-view-container lockscreen-view-wrapper">
-        <!-- Top Banner -->
-        <div class="lockscreen-banner">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">
-            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-          <div>
-            <strong>GDM Login &amp; Lock Screen Manager</strong>
-            <p style="margin: 2px 0 0; font-size: 11.5px; opacity: 0.9;">
-              Customize GNOME login screen appearance, background blur, themes, icons, and logo. Changes require admin (sudo) authorization.
-            </p>
-          </div>
-        </div>
-
-        ${!isGseInstalled ? `
-          <!-- Setup Required Prompt Card -->
-          <div class="settings-section">
-            <div class="settings-card" style="border-left: 3px solid #cf4110; flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px 22px;">
-              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <div class="settings-option-title">
-                  <strong style="font-size: 14.5px; color: #18181b;">GSE-GDM Extension Setup Required</strong>
-                  <span class="badge-tag badge-script">Setup Needed</span>
-                </div>
-                <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 6px 12px; font-size: 11.5px;">
-                  Re-check Status
-                </button>
+        <!-- Top Banner / Extension Status Header -->
+        <div class="settings-section">
+          <div class="settings-card" style="padding: 16px 20px;">
+            <div class="settings-card-left">
+              <div class="settings-option-title">
+                <strong>GDM Login Screen Extension</strong>
+                <span class="badge-tag ${isGseInstalled ? 'badge-installed' : 'badge-script'}">
+                  ${isGseInstalled ? 'Installed &amp; Active' : 'Setup Needed'}
+                </span>
               </div>
-
-              <p class="settings-option-desc" style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); margin: 0;">
-                To customize the GDM login and lock screen appearance on GNOME 42+, the <strong>GSE-GDM Extension</strong> (<code>gdm-extension@pratap.fastmail.fm</code>) is required. You can install it in 1 click below:
+              <p class="settings-option-desc">
+                ${isGseInstalled 
+                  ? 'GSE-GDM integration is active. Customize background blur, welcome title, clock, and login behavior below.' 
+                  : 'Install the GSE-GDM extension in 1 click to enable background blur and visual customization on GNOME 42+.'}
               </p>
-
-              <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; align-items: center;">
+            </div>
+            <div class="settings-card-right" style="display: flex; gap: 8px;">
+              ${!isGseInstalled ? `
                 <button class="btn btn-primary" id="btn-clone-install-gdm" style="padding: 8px 16px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                   </svg>
-                  1-Click Clone &amp; Install GSE-GDM Extension
+                  1-Click Install GSE-GDM
                 </button>
-
-                <a href="https://github.com/pratap-panabaka/gse-gdm-extension" target="_blank" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 7px 13px;">
-                  View on GitHub ↗
-                </a>
-              </div>
-            </div>
-          </div>
-        ` : `
-          <!-- Integration Active & Life-cycle Card -->
-          <div class="settings-section">
-            <div class="settings-card" style="padding: 16px 20px;">
-              <div class="settings-card-left">
-                <div class="settings-option-title">
-                  <strong style="font-size: 14px;">GSE-GDM Extension Integration</strong>
-                  <span class="badge-tag badge-installed">Installed &amp; Active</span>
-                </div>
-                <p class="settings-option-desc">
-                  GSE-GDM extension is installed at <code>/usr/local/share/gnome-shell/extensions/${window.electronAPI.gdm ? 'gdm-extension@pratap.fastmail.fm' : ''}</code>.
-                </p>
-              </div>
-              <div class="settings-card-right" style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary" id="btn-recheck-gdm" style="padding: 7px 12px; font-size: 11.5px;">
+                  Re-check
+                </button>
+              ` : `
                 <button class="btn btn-primary" id="btn-enable-gdm-custom" style="padding: 7px 14px; font-size: 11.5px; background: #cf4110; color: #ffffff; border: none; font-weight: 600;">
                   Enable GDM Theming
                 </button>
                 <button class="btn btn-secondary" id="btn-uninstall-gse-gdm" style="padding: 7px 12px; font-size: 11.5px; color: #ef4444;" title="Uninstall GSE-GDM extension">
-                  Uninstall Extension
+                  Uninstall
                 </button>
+              `}
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1: Background & Blur Visual Studio (ALWAYS VISIBLE) -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Background &amp; Blur Effects</h3>
+          <p class="settings-section-desc">
+            Select login screen wallpaper, adjust blur radius and brightness, and configure image scaling.
+          </p>
+
+          <div class="settings-card lockscreen-form-card">
+            <!-- Wallpaper Image -->
+            <div class="lockscreen-form-row">
+              <div class="lockscreen-row-info">
+                <strong>Background Image</strong>
+                <span>Select wallpaper from <code>/usr/share/backgrounds</code></span>
+              </div>
+              <div class="lockscreen-row-control">
+                <select id="gdm-bg-select" class="form-select" style="min-width: 220px; max-width: 300px;">
+                  <option value="">(Default GNOME Background)</option>
+                  ${availableBackgrounds.map(bg => {
+                    const base = bg.split('/').pop();
+                    const isSel = current.backgroundImage === bg || current.backgroundImage.endsWith(base);
+                    return `<option value="${bg}" ${isSel ? 'selected' : ''}>${base}</option>`;
+                  }).join('')}
+                </select>
+              </div>
+            </div>
+
+            <!-- Blur Radius -->
+            <div class="lockscreen-form-row">
+              <div class="lockscreen-row-info">
+                <strong>Blur Radius</strong>
+                <span>Intensity of login screen blur (0px = disabled)</span>
+              </div>
+              <div class="lockscreen-slider-control">
+                <input type="range" id="gdm-blur-radius" min="0" max="100" value="${current.blurRadius || 0}">
+                <span id="lbl-blur-radius" class="slider-badge">${current.blurRadius || 0}px</span>
+              </div>
+            </div>
+
+            <!-- Blur Brightness -->
+            <div class="lockscreen-form-row">
+              <div class="lockscreen-row-info">
+                <strong>Blur Brightness</strong>
+                <span>Brightness level when blur is active</span>
+              </div>
+              <div class="lockscreen-slider-control">
+                <input type="range" id="gdm-blur-brightness" min="0" max="1" step="0.05" value="${current.blurBrightness || 0.65}">
+                <span id="lbl-blur-brightness" class="slider-badge">${current.blurBrightness || 0.65}</span>
+              </div>
+            </div>
+
+            <!-- Background Scaling -->
+            <div class="lockscreen-form-row">
+              <div class="lockscreen-row-info">
+                <strong>Scaling Mode</strong>
+                <span>Image fitting format on login screen</span>
+              </div>
+              <div class="lockscreen-row-control">
+                <select id="gdm-bg-size" class="form-select" style="min-width: 140px;">
+                  <option value="cover" ${current.backgroundSize === 'cover' ? 'selected' : ''}>Cover</option>
+                  <option value="contain" ${current.backgroundSize === 'contain' ? 'selected' : ''}>Contain</option>
+                  <option value="auto" ${current.backgroundSize === 'auto' ? 'selected' : ''}>Auto</option>
+                </select>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Section: Login Screen Visual Customizer -->
-          <div class="settings-section">
-            <h3 class="settings-section-title">Login Screen Visual Customization</h3>
-            <p class="settings-section-desc">
-              Configure background image, blur intensity, gradient colors, and lock screen settings directly in GDM dconf.
-            </p>
+        <!-- Section 2: Welcome Banner & Logo -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Welcome Banner Title &amp; Logo</h3>
+          <p class="settings-section-desc">
+            Display a custom welcome title message and brand logo on the GDM login screen.
+          </p>
 
-            <div class="settings-card" style="flex-direction: column; align-items: stretch; gap: 16px; padding: 18px 20px;">
-              <!-- Background Image -->
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-                <div>
-                  <strong style="font-size: 13px; color: #18181b;">Background Image</strong>
-                  <span style="font-size: 11.5px; color: var(--text-muted); display: block;">Select wallpaper from <code>/usr/share/backgrounds</code></span>
-                </div>
-                <select id="gdm-bg-select" class="form-select" style="padding: 6px 12px; border: 1px solid var(--border-card); border-radius: var(--radius); font-size: 12px; min-width: 200px;">
-                  <option value="">Default GNOME Background</option>
-                  ${availableBackgrounds.map(bg => `<option value="${bg}">${bg}</option>`).join('')}
+          <div class="settings-card lockscreen-form-card">
+            <!-- Banner Message Toggle -->
+            <div class="lockscreen-form-row">
+              <div class="lockscreen-row-info">
+                <strong>Show Banner Message Title</strong>
+                <span>Enable custom text greeting above login username</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="chk-gdm-banner-enable" ${current.bannerMessageEnable ? 'checked' : ''}>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <!-- Banner Text Input -->
+            <div class="lockscreen-form-row" id="banner-text-row">
+              <div class="lockscreen-row-info">
+                <strong>Banner Title Text</strong>
+                <span>Heading text displayed on login screen</span>
+              </div>
+              <div class="lockscreen-row-control" style="flex: 1; max-width: 320px;">
+                <input type="text" id="txt-gdm-banner" class="form-input" placeholder="e.g. Welcome to Ubuntu" value="${current.bannerMessageText || ''}" style="width: 100%; box-sizing: border-box;">
+              </div>
+            </div>
+
+            <!-- GDM Logo -->
+            <div class="lockscreen-form-row">
+              <div class="lockscreen-row-info">
+                <strong>Login Screen Logo</strong>
+                <span>Bottom logo icon from <code>/usr/share/pixmaps</code></span>
+              </div>
+              <div class="lockscreen-row-control">
+                <select id="gdm-logo-select" class="form-select" style="min-width: 220px; max-width: 300px;">
+                  <option value="">(Default System Logo)</option>
+                  ${availableLogos.map(logo => {
+                    const base = logo.split('/').pop();
+                    const isSel = current.logo === logo || current.logo.endsWith(base);
+                    return `<option value="${logo}" ${isSel ? 'selected' : ''}>${base}</option>`;
+                  }).join('')}
                 </select>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <div style="height: 1px; background: var(--border-subtle, #f4f4f5);"></div>
+        <!-- Section 3: Clock, Top Bar & Touchpad Controls -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">Clock, Status Bar &amp; Touchpad</h3>
+          <p class="settings-section-desc">
+            Configure clock format, battery indicator, and touchpad behavior on the login screen.
+          </p>
 
-              <!-- Blur Radius & Brightness -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div>
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                    <strong style="font-size: 12.5px; color: #18181b;">Blur Radius</strong>
-                    <span id="lbl-blur-radius" style="font-size: 11.5px; font-weight: 600; color: #cf4110;">0px</span>
-                  </div>
-                  <input type="range" id="gdm-blur-radius" min="0" max="100" value="0" style="width: 100%; accent-color: #cf4110;">
-                </div>
-
-                <div>
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                    <strong style="font-size: 12.5px; color: #18181b;">Blur Brightness</strong>
-                    <span id="lbl-blur-brightness" style="font-size: 11.5px; font-weight: 600; color: #cf4110;">0.65</span>
-                  </div>
-                  <input type="range" id="gdm-blur-brightness" min="0" max="1" step="0.05" value="0.65" style="width: 100%; accent-color: #cf4110;">
-                </div>
-              </div>
-
-              <div style="height: 1px; background: var(--border-subtle, #f4f4f5);"></div>
-
-              <!-- Background Size & Button Visibility -->
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-                <div>
-                  <strong style="font-size: 13px; color: #18181b;">Background Size</strong>
-                  <span style="font-size: 11.5px; color: var(--text-muted); display: block;">Image scaling mode on login screen</span>
-                </div>
-                <select id="gdm-bg-size" class="form-select" style="padding: 6px 12px; border: 1px solid var(--border-card); border-radius: var(--radius); font-size: 12px; min-width: 140px;">
-                  <option value="cover" selected>Cover</option>
-                  <option value="contain">Contain</option>
-                  <option value="auto">Auto</option>
-                </select>
-              </div>
-
-              <div style="height: 1px; background: var(--border-subtle, #f4f4f5);"></div>
-
-              <!-- Hide Button on Login Screen -->
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-                <div>
-                  <strong style="font-size: 13px; color: #18181b;">Hide Settings Button on Login Screen</strong>
-                  <span style="font-size: 11.5px; color: var(--text-muted); display: block;">Hides the GSE-GDM gear button from the GDM top bar</span>
+          <div class="settings-card lockscreen-form-card">
+            <div class="lockscreen-grid-2col">
+              <div class="lockscreen-form-row no-border">
+                <div class="lockscreen-row-info">
+                  <strong>Show Date in Clock</strong>
                 </div>
                 <label class="toggle-switch">
-                  <input type="checkbox" id="chk-hide-gdm-btn" ${hideButton ? 'checked' : ''}>
+                  <input type="checkbox" id="chk-gdm-clock-date" ${current.clockShowDate !== false ? 'checked' : ''}>
                   <span class="toggle-slider"></span>
                 </label>
               </div>
 
-              <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
-                <button class="btn btn-primary" id="btn-save-gdm-visuals" style="padding: 8px 18px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600;">
-                  Apply Visual Settings
-                </button>
+              <div class="lockscreen-form-row no-border">
+                <div class="lockscreen-row-info">
+                  <strong>Show Seconds in Clock</strong>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="chk-gdm-clock-seconds" ${current.clockShowSeconds ? 'checked' : ''}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="lockscreen-form-row no-border">
+                <div class="lockscreen-row-info">
+                  <strong>Show Weekday in Clock</strong>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="chk-gdm-clock-weekday" ${current.clockShowWeekday !== false ? 'checked' : ''}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="lockscreen-form-row no-border">
+                <div class="lockscreen-row-info">
+                  <strong>Show Battery Percentage</strong>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="chk-gdm-battery" ${current.showBatteryPercentage !== false ? 'checked' : ''}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="lockscreen-form-row no-border">
+                <div class="lockscreen-row-info">
+                  <strong>Tap-to-Click on Login</strong>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="chk-gdm-tap-click" ${current.tapToClick !== false ? 'checked' : ''}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="lockscreen-form-row no-border">
+                <div class="lockscreen-row-info">
+                  <strong>Hide Extension Gear Button</strong>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="chk-hide-gdm-btn" ${current.hideButton ? 'checked' : ''}>
+                  <span class="toggle-slider"></span>
+                </label>
               </div>
             </div>
           </div>
-        `}
+        </div>
 
-        <!-- Section: Shell Themes -->
+        <!-- Save Button Bar -->
+        <div class="lockscreen-save-bar">
+          <button class="btn btn-primary" id="btn-save-gdm-all">
+            Apply All Lock Screen Settings
+          </button>
+        </div>
+
+        <!-- Section 4: Shell Themes -->
         <div class="settings-section">
           <h3 class="settings-section-title">Lock Screen Shell Themes</h3>
           <p class="settings-section-desc">
@@ -213,7 +301,7 @@ const LockscreenView = {
 
           <div class="gdm-items-list">
             ${shellThemes.length === 0 ? `
-              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #fafafa; border: 1px dashed var(--border-card); border-radius: var(--radius);">
+              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius);">
                 No installed shell themes found. Install <strong>Orchis</strong> or <strong>WhiteSur</strong> from the Shell Themes tab first.
               </div>
             ` : shellThemes.map(theme => `
@@ -232,7 +320,7 @@ const LockscreenView = {
           </div>
         </div>
 
-        <!-- Section: Icons & Cursors -->
+        <!-- Section 5: Icons & Cursors -->
         <div class="settings-section">
           <h3 class="settings-section-title">System Icons &amp; Cursors for GDM</h3>
           <p class="settings-section-desc">
@@ -241,7 +329,7 @@ const LockscreenView = {
 
           <div class="gdm-items-list">
             ${iconsAndCursors.length === 0 ? `
-              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #fafafa; border: 1px dashed var(--border-card); border-radius: var(--radius);">
+              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius);">
                 No installed icons or cursors found. Install icons from the Icons/Cursors tabs first.
               </div>
             ` : iconsAndCursors.map(item => `
@@ -260,7 +348,7 @@ const LockscreenView = {
           </div>
         </div>
 
-        <!-- Section: Safety & Reset Recovery -->
+        <!-- Section 6: Safety & Reset Recovery -->
         <div class="settings-section">
           <h3 class="settings-section-title">Safety &amp; Recovery</h3>
           <div class="settings-card" style="border-left: 3px solid #71717a;">
@@ -286,7 +374,7 @@ const LockscreenView = {
   },
 
   bindEvents() {
-    // 0. Clone & Install GSE-GDM Extension (1-Click)
+    // 0. 1-Click Install GSE-GDM Extension
     const cloneInstallBtn = this.container.querySelector('#btn-clone-install-gdm');
     if (cloneInstallBtn) {
       cloneInstallBtn.addEventListener('click', async () => {
@@ -298,7 +386,7 @@ const LockscreenView = {
           </svg>
           Installing GSE-GDM...
         `;
-        showToast('Cloning & running GSE-GDM installer (requires admin password)...', 'info');
+        showToast('Installing GSE-GDM Extension (requires admin password)...', 'info');
 
         try {
           const res = await window.electronAPI.gdm.installGseGdm();
@@ -322,7 +410,7 @@ const LockscreenView = {
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              1-Click Clone &amp; Install GSE-GDM Extension
+              1-Click Install GSE-GDM
             `;
           }
         }
@@ -411,40 +499,60 @@ const LockscreenView = {
       });
     }
 
-    // 5. Apply Visual Settings
-    const saveVisualsBtn = this.container.querySelector('#btn-save-gdm-visuals');
-    if (saveVisualsBtn) {
-      saveVisualsBtn.addEventListener('click', async () => {
-        saveVisualsBtn.disabled = true;
-        saveVisualsBtn.textContent = 'Applying...';
-        showToast('Applying visual settings to GDM (requires admin password)...', 'info');
+    // 5. Apply All Settings
+    const saveAllBtn = this.container.querySelector('#btn-save-gdm-all');
+    if (saveAllBtn) {
+      saveAllBtn.addEventListener('click', async () => {
+        saveAllBtn.disabled = true;
+        saveAllBtn.textContent = 'Applying...';
+        showToast('Applying all Lock Screen settings to GDM dconf (requires admin password)...', 'info');
 
         const bgSelect = this.container.querySelector('#gdm-bg-select');
         const bgSizeSelect = this.container.querySelector('#gdm-bg-size');
+        const chkBannerEnable = this.container.querySelector('#chk-gdm-banner-enable');
+        const txtBanner = this.container.querySelector('#txt-gdm-banner');
+        const logoSelect = this.container.querySelector('#gdm-logo-select');
+        const chkClockDate = this.container.querySelector('#chk-gdm-clock-date');
+        const chkClockSec = this.container.querySelector('#chk-gdm-clock-seconds');
+        const chkClockWk = this.container.querySelector('#chk-gdm-clock-weekday');
+        const chkBattery = this.container.querySelector('#chk-gdm-battery');
+        const chkTapClick = this.container.querySelector('#chk-gdm-tap-click');
         const chkHideBtn = this.container.querySelector('#chk-hide-gdm-btn');
 
-        const config = {
-          backgroundImage: bgSelect ? bgSelect.value : undefined,
-          backgroundSize: bgSizeSelect ? bgSizeSelect.value : undefined,
-          blurRadius: blurRadiusInput ? parseInt(blurRadiusInput.value, 10) : undefined,
-          blurBrightness: blurBrightnessInput ? parseFloat(blurBrightnessInput.value) : undefined,
-          hideButton: chkHideBtn ? chkHideBtn.checked : undefined
+        const payload = {
+          backgroundImage: bgSelect ? bgSelect.value : '',
+          backgroundSize: bgSizeSelect ? bgSizeSelect.value : 'cover',
+          blurRadius: blurRadiusInput ? parseInt(blurRadiusInput.value, 10) : 0,
+          blurBrightness: blurBrightnessInput ? parseFloat(blurBrightnessInput.value) : 0.65,
+          bannerMessageEnable: chkBannerEnable ? chkBannerEnable.checked : false,
+          bannerMessageText: txtBanner ? txtBanner.value.trim() : '',
+          logo: logoSelect ? logoSelect.value : '',
+          clockShowDate: chkClockDate ? chkClockDate.checked : true,
+          clockShowSeconds: chkClockSec ? chkClockSec.checked : false,
+          clockShowWeekday: chkClockWk ? chkClockWk.checked : true,
+          showBatteryPercentage: chkBattery ? chkBattery.checked : true,
+          tapToClick: chkTapClick ? chkTapClick.checked : true,
+          hideButton: chkHideBtn ? chkHideBtn.checked : false
         };
 
         try {
-          const res = await window.electronAPI.gdm.updateConfig(config);
+          const res = await window.electronAPI.gdm.updateConfig(payload);
           if (res && res.success) {
-            showToast('Login Screen visual settings applied successfully!', 'success');
+            showToast('All Lock Screen settings applied successfully to GDM!', 'success');
+            await this.loadData();
+            this.renderUI();
           } else if (res && res.cancelled) {
-            showToast('Authentication cancelled.', 'info');
+            showToast('Administrator authentication was cancelled.', 'info');
           } else {
             showToast(`Update error: ${res ? res.error : 'Unknown error'}`, 'warning');
           }
         } catch (err) {
           showToast(`Error: ${err.message}`, 'warning');
         } finally {
-          saveVisualsBtn.disabled = false;
-          saveVisualsBtn.textContent = 'Apply Visual Settings';
+          if (saveAllBtn) {
+            saveAllBtn.disabled = false;
+            saveAllBtn.textContent = 'Apply All Lock Screen Settings';
+          }
         }
       });
     }
@@ -468,6 +576,8 @@ const LockscreenView = {
           const setRes = await window.electronAPI.gdm.setShellTheme({ themeName });
           if (setRes && setRes.success) {
             showToast(`${themeName} applied to GDM Login Screen!`, 'success');
+            await this.loadData();
+            this.renderUI();
           } else if (setRes && setRes.cancelled) {
             showToast('Authentication cancelled.', 'info');
           } else {
@@ -494,6 +604,8 @@ const LockscreenView = {
           const res = await window.electronAPI.gdm.copyAsset({ id, category: 'icon' });
           if (res && res.success) {
             showToast('Icons copied to /usr/share/icons for GDM!', 'success');
+            await this.loadData();
+            this.renderUI();
           } else if (res && res.cancelled) {
             showToast('Authentication cancelled.', 'info');
           } else {
@@ -520,6 +632,8 @@ const LockscreenView = {
           const res = await window.electronAPI.gdm.resetDefault();
           if (res && res.success) {
             showToast('GDM Lock Screen settings reset to default!', 'success');
+            await this.loadData();
+            this.renderUI();
           } else if (res && res.cancelled) {
             showToast('Authentication cancelled.', 'info');
           } else {
