@@ -1982,14 +1982,22 @@ input:checked + .toggle-slider:before {
 .lockscreen-view-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+  width: 100%;
+  padding-bottom: 40px;
+}
+
+.lockscreen-controls-group {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
 }
 
 .lockscreen-disabled-area {
-  opacity: 0.52;
+  opacity: 0.55;
   pointer-events: none;
-  filter: grayscale(0.2);
+  filter: grayscale(0.25);
   user-select: none;
   cursor: not-allowed;
   transition: opacity 0.2s ease;
@@ -2000,7 +2008,8 @@ input:checked + .toggle-slider:before {
   flex-direction: column !important;
   align-items: stretch !important;
   padding: 0 !important;
-  overflow: hidden;
+  overflow: visible !important;
+  position: relative;
   border-radius: var(--radius);
   border: 1px solid var(--border-card, #e4e4e7);
   background: #ffffff;
@@ -2013,6 +2022,19 @@ input:checked + .toggle-slider:before {
   padding: 14px 20px;
   border-bottom: 1px solid var(--border-subtle, #f4f4f5);
   gap: 16px;
+  position: relative;
+}
+
+.lockscreen-row-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lockscreen-custom-select .custom-select-menu {
+  z-index: 999999 !important;
+  background: #ffffff !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18) !important;
 }
 
 .lockscreen-form-row:last-child {

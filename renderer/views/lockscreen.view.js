@@ -1,5 +1,5 @@
 // renderer/views/lockscreen.view.js
-// Complete GDM Login / Lock Screen Management Studio with custom dropdowns & disabled state
+// Complete GDM Login / Lock Screen Management Studio with refined minimalist UI
 
 const LockscreenView = {
   container: null,
@@ -73,7 +73,7 @@ const LockscreenView = {
               <div class="settings-option-title">
                 <strong>GDM Login Screen Extension</strong>
                 <span class="badge-tag ${isGseInstalled ? 'badge-installed' : 'badge-script'}">
-                  ${isGseInstalled ? 'Installed &amp; Ready' : 'Setup Needed'}
+                  ${isGseInstalled ? 'Installed &amp; Active' : 'Setup Needed'}
                 </span>
               </div>
               <p class="settings-option-desc">
@@ -111,7 +111,7 @@ const LockscreenView = {
               Select login screen wallpaper, adjust blur radius and brightness, and configure image scaling.
             </p>
 
-            <div class="settings-card lockscreen-form-card">
+            <div class="settings-card lockscreen-form-card" style="z-index: 30;">
               <!-- Custom Wallpaper Dropdown -->
               <div class="lockscreen-form-row">
                 <div class="lockscreen-row-info">
@@ -124,7 +124,7 @@ const LockscreenView = {
                       <span class="custom-select-label">${curBgBase}</span>
                       <svg class="custom-select-arrow" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
-                    <div class="custom-select-menu" style="max-height: 220px; overflow-y: auto;">
+                    <div class="custom-select-menu">
                       <div class="custom-select-option ${!curBg ? 'selected' : ''}" data-value="" data-label="Default GNOME Background">
                         Default GNOME Background
                       </div>
@@ -196,7 +196,7 @@ const LockscreenView = {
               Display a custom welcome title message and brand logo on the GDM login screen.
             </p>
 
-            <div class="settings-card lockscreen-form-card">
+            <div class="settings-card lockscreen-form-card" style="z-index: 20;">
               <!-- Banner Message Toggle -->
               <div class="lockscreen-form-row">
                 <div class="lockscreen-row-info">
@@ -232,7 +232,7 @@ const LockscreenView = {
                       <span class="custom-select-label">${curLogoBase}</span>
                       <svg class="custom-select-arrow" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
-                    <div class="custom-select-menu" style="max-height: 220px; overflow-y: auto;">
+                    <div class="custom-select-menu">
                       <div class="custom-select-option ${!curLogo ? 'selected' : ''}" data-value="" data-label="(Default System Logo)">
                         (Default System Logo)
                       </div>
@@ -259,7 +259,7 @@ const LockscreenView = {
               Configure clock format, battery indicator, and touchpad behavior on the login screen.
             </p>
 
-            <div class="settings-card lockscreen-form-card">
+            <div class="settings-card lockscreen-form-card" style="z-index: 10;">
               <div class="lockscreen-grid-2col">
                 <div class="lockscreen-grid-cell">
                   <span class="lockscreen-cell-label">Show Date in Clock</span>
@@ -309,14 +309,14 @@ const LockscreenView = {
                   </label>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Save Button Bar -->
-          <div class="lockscreen-save-bar">
-            <button class="btn btn-primary" id="btn-save-gdm-all" ${!isGseInstalled ? 'disabled' : ''}>
-              Apply All Lock Screen Settings
-            </button>
+              <!-- Dedicated Card Action Footer -->
+              <div class="lockscreen-form-row" style="background: #fafafa; padding: 14px 20px; justify-content: flex-end; border-top: 1px solid var(--border-subtle, #f4f4f5);">
+                <button class="btn btn-primary" id="btn-save-gdm-all" ${!isGseInstalled ? 'disabled' : ''} style="padding: 8px 22px; font-size: 12px; background: #cf4110; color: #ffffff; border: none; font-weight: 600; border-radius: var(--radius); cursor: pointer;">
+                  Apply All Lock Screen Settings
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -412,9 +412,15 @@ const LockscreenView = {
         trigger.addEventListener('click', (e) => {
           e.stopPropagation();
           const isOpen = selectEl.classList.contains('is-open');
-          customSelects.forEach(s => s.classList.remove('is-open'));
+          customSelects.forEach(s => {
+            s.classList.remove('is-open');
+            const parentRow = s.closest('.lockscreen-form-row');
+            if (parentRow) parentRow.style.zIndex = '';
+          });
           if (!isOpen) {
             selectEl.classList.add('is-open');
+            const parentRow = selectEl.closest('.lockscreen-form-row');
+            if (parentRow) parentRow.style.zIndex = '1000';
           }
         });
       }
@@ -430,6 +436,8 @@ const LockscreenView = {
           selectEl.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
           optEl.classList.add('selected');
           selectEl.classList.remove('is-open');
+          const parentRow = selectEl.closest('.lockscreen-form-row');
+          if (parentRow) parentRow.style.zIndex = '';
         });
       });
     });
@@ -437,7 +445,11 @@ const LockscreenView = {
     // Close dropdowns on outside click
     document.addEventListener('click', () => {
       if (this.container) {
-        this.container.querySelectorAll('.lockscreen-custom-select').forEach(s => s.classList.remove('is-open'));
+        this.container.querySelectorAll('.lockscreen-custom-select').forEach(s => {
+          s.classList.remove('is-open');
+          const parentRow = s.closest('.lockscreen-form-row');
+          if (parentRow) parentRow.style.zIndex = '';
+        });
       }
     });
 
