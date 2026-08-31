@@ -334,7 +334,7 @@ const LockscreenView = {
 
           <div class="gdm-items-list">
             ${shellThemes.length === 0 ? `
-              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius-lg);">
+              <div class="gdm-empty-card">
                 No installed shell themes found. Install <strong>Orchis</strong> or <strong>WhiteSur</strong> from the Shell Themes tab first.
               </div>
             ` : shellThemes.map(theme => `
@@ -362,7 +362,7 @@ const LockscreenView = {
 
           <div class="gdm-items-list">
             ${iconsAndCursors.length === 0 ? `
-              <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius-lg);">
+              <div class="gdm-empty-card">
                 No installed icons or cursors found. Install icons from the Icons/Cursors tabs first.
               </div>
             ` : iconsAndCursors.map(item => `
